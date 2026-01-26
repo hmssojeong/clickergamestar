@@ -1,0 +1,90 @@
+using UnityEngine;
+using TMPro;
+using DG.Tweening;
+
+/// <summary>
+/// 클릭 시 떠오르는 데미지/점수 텍스트
+/// </summary>
+public class FloatingText : MonoBehaviour
+{
+    [Header("Settings")]
+    [SerializeField] private TextMeshProUGUI _text;
+    [SerializeField] private float _floatDuration = 1f;
+    [SerializeField] private float _floatHeight = 2f;
+    [SerializeField] private Ease _floatEase = Ease.OutQuad;
+
+    [Header("Colors")]
+    [SerializeField] private Color _normalColor = Color.white;
+    [SerializeField] private Color _criticalColor = Color.red;
+
+    private Canvas _canvas;
+    private RectTransform _rectTransform;
+
+    private void Awake()
+    {
+        _canvas = GetComponentInParent<Canvas>();
+        _rectTransform = GetComponent<RectTransform>();
+        
+        if (_text == null)
+            _text = GetComponent<TextMeshProUGUI>();
+    }
+
+    /// <summary>
+    /// 플로팅 텍스트 초기화 및 재생
+    /// </summary>
+    public void Initialize(string text, Vector3 worldPosition, bool isCritical = false)
+    {
+        _text.text = text;
+        _text.color = isCritical ? _criticalColor : _normalColor;
+
+        // 월드 좌표를 스크린 좌표로 변환
+        Vector2 screenPosition = RectTransformUtility.WorldToScreenPoint(
+            Camera.main,
+            worldPosition
+        );
+
+        // 스크린 좌표를 캔버스 좌표로 변환
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            _canvas.transform as RectTransform,
+            screenPosition,
+            _canvas.worldCamera,
+            out Vector2 localPoint
+        );
+
+        _rectTransform.localPosition = localPoint;
+
+        // 애니메이션 재생
+        PlayAnimation();
+    }
+
+    /// <summary>
+    /// 떠오르는 애니메이션
+    /// </summary>
+    private void PlayAnimation()
+    {
+        // 위로 떠오름
+        _rectTransform.DOAnchorPosY(_rectTransform.anchoredPosition.y + _floatHeight * 100f, _floatDuration)
+            .SetEase(_floatEase);
+
+        // 페이드 아웃
+        _text.DOFade(0f, _floatDuration)
+            .SetEase(Ease.InQuad);
+
+        // 스케일 애니메이션 (선택)
+        transform.localScale = Vector3.zero;
+        transform.DOScale(Vector3.one, 0.2f)
+            .SetEase(Ease.OutBack);
+
+        // 애니메이션 완료 후 삭제
+        Destroy(gameObject, _floatDuration);
+    }
+
+    /// <summary>
+    /// 랜덤 방향으로 조금 움직이기
+    /// </summary>
+    public void AddRandomOffset()
+    {
+        float randomX = Random.Range(-50f, 50f);
+        _rectTransform.anchoredPosition += new Vector2(randomX, 0);
+    }
+}
