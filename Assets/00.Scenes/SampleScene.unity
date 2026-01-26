@@ -811,7 +811,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FloatingTextManager
   _floatingTextPrefab: {fileID: 0}
-  _canvasTransform: {fileID: 0}
+  _canvasTransform: {fileID: 477619758}
   _maxPoolSize: 20
 --- !u!4 &357336830
 Transform:
