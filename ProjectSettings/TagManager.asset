@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - Clickable
+  - Collector
   layers:
   - Default
   - TransparentFX
