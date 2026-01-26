@@ -1,33 +1,32 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using UnityEngine;
 
 public class AutoClicker : MonoBehaviour
 {
-    // ¿ªÇÒ: Á¤ÇØÁø ½Ã°£ °£°İ¸¶´Ù ClickableÇÑ Ä£±¸¸¦ ¶§¸°´Ù.
-    [SerializeField] private int _damage;           // ´ë¹ÌÁö
-    [SerializeField] private float _interval;       // ½Ã°£ °£°İ
+    // ì—­í• : ì •í•´ì§„ ì‹œê°„ ê°„ê²©ë§ˆë‹¤ Clickableí•œ ì¹œêµ¬ë¥¼ ë•Œë¦°ë‹¤.
+    [SerializeField] private float _interval;       // ì‹œê°„ ê°„ê²©
     private float _timer;
 
     private void Update()
     {
         _timer += Time.deltaTime;
 
-        if (_timer >= _interval)  // 1. ½Ã°£ °£°İ¸¶´Ù.
+        if (_timer >= _interval)  // 1. ì‹œê°„ ê°„ê²©ë§ˆë‹¤.
         {
             _timer = 0f;
 
 
-            // 2. Clickable °ÔÀÓ ¿ÀºêÁ§Æ®¸¦ ¸ğµÎ Ã£¾Æ¿Í¼­ (¿©·¯ºĞµéÀº Ä³½ÌÇÏ¼¼¿ä.)
+            // 2. Clickable ê²Œì„ ì˜¤ë¸Œì íŠ¸ë¥¼ ëª¨ë‘ ì°¾ì•„ì™€ì„œ (ì—¬ëŸ¬ë¶„ë“¤ì€ ìºì‹±í•˜ì„¸ìš”.)
             GameObject[] clickables = GameObject.FindGameObjectsWithTag("Clickable");
             // GameObject[] clickables = ClickTargetManager.Instance.GetActiveTargets();
             foreach (GameObject clickable in clickables)
             {
-                // 3. Å¬¸¯ÇÑ´Ù.
+                // 3. í´ë¦­í•œë‹¤.
                 Clickable clickableScript = clickable.GetComponent<Clickable>();
                 ClickInfo clickInfo = new ClickInfo
                 {
                     Type = EClickType.Auto,
-                    Damage = _damage,
+                    Damage = GameManager.Instance.AutoDamage
                 };
 
                 clickableScript.OnClick(clickInfo);

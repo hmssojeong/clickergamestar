@@ -8,7 +8,7 @@ public class ColorFlashFeedback : MonoBehaviour, IFeedback
     [SerializeField] private SpriteRenderer _spriteRenderer;
     [SerializeField] private Color _flashColor;
 
-    public void Play()
+    public void Play(ClickInfo clickInfo)
     {
         if (_coroutine != null)
         {

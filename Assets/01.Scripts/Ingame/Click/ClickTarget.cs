@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class ClickTarget : MonoBehaviour, Clickable
 {
@@ -7,8 +7,14 @@ public class ClickTarget : MonoBehaviour, Clickable
 
     public bool OnClick(ClickInfo clickInfo)
     {
-        // S: ÇÑ Å¬·¡½º´Â ÇÏ³ªÀÇ ¿ªÇÒ/Ã¥ÀÓ¸¸ °¡ÁöÀÚ
-        Debug.Log($"{_name}: ´ÙÀ½ºÎÅÍ´Â ´ÊÁö ¾Ê°Ú½À´Ï´Ù.");
+        // S: í•œ í´ë˜ìŠ¤ëŠ” í•˜ë‚˜ì˜ ì—­í• /ì±…ì„ë§Œ ê°€ì§€ì
+        Debug.Log($"{_name}: ë‹¤ìŒë¶€í„°ëŠ” ëŠ¦ì§€ ì•Šê² ìŠµë‹ˆë‹¤.");
+
+        var feedbacks = GetComponentsInChildren<IFeedback>();
+        foreach (var feedback in feedbacks)
+        {
+            feedback.Play(clickInfo);
+        }
 
         return true;
     }
