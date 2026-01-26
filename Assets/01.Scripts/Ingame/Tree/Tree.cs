@@ -1,9 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// 클릭 가능한 나무 오브젝트
-/// 클릭하면 사과를 떨어뜨리고 점수를 증가시킵니다
-/// </summary>
 public class Tree : MonoBehaviour, Clickable
 {
     [Header("Tree Settings")]
@@ -23,11 +19,11 @@ public class Tree : MonoBehaviour, Clickable
     private void Start()
     {
         _currentHealth = _maxHealth;
+
+        // 초기 체력바 업데이트
+        UpdateHealthBar();
     }
 
-    /// <summary>
-    /// 클릭 시 호출되는 메서드
-    /// </summary>
     public bool OnClick(ClickInfo clickInfo)
     {
         // 1. 데미지 적용
@@ -37,19 +33,22 @@ public class Tree : MonoBehaviour, Clickable
         int appleScore = clickInfo.Damage; // 데미지만큼 사과 추가
         GameManager.Instance.AddApples(appleScore);
 
-        // 3. 사과 떨어뜨리기 (수동 클릭만)
+        // 3. 체력바 UI 업데이트 ⭐ 추가!
+        UpdateHealthBar();
+
+        // 4. 사과 떨어뜨리기 (수동 클릭만)
         if (clickInfo.Type == EClickType.Manual)
         {
             DropApple(clickInfo.Position);
         }
 
-        // 4. 피드백 실행
+        // 5. 피드백 실행
         PlayFeedbacks(clickInfo);
 
-        // 5. 파티클 효과
+        // 6. 파티클 효과
         PlayParticleEffects(clickInfo);
 
-        // 6. 나무가 죽었는지 체크
+        // 7. 나무가 죽었는지 체크
         if (_currentHealth <= 0)
         {
             RespawnTree();
@@ -58,20 +57,17 @@ public class Tree : MonoBehaviour, Clickable
         return true;
     }
 
-    /// <summary>
-    /// 사과를 떨어뜨립니다
-    /// </summary>
     private void DropApple(Vector2 clickPosition)
     {
         if (_applePrefab == null) return;
 
         // 클릭 위치에 가장 가까운 스폰 포인트 찾기
         Transform spawnPoint = GetClosestSpawnPoint(clickPosition);
-        
+
         if (spawnPoint != null)
         {
             GameObject apple = Instantiate(_applePrefab, spawnPoint.position, Quaternion.identity);
-            
+
             // 사과에 물리 적용 (Rigidbody2D가 있다면)
             Rigidbody2D rb = apple.GetComponent<Rigidbody2D>();
             if (rb != null)
@@ -85,9 +81,7 @@ public class Tree : MonoBehaviour, Clickable
         }
     }
 
-    /// <summary>
-    /// 클릭 위치에 가장 가까운 스폰 포인트 반환
-    /// </summary>
+    // 클릭 위치에 가장 가까운 스폰 포인트 반환
     private Transform GetClosestSpawnPoint(Vector2 clickPosition)
     {
         if (_appleSpawnPoints == null || _appleSpawnPoints.Length == 0)
@@ -109,9 +103,6 @@ public class Tree : MonoBehaviour, Clickable
         return closest;
     }
 
-    /// <summary>
-    /// 모든 피드백을 실행합니다
-    /// </summary>
     private void PlayFeedbacks(ClickInfo clickInfo)
     {
         var feedbacks = GetComponentsInChildren<IFeedback>();
@@ -121,9 +112,6 @@ public class Tree : MonoBehaviour, Clickable
         }
     }
 
-    /// <summary>
-    /// 파티클 효과를 재생합니다
-    /// </summary>
     private void PlayParticleEffects(ClickInfo clickInfo)
     {
         // 클릭 이펙트 파티클
@@ -140,24 +128,34 @@ public class Tree : MonoBehaviour, Clickable
         }
     }
 
-    /// <summary>
-    /// 나무를 리스폰합니다
-    /// </summary>
+    // 체력바 UI를 업데이트
+    private void UpdateHealthBar()
+    {
+        float healthPercent = GetHealthPercent();
+
+        // UIManager에게 체력 업데이트 알림
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.UpdateTreeHealth(healthPercent);
+        }
+    }
+
+    // 나무를 리스폰합니다
     private void RespawnTree()
     {
         _currentHealth = _maxHealth;
-        
+
+        // 체력바 UI 업데이트
+        UpdateHealthBar();
+
         // 나무 리스폰 이벤트 (보너스 점수, 특별 효과 등)
         GameManager.Instance.OnTreeRespawn();
-        
+
         Debug.Log($"{_treeName} 리스폰!");
     }
 
-    /// <summary>
-    /// 현재 체력 퍼센트 반환 (UI 표시용)
-    /// </summary>
     public float GetHealthPercent()
     {
-        return (float)_currentHealth / _maxHealth;
+        return ((float)_currentHealth / _maxHealth) * 100f;
     }
 }

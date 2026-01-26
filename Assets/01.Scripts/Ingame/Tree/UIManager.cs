@@ -3,10 +3,6 @@ using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
 
-/// <summary>
-/// 게임 UI를 관리하는 매니저
-/// 사과 점수, 업그레이드 버튼 등을 표시합니다
-/// </summary>
 public class UIManager : MonoBehaviour
 {
     public static UIManager Instance;
@@ -32,7 +28,7 @@ public class UIManager : MonoBehaviour
     [Header("Tree Health UI")]
     [SerializeField] private Slider _treeHealthSlider;
     [SerializeField] private Image _healthFillImage;
-    [SerializeField] private Gradient _healthColorGradient; // 체력에 따른 색상 변화
+    [SerializeField] private Gradient _healthColorGradient;
 
     [Header("Popup UI")]
     [SerializeField] private GameObject _upgradePanel;
@@ -56,7 +52,6 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
-        // 게임 매니저 이벤트 구독
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnAppleChanged.AddListener(UpdateAppleScore);
@@ -73,9 +68,6 @@ public class UIManager : MonoBehaviour
         UpdateAllUI();
     }
 
-    /// <summary>
-    /// 사과 점수 UI 업데이트
-    /// </summary>
     private void UpdateAppleScore(int score)
     {
         if (_appleScoreText != null)
@@ -87,15 +79,13 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 점수 증가 애니메이션
-    /// </summary>
     private void AnimateScoreIncrease()
     {
         if (_appleScoreTransform == null) return;
 
         // DOTween으로 펀치 애니메이션
-        _appleScoreTransform.DOKill();
+        _appleScoreTransform.DOKill(true);
+
         _appleScoreTransform.DOPunchScale(Vector3.one * (_scorePunchScale - 1f), _scoreAnimationDuration, 1, 0.5f);
 
         // 아이콘 회전
@@ -106,9 +96,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 수동 데미지 UI 업데이트
-    /// </summary>
+    // 수동
     private void UpdateManualDamage(int damage)
     {
         if (_manualDamageText != null)
@@ -119,9 +107,7 @@ public class UIManager : MonoBehaviour
         UpdateUpgradeButtons();
     }
 
-    /// <summary>
-    /// 자동 데미지 UI 업데이트
-    /// </summary>
+    // 자동
     private void UpdateAutoDamage(int damage)
     {
         if (_autoDamageText != null)
@@ -132,9 +118,7 @@ public class UIManager : MonoBehaviour
         UpdateUpgradeButtons();
     }
 
-    /// <summary>
-    /// 업그레이드 버튼 UI 업데이트
-    /// </summary>
+    // 업그레이드 버튼 UI 업데이트
     private void UpdateUpgradeButtons()
     {
         var gm = GameManager.Instance;
@@ -168,9 +152,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 나무 체력 UI 업데이트
-    /// </summary>
+    // 나무 체력 UI 업데이트
     public void UpdateTreeHealth(float healthPercent)
     {
         if (_treeHealthSlider != null)
@@ -180,14 +162,12 @@ public class UIManager : MonoBehaviour
             // 체력에 따른 색상 변화
             if (_healthFillImage != null && _healthColorGradient != null)
             {
-                _healthFillImage.color = _healthColorGradient.Evaluate(healthPercent);
+                float normalizedHealth = healthPercent / 100f; // 0~100을 0~1로 변환
+                _healthFillImage.color = _healthColorGradient.Evaluate(normalizedHealth);
             }
         }
     }
 
-    /// <summary>
-    /// 모든 UI 업데이트
-    /// </summary>
     public void UpdateAllUI()
     {
         var gm = GameManager.Instance;
@@ -205,9 +185,7 @@ public class UIManager : MonoBehaviour
         UpdateUpgradeButtons();
     }
 
-    /// <summary>
-    /// 수동 업그레이드 버튼 클릭
-    /// </summary>
+    // 수동 업그레이드 버튼 클릭
     private void OnManualUpgradeClicked()
     {
         if (GameManager.Instance.UpgradeManualDamage())
@@ -222,9 +200,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 자동 업그레이드 버튼 클릭
-    /// </summary>
+    // 자동 업그레이드 버튼 클릭
     private void OnAutoUpgradeClicked()
     {
         if (GameManager.Instance.UpgradeAutoDamage())
@@ -237,9 +213,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 자동 클리커 구매 버튼 클릭
-    /// </summary>
+    // 자동 클리커 구매 버튼 클릭
     private void OnBuyAutoClickerClicked()
     {
         if (GameManager.Instance.BuyAutoClicker())
@@ -252,32 +226,26 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 업그레이드 성공 효과
-    /// </summary>
+    // 업그레이드 성공 효과
     private void PlayUpgradeSuccessEffect(Transform buttonTransform)
     {
         buttonTransform.DOPunchScale(Vector3.one * 0.2f, 0.3f, 1, 0.5f);
-        
+
         // 파티클이나 사운드 재생
         // EffectManager.Instance.PlayUpgradeSuccess();
     }
 
-    /// <summary>
-    /// 업그레이드 실패 효과 (돈 부족)
-    /// </summary>
+    // 업그레이드 실패 효과 (돈 부족)
     private void PlayUpgradeFailEffect(Transform buttonTransform)
     {
         // 좌우 흔들림
         buttonTransform.DOShakePosition(0.5f, 10f, 20, 90f);
-        
+
         // 사운드 재생
         // AudioManager.Instance.PlayFailSound();
     }
 
-    /// <summary>
-    /// 업그레이드 패널 토글
-    /// </summary>
+    // 업그레이드 패널 토글
     public void ToggleUpgradePanel()
     {
         if (_upgradePanel != null)
@@ -292,9 +260,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 설정 패널 토글
-    /// </summary>
+    // 설정 패널 토글
     public void ToggleSettingsPanel()
     {
         if (_settingsPanel != null)
@@ -303,9 +269,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 데미지 텍스트 표시 (나무 위에 떠오르는 효과)
-    /// </summary>
+    // 데미지 텍스트 표시 (나무 위에 떠오르는 효과)
     public void ShowDamageText(Vector3 position, int damage)
     {
         // TODO: Floating Text 프리팹을 사용하여 데미지 표시
