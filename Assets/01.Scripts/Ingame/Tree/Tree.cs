@@ -9,6 +9,7 @@ public class Tree : MonoBehaviour, Clickable
 
     [Header("Apple Drop Settings")]
     [SerializeField] private GameObject _applePrefab;
+    [SerializeField] private GameObject _goldApplePrefab;
     [SerializeField] private Transform[] _appleSpawnPoints; // 사과가 떨어지는 위치들
     [SerializeField] private float _appleDropForce = 5f;
 
@@ -102,14 +103,23 @@ public class Tree : MonoBehaviour, Clickable
     {
         if (_applePrefab == null) return;
 
-        // 클릭 위치에 가장 가까운 스폰 포인트 찾기
+        GameObject prefabToSpawn = _applePrefab;
+
+        if (FeverManager.Instance != null && FeverManager.Instance.IsFeverActive)
+        {
+            // 피버 타임이면 골드 사과 프리팹 사용
+            // 만약 골드 사과 프리팹이 할당되지 않았다면 일반 사과를 사용하도록 방어 코드 작성
+            prefabToSpawn = (_goldApplePrefab != null) ? _goldApplePrefab : _applePrefab;
+        }
+
+        if (prefabToSpawn == null) return;
+
         Transform spawnPoint = GetClosestSpawnPoint(clickPosition);
 
         if (spawnPoint != null)
         {
-            GameObject apple = Instantiate(_applePrefab, spawnPoint.position, Quaternion.identity);
+            GameObject apple = Instantiate(prefabToSpawn, spawnPoint.position, Quaternion.identity);
 
-            // 사과에 물리 적용 (Rigidbody2D가 있다면)
             Rigidbody2D rb = apple.GetComponent<Rigidbody2D>();
             if (rb != null)
             {
@@ -117,7 +127,6 @@ public class Tree : MonoBehaviour, Clickable
                 rb.AddForce(dropDirection * _appleDropForce, ForceMode2D.Impulse);
             }
 
-            // 사과는 2초 후 자동 삭제
             Destroy(apple, 2f);
         }
     }

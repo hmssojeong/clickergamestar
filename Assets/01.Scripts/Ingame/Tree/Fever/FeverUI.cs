@@ -32,6 +32,11 @@ public class FeverUI : MonoBehaviour
     [SerializeField] private Color _feverSkyColor = new Color32(0x54, 0x59, 0x7B, 0xFF);
     [SerializeField] private float _colorTransitionDuration = 0.5f; // 색 변화 시간
 
+    [Header("Rain Particle Settings")]
+    [SerializeField] private ParticleSystem _rainFallParticle;
+    [SerializeField] private ParticleSystem _rainMistParticle;
+    [SerializeField] private float _fadeDuration = 0.5f;
+
     private void Start()
     {
         if (FeverManager.Instance != null)
@@ -73,7 +78,7 @@ public class FeverUI : MonoBehaviour
             // 게이지 텍스트 업데이트
             if (_gaugeText != null)
             {
-                _gaugeText.text = $"{currentClicks} / {maxClicks}";
+                _gaugeText.text = $"수동 클릭: {currentClicks} / {maxClicks}";
             }
 
             // 게이지 꽉 차면 펄스 애니메이션
@@ -120,7 +125,6 @@ public class FeverUI : MonoBehaviour
         if (_gaugeText != null)
         {
             _gaugeText.text = "FEVER";
-            // 텍스트가 강조되도록 살짝 흔들리거나 색상을 바꾸는 효과를 추가할 수도 있습니다.
             _gaugeText.transform.DOShakePosition(0.5f, 5f);
         }
 
@@ -161,6 +165,9 @@ public class FeverUI : MonoBehaviour
         {
             _skyBottom.DOColor(_feverSkyColor, _colorTransitionDuration);
         }
+
+        FadeParticle(_rainFallParticle, 1f);
+        FadeParticle(_rainMistParticle, 1f);
     }
 
     // 피버 종료 시 호출
@@ -194,6 +201,24 @@ public class FeverUI : MonoBehaviour
         {
             _skyBottom.DOColor(Color.white, _colorTransitionDuration);
         }
+
+        FadeParticle(_rainFallParticle, 0f);
+        FadeParticle(_rainMistParticle, 0f);
+    }
+
+    private void FadeParticle(ParticleSystem ps, float targetAlpha)
+    {
+        if (ps == null) return;
+
+        // 파티클의 메인 모듈에 접근
+        var main = ps.main;
+        Color color = main.startColor.color;
+
+        // DOTween을 사용하여 컬러의 알파값만 부드럽게 변경
+        DOTween.To(() => color.a, x => {
+            color.a = x;
+            main.startColor = color;
+        }, targetAlpha, _fadeDuration);
     }
 
     private void OnDestroy()

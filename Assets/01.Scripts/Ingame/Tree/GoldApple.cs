@@ -1,38 +1,36 @@
-using UnityEngine;
 using DG.Tweening;
+using UnityEngine;
 
-public class Apple : MonoBehaviour
+public class GoldApple : MonoBehaviour
 {
     [Header("Visual Settings")]
     [SerializeField] private SpriteRenderer _spriteRenderer;
     [SerializeField] private float _rotationSpeed = 200f;
-    
+
     [Header("Animation")]
     [SerializeField] private float _spawnScaleDuration = 0.3f;
     [SerializeField] private Ease _spawnEase = Ease.OutBack;
 
-    private Vector3 _targetScale;
-
     private Rigidbody2D _rb;
     private bool _isCollected = false;
+
+    private Vector3 _targetScale;
 
     private void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
         _targetScale = transform.localScale;
         if (_spriteRenderer == null)
-        { 
             _spriteRenderer = GetComponent<SpriteRenderer>();
-        }
     }
 
     private void Start()
     {
-        // ìŠ¤í° ì• ë‹ˆë©”ì´ì…˜
+        // ½ºÆù ¾Ö´Ï¸ŞÀÌ¼Ç
         transform.localScale = Vector3.zero;
         transform.DOScale(_targetScale, _spawnScaleDuration).SetEase(_spawnEase);
 
-        // ëœë¤ íšŒì „ ì¶”ê°€
+        // ·£´ı È¸Àü Ãß°¡
         if (_rb != null)
         {
             _rb.angularVelocity = Random.Range(-_rotationSpeed, _rotationSpeed);
@@ -41,7 +39,7 @@ public class Apple : MonoBehaviour
 
     private void Update()
     {
-        // í™”ë©´ ë°–ìœ¼ë¡œ ë‚˜ê°€ë©´ ì‚­ì œ
+        // È­¸é ¹ÛÀ¸·Î ³ª°¡¸é »èÁ¦
         if (transform.position.y < -10f)
         {
             Destroy(gameObject);
@@ -50,41 +48,41 @@ public class Apple : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        // ë°”ìŠ¤ì¼“ì´ë‚˜ ìˆ˜ì§‘ ì˜ì—­ì— ë‹¿ìœ¼ë©´ ìˆ˜ì§‘
+        // ¹Ù½ºÄÏÀÌ³ª ¼öÁı ¿µ¿ª¿¡ ´êÀ¸¸é ¼öÁı
         if (other.CompareTag("Collector") && !_isCollected)
         {
             CollectApple();
         }
     }
 
-    // ì‚¬ê³¼ë¥¼ ìˆ˜ì§‘í•©ë‹ˆë‹¤
+    // »ç°ú¸¦ ¼öÁıÇÕ´Ï´Ù
     private void CollectApple()
     {
         if (_isCollected) return;
-        
+
         _isCollected = true;
 
-        // ìˆ˜ì§‘ ì• ë‹ˆë©”ì´ì…˜
+        // ¼öÁı ¾Ö´Ï¸ŞÀÌ¼Ç
         transform.DOScale(Vector3.zero, 0.2f).SetEase(Ease.InBack);
-        
-        // ì•½ê°„ì˜ ë³´ë„ˆìŠ¤ íš¨ê³¼
-        GameManager.Instance.AddApples(1);
-        
-        // íŒŒí‹°í´ì´ë‚˜ ì‚¬ìš´ë“œ ì¬ìƒ
+
+        // ¾à°£ÀÇ º¸³Ê½º È¿°ú
+        GameManager.Instance.AddApples(10);
+
+        // ÆÄÆ¼Å¬ÀÌ³ª »ç¿îµå Àç»ı
         // PlayCollectEffect();
 
         Destroy(gameObject, 0.3f);
     }
 
-    // ì‚¬ê³¼ë¥¼ í´ë¦­í–ˆì„ ë•Œ (ë³´ë„ˆìŠ¤ ì ìˆ˜)
+    // »ç°ú¸¦ Å¬¸¯ÇßÀ» ¶§ (º¸³Ê½º Á¡¼ö)
     private void OnMouseDown()
     {
         if (!_isCollected)
         {
-            // í´ë¦­ ì‹œ ë³´ë„ˆìŠ¤ ì ìˆ˜
-            GameManager.Instance.AddApples(5);
-            
-            // ìˆ˜ì§‘ íš¨ê³¼
+            // Å¬¸¯ ½Ã º¸³Ê½º Á¡¼ö
+            GameManager.Instance.AddApples(15);
+
+            // ¼öÁı È¿°ú
             CollectApple();
         }
     }
