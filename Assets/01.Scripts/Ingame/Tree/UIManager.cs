@@ -68,7 +68,7 @@ public class UIManager : MonoBehaviour
         UpdateAllUI();
     }
 
-    private void UpdateAppleScore(int score)
+    private void UpdateAppleScore(double score)
     {
         if (_appleScoreText != null)
         {
@@ -97,7 +97,7 @@ public class UIManager : MonoBehaviour
     }
 
     // 수동
-    private void UpdateManualDamage(int damage)
+    private void UpdateManualDamage(double damage)
     {
         if (_manualDamageText != null)
         {
@@ -108,7 +108,7 @@ public class UIManager : MonoBehaviour
     }
 
     // 자동
-    private void UpdateAutoDamage(int damage)
+    private void UpdateAutoDamage(double damage)
     {
         if (_autoDamageText != null)
         {
@@ -153,16 +153,16 @@ public class UIManager : MonoBehaviour
     }
 
     // 나무 체력 UI 업데이트
-    public void UpdateTreeHealth(float healthPercent)
+    public void UpdateTreeHealth(double healthPercent)
     {
         if (_treeHealthSlider != null)
         {
-            _treeHealthSlider.value = healthPercent;
+            _treeHealthSlider.value = (float)healthPercent;
 
             // 체력에 따른 색상 변화
             if (_healthFillImage != null && _healthColorGradient != null)
             {
-                float normalizedHealth = healthPercent / 100f; // 0~100을 0~1로 변환
+                float normalizedHealth = (float)healthPercent / 100f; // 0~100을 0~1로 변환
                 _healthFillImage.color = _healthColorGradient.Evaluate(normalizedHealth);
             }
         }
@@ -270,7 +270,7 @@ public class UIManager : MonoBehaviour
     }
 
     // 데미지 텍스트 표시 (나무 위에 떠오르는 효과)
-    public void ShowDamageText(Vector3 position, int damage)
+    public void ShowDamageText(Vector3 position, double damage)
     {
         // TODO: Floating Text 프리팹을 사용하여 데미지 표시
         // FloatingTextManager.Instance.ShowText(position, damage.ToString(), Color.red);

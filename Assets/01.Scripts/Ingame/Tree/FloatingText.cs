@@ -2,9 +2,6 @@ using UnityEngine;
 using TMPro;
 using DG.Tweening;
 
-/// <summary>
-/// 클릭 시 떠오르는 데미지/점수 텍스트
-/// </summary>
 public class FloatingText : MonoBehaviour
 {
     [Header("Settings")]
@@ -29,9 +26,7 @@ public class FloatingText : MonoBehaviour
             _text = GetComponent<TextMeshProUGUI>();
     }
 
-    /// <summary>
-    /// 플로팅 텍스트 초기화 및 재생
-    /// </summary>
+    // 플로팅 텍스트 초기화 및 재생
     public void Initialize(string text, Vector3 worldPosition, bool isCritical = false)
     {
         _text.text = text;
@@ -57,9 +52,7 @@ public class FloatingText : MonoBehaviour
         PlayAnimation();
     }
 
-    /// <summary>
-    /// 떠오르는 애니메이션
-    /// </summary>
+    // 떠오르는 애니메이션
     private void PlayAnimation()
     {
         // 위로 떠오름
@@ -79,9 +72,7 @@ public class FloatingText : MonoBehaviour
         Destroy(gameObject, _floatDuration);
     }
 
-    /// <summary>
-    /// 랜덤 방향으로 조금 움직이기
-    /// </summary>
+    // 랜덤 방향으로 조금 움직이기
     public void AddRandomOffset()
     {
         float randomX = Random.Range(-50f, 50f);

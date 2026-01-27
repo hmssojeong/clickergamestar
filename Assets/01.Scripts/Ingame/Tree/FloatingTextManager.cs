@@ -1,8 +1,6 @@
 using UnityEngine;
 
-/// <summary>
-/// 플로팅 텍스트를 생성하고 관리하는 매니저
-/// </summary>
+// 플로팅 텍스트를 생성하고 관리하는 매니저
 public class FloatingTextManager : MonoBehaviour
 {
     public static FloatingTextManager Instance;
@@ -12,7 +10,7 @@ public class FloatingTextManager : MonoBehaviour
 
     [Header("Spawn Settings")]
     [SerializeField] private Transform _canvasTransform;
-    [SerializeField] private int _maxPoolSize = 20;
+    [SerializeField] private int _maxPoolSize = 30;
 
     private void Awake()
     {
@@ -26,25 +24,19 @@ public class FloatingTextManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 데미지 텍스트 표시
-    /// </summary>
-    public void ShowDamage(Vector3 worldPosition, int damage, bool isCritical = false)
+    // 데미지 텍스트 표시
+    public void ShowDamage(Vector3 worldPosition, double damage, bool isCritical = false)
     {
         ShowText(worldPosition, $"+{damage}", isCritical);
     }
 
-    /// <summary>
-    /// 점수 텍스트 표시
-    /// </summary>
-    public void ShowScore(Vector3 worldPosition, int score)
+    // 점수 텍스트 표시
+    public void ShowScore(Vector3 worldPosition, double score)
     {
         ShowText(worldPosition, $"+{score} 🍎", false);
     }
 
-    /// <summary>
-    /// 일반 텍스트 표시
-    /// </summary>
+    // 일반 텍스트 표시
     public void ShowText(Vector3 worldPosition, string text, bool isCritical = false)
     {
         if (_floatingTextPrefab == null)
@@ -64,9 +56,7 @@ public class FloatingTextManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 여러 텍스트를 연속으로 표시 (콤보 효과)
-    /// </summary>
+    // 여러 텍스트를 연속으로 표시 (콤보 효과)
     public void ShowCombo(Vector3 worldPosition, int comboCount)
     {
         string comboText = comboCount switch

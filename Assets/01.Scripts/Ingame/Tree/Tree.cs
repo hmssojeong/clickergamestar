@@ -4,8 +4,8 @@ public class Tree : MonoBehaviour, Clickable
 {
     [Header("Tree Settings")]
     [SerializeField] private string _treeName = "Apple Tree";
-    [SerializeField] private int _maxHealth = 100;
-    private int _currentHealth;
+    [SerializeField] private double _maxHealth = 100;
+    private double _currentHealth;
 
     [Header("Apple Drop Settings")]
     [SerializeField] private GameObject _applePrefab;
@@ -30,11 +30,18 @@ public class Tree : MonoBehaviour, Clickable
         _currentHealth -= clickInfo.Damage;
 
         // 2. 사과 점수 추가
-        int appleScore = clickInfo.Damage; // 데미지만큼 사과 추가
+        double appleScore = clickInfo.Damage; // 데미지만큼 사과 추가
         GameManager.Instance.AddApples(appleScore);
 
         // 3. 체력바 UI 업데이트 ⭐ 추가!
         UpdateHealthBar();
+
+        //Floating Text
+        if(clickInfo.Type == EClickType.Manual && FloatingTextManager.Instance != null)
+        {
+            Vector3 worldPos = clickInfo.Position;
+            FloatingTextManager.Instance.ShowDamage(worldPos, clickInfo.Damage);
+        }
 
         // 4. 사과 떨어뜨리기 (수동 클릭만)
         if (clickInfo.Type == EClickType.Manual)
@@ -131,7 +138,7 @@ public class Tree : MonoBehaviour, Clickable
     // 체력바 UI를 업데이트
     private void UpdateHealthBar()
     {
-        float healthPercent = GetHealthPercent();
+        double healthPercent = GetHealthPercent();
 
         // UIManager에게 체력 업데이트 알림
         if (UIManager.Instance != null)
@@ -154,8 +161,8 @@ public class Tree : MonoBehaviour, Clickable
         Debug.Log($"{_treeName} 리스폰!");
     }
 
-    public float GetHealthPercent()
+    public double GetHealthPercent()
     {
-        return ((float)_currentHealth / _maxHealth) * 100f;
+        return (_currentHealth / _maxHealth) * 100f;
     }
 }
