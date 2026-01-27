@@ -55,10 +55,18 @@ public class FloatingText : MonoBehaviour
     // 떠오르는 애니메이션
     private void PlayAnimation(bool isCritical)
     {
+        // 1. 기본 크기 설정 (크리티컬이면 1.5배, 아니면 1배)
+        float targetScale = isCritical ? 1.8f : 1.0f;
+
+        transform.localScale = Vector3.zero;
+
         if (isCritical)
         {
-            // 크리티컬이면 1.5배 더 크게 커졌다가 돌아옴
-            transform.DOScale(Vector3.one * 1.5f, 0.1f).SetLoops(2, LoopType.Yoyo);
+            transform.DOScale(Vector3.one * targetScale, 0.2f).SetEase(Ease.OutBack);
+        }
+        else
+        {
+            transform.DOScale(Vector3.one * targetScale, 0.2f).SetEase(Ease.OutQuad);
         }
 
         // 위로 떠오름
@@ -68,11 +76,6 @@ public class FloatingText : MonoBehaviour
         // 페이드 아웃
         _text.DOFade(0f, _floatDuration)
             .SetEase(Ease.InQuad);
-
-        // 스케일 애니메이션 (선택)
-        transform.localScale = Vector3.zero;
-        transform.DOScale(Vector3.one, 0.2f)
-            .SetEase(Ease.OutBack);
 
         // 애니메이션 완료 후 삭제
         Destroy(gameObject, _floatDuration);
