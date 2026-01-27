@@ -26,27 +26,61 @@ public class Tree : MonoBehaviour, Clickable
 
     public bool OnClick(ClickInfo clickInfo)
     {
-        // 1. 데미지 적용
-        _currentHealth -= clickInfo.Damage;
+        // 0. 피버 클릭 카운트 증가 (수동 클릭만) ⭐ 추가!
+        if (clickInfo.Type == EClickType.Manual && FeverManager.Instance != null)
+        {
+            FeverManager.Instance.AddClick();
+        }
 
-        // 2. 사과 점수 추가
-        double appleScore = clickInfo.Damage; // 데미지만큼 사과 추가
+        //크리티컬 판정 로직 추가
+        float criticalChance = 0.2f; // 20%확률
+        bool isCritical = Random.value < criticalChance;
+
+        // 1. 데미지 적용 (피버 배율 적용)
+        double finalDamage = clickInfo.Damage;
+        if (FeverManager.Instance != null)
+        {
+            finalDamage *= FeverManager.Instance.GetDamageMultiplier();
+        }
+
+        //크리티컬이면 데미지 2배 적용
+        if (isCritical)
+        {
+            finalDamage *= 2.0;
+        }
+
+        if (FloatingTextManager.Instance != null)
+        {
+            // 세 번째 인자로 isCritical을 전달합니다.
+            FloatingTextManager.Instance.ShowDamage(clickInfo.Position, finalDamage, isCritical);
+        }
+
+        _currentHealth -= finalDamage;
+
+        // 2. 사과 점수 추가 (배율 적용된 데미지)
+        double appleScore = finalDamage;
         GameManager.Instance.AddApples(appleScore);
 
-        // 3. 체력바 UI 업데이트 ⭐ 추가!
+        // 3. 체력바 UI 업데이트
         UpdateHealthBar();
 
-        //Floating Text
-        if(clickInfo.Type == EClickType.Manual && FloatingTextManager.Instance != null)
+        // Floating Text (배율 적용된 데미지 표시) ⭐ 수정!
+        if (clickInfo.Type == EClickType.Manual && FloatingTextManager.Instance != null)
         {
             Vector3 worldPos = clickInfo.Position;
-            FloatingTextManager.Instance.ShowDamage(worldPos, clickInfo.Damage);
+            FloatingTextManager.Instance.ShowDamage(worldPos, finalDamage);
         }
 
         // 4. 사과 떨어뜨리기 (수동 클릭만)
         if (clickInfo.Type == EClickType.Manual)
         {
             DropApple(clickInfo.Position);
+
+            // 피버 중이면 사과 2배 드롭 ⭐ 추가!
+            if (FeverManager.Instance != null && FeverManager.Instance.IsFeverActive)
+            {
+                DropApple(clickInfo.Position);
+            }
         }
 
         // 5. 피드백 실행

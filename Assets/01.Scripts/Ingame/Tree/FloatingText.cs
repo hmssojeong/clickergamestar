@@ -29,8 +29,8 @@ public class FloatingText : MonoBehaviour
     // 플로팅 텍스트 초기화 및 재생
     public void Initialize(string text, Vector3 worldPosition, bool isCritical = false)
     {
-        _text.text = text;
         _text.color = isCritical ? _criticalColor : _normalColor;
+        _text.text = text;
 
         // 월드 좌표를 스크린 좌표로 변환
         Vector2 screenPosition = RectTransformUtility.WorldToScreenPoint(
@@ -49,12 +49,18 @@ public class FloatingText : MonoBehaviour
         _rectTransform.localPosition = localPoint;
 
         // 애니메이션 재생
-        PlayAnimation();
+        PlayAnimation(isCritical);
     }
 
     // 떠오르는 애니메이션
-    private void PlayAnimation()
+    private void PlayAnimation(bool isCritical)
     {
+        if (isCritical)
+        {
+            // 크리티컬이면 1.5배 더 크게 커졌다가 돌아옴
+            transform.DOScale(Vector3.one * 1.5f, 0.1f).SetLoops(2, LoopType.Yoyo);
+        }
+
         // 위로 떠오름
         _rectTransform.DOAnchorPosY(_rectTransform.anchoredPosition.y + _floatHeight * 100f, _floatDuration)
             .SetEase(_floatEase);

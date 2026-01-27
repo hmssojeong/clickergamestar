@@ -1,10 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// 업그레이드 시스템 관리
-/// 스크롤 뷰에 아이템들을 동적으로 생성하고 관리합니다
-/// </summary>
 public class UpgradeManager : MonoBehaviour
 {
     public static UpgradeManager Instance;
@@ -52,9 +48,7 @@ public class UpgradeManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 업그레이드 목록 초기화
-    /// </summary>
+    // 업그레이드 목록 초기화
     private void InitializeUpgrades()
     {
         if (_contentTransform == null)
@@ -77,9 +71,7 @@ public class UpgradeManager : MonoBehaviour
         Debug.Log($"{_upgradeList.Count}개의 업그레이드 아이템 생성 완료");
     }
 
-    /// <summary>
-    /// 업그레이드 아이템 생성
-    /// </summary>
+    // 업그레이드 아이템 생성
     private void CreateUpgradeItem(UpgradeData data)
     {
         GameObject itemObj = Instantiate(_upgradeItemPrefab, _contentTransform);
@@ -107,9 +99,7 @@ public class UpgradeManager : MonoBehaviour
         _upgradeItems.Add(data.id, item);
     }
 
-    /// <summary>
-    /// 업그레이드 구매
-    /// </summary>
+    // 업그레이드 구매
     public void PurchaseUpgrade(string itemId)
     {
         UpgradeData data = _upgradeList.Find(x => x.id == itemId);
@@ -156,9 +146,7 @@ public class UpgradeManager : MonoBehaviour
         RefreshAllItems();
     }
 
-    /// <summary>
-    /// 특정 아이템 UI 새로고침
-    /// </summary>
+    // 특정 아이템 UI 새로고침
     private void RefreshItem(string itemId)
     {
         UpgradeData data = _upgradeList.Find(x => x.id == itemId);
@@ -172,9 +160,7 @@ public class UpgradeManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 모든 아이템 UI 새로고침
-    /// </summary>
+    // 모든 아이템 UI 새로고침
     public void RefreshAllItems()
     {
         foreach (var data in _upgradeList)
@@ -188,9 +174,7 @@ public class UpgradeManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 비용 계산
-    /// </summary>
+    // 비용 계산
     private int CalculateCost(UpgradeData data)
     {
         if (data.currentLevel == 0 && !data.isHired)
@@ -203,9 +187,7 @@ public class UpgradeManager : MonoBehaviour
         return Mathf.RoundToInt(data.baseCost * Mathf.Pow(1.15f, data.currentLevel));
     }
 
-    /// <summary>
-    /// DPS 계산
-    /// </summary>
+    // DPS 계산
     private long CalculateDps(UpgradeData data)
     {
         if (data.currentLevel == 0)
@@ -217,9 +199,7 @@ public class UpgradeManager : MonoBehaviour
         return (long)(data.baseDps * Mathf.Pow(1.5f, data.currentLevel - 1));
     }
 
-    /// <summary>
-    /// 이번 레벨업으로 증가하는 DPS 계산
-    /// </summary>
+    // 이번 레벨업으로 증가하는 DPS 계산
     private long CalculateDpsIncrease(UpgradeData data)
     {
         if (data.currentLevel == 1)
@@ -235,9 +215,7 @@ public class UpgradeManager : MonoBehaviour
         return currentDps - previousDps;
     }
 
-    /// <summary>
-    /// 사과 개수가 변경되었을 때 호출
-    /// </summary>
+    // 사과 개수가 변경되었을 때 호출
     private void OnApplesChanged(double newAmount)
     {
         // 모든 버튼의 활성화 상태 업데이트
@@ -245,9 +223,7 @@ public class UpgradeManager : MonoBehaviour
     }
 }
 
-/// <summary>
-/// 업그레이드 데이터 클래스
-/// </summary>
+// 업그레이드 데이터 클래스
 [System.Serializable]
 public class UpgradeData
 {
