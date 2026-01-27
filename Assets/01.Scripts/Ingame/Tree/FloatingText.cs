@@ -84,7 +84,8 @@ public class FloatingText : MonoBehaviour
     // 랜덤 방향으로 조금 움직이기
     public void AddRandomOffset()
     {
-        float randomX = Random.Range(-50f, 50f);
-        _rectTransform.anchoredPosition += new Vector2(randomX, 0);
+        float randomX = Random.Range(-150f, 150f);
+        float randomY = Random.Range(-20f, 20f);
+        _rectTransform.anchoredPosition += new Vector2(randomX, randomY);
     }
 }

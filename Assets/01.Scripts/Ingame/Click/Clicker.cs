@@ -25,6 +25,11 @@ public class Clicker : MonoBehaviour
         RaycastHit2D hit = Physics2D.Raycast(worldPos, Vector2.zero);
         if (hit == true)
         {
+            if (SoundManager.Instance != null)
+            {
+                SoundManager.Instance.PlaySFX(ESfx.Click);
+            }
+
             Clickable clickable = hit.collider.GetComponent<Clickable>();
             // 누가 클릭했는지             (ManualClick, AutoClick)
             // 어느정도의 강도로 클릭했는지 (int)

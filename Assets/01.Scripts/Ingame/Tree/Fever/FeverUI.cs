@@ -37,8 +37,26 @@ public class FeverUI : MonoBehaviour
     [SerializeField] private ParticleSystem _rainMistParticle;
     [SerializeField] private float _fadeDuration = 0.5f;
 
+    [Header("Sound Settings")]
+    [SerializeField] private AudioSource _feverAudioSource;
+    [SerializeField] private AudioClip _feverBGMClip;
+    [SerializeField] private AudioClip _feverStartClip;
+
+    [SerializeField] private float _soundFadeDuration = 0.5f;
+
     private void Start()
     {
+        if (_rainFallParticle != null)
+        {
+            _rainFallParticle.Stop();
+            SetParticleAlpha(_rainFallParticle, 0f);
+        }
+        if (_rainMistParticle != null)
+        {
+            _rainMistParticle.Stop();
+            SetParticleAlpha(_rainMistParticle, 0f);
+        }
+
         if (FeverManager.Instance != null)
         {
             // 이벤트 구독
@@ -78,7 +96,9 @@ public class FeverUI : MonoBehaviour
             // 게이지 텍스트 업데이트
             if (_gaugeText != null)
             {
-                _gaugeText.text = $"수동 클릭: {currentClicks} / {maxClicks}";
+                string current = CurrencyFormatter.Format(currentClicks);
+                string max = CurrencyFormatter.Format(maxClicks);
+                _gaugeText.text = $"수동 클릭: {current} / {max}";
             }
 
             // 게이지 꽉 차면 펄스 애니메이션
@@ -122,6 +142,21 @@ public class FeverUI : MonoBehaviour
     // 피버 시작 시 호출
     private void OnFeverStart()
     {
+        if (_feverAudioSource != null && _feverStartClip != null)
+        {
+            _feverAudioSource.PlayOneShot(_feverStartClip);
+        }
+
+        // BGM 재생 및 페이드 인
+        if (_feverAudioSource != null && _feverBGMClip != null)
+        {
+            _feverAudioSource.clip = _feverBGMClip;
+            _feverAudioSource.loop = true;         
+            _feverAudioSource.volume = 0;
+            _feverAudioSource.Play();
+            _feverAudioSource.DOFade(1f, _soundFadeDuration);
+        }
+
         if (_gaugeText != null)
         {
             _gaugeText.text = "FEVER";
@@ -166,13 +201,29 @@ public class FeverUI : MonoBehaviour
             _skyBottom.DOColor(_feverSkyColor, _colorTransitionDuration);
         }
 
-        FadeParticle(_rainFallParticle, 1f);
-        FadeParticle(_rainMistParticle, 1f);
+        if (_rainFallParticle != null)
+        {
+            _rainFallParticle.Play();
+            FadeParticle(_rainFallParticle, 1f);
+        }
+        if (_rainMistParticle != null)
+        {
+            _rainMistParticle.Play();
+            FadeParticle(_rainMistParticle, 1f);
+        }
     }
 
     // 피버 종료 시 호출
     private void OnFeverEnd()
     {
+        if (_feverAudioSource != null)
+        {
+            _feverAudioSource.DOFade(0f, _soundFadeDuration).OnComplete(() => {
+                _feverAudioSource.Stop();
+                _feverAudioSource.clip = null; // 클립 제거
+            });
+        }
+
         if (_gaugeText != null && FeverManager.Instance != null)
         {
             // 피버가 끝나면 클릭 수가 0으로 리셋되므로 "0 / 75" 형태로 표시
@@ -202,23 +253,36 @@ public class FeverUI : MonoBehaviour
             _skyBottom.DOColor(Color.white, _colorTransitionDuration);
         }
 
-        FadeParticle(_rainFallParticle, 0f);
-        FadeParticle(_rainMistParticle, 0f);
+        FadeParticle(_rainFallParticle, 0f, true);
+        FadeParticle(_rainMistParticle, 0f, true);
     }
 
-    private void FadeParticle(ParticleSystem ps, float targetAlpha)
+    private void FadeParticle(ParticleSystem ps, float targetAlpha, bool stopOnComplete = false)
     {
         if (ps == null) return;
 
-        // 파티클의 메인 모듈에 접근
         var main = ps.main;
         Color color = main.startColor.color;
 
-        // DOTween을 사용하여 컬러의 알파값만 부드럽게 변경
         DOTween.To(() => color.a, x => {
             color.a = x;
             main.startColor = color;
-        }, targetAlpha, _fadeDuration);
+        }, targetAlpha, _fadeDuration).OnComplete(() => {
+            // 페이드 아웃이 완료되었고, stopOnComplete가 true라면 시스템 정지
+            if (stopOnComplete && targetAlpha <= 0f)
+            {
+                ps.Stop();
+            }
+        });
+    }
+
+    private void SetParticleAlpha(ParticleSystem ps, float alpha)
+    {
+        if (ps == null) return;
+        var main = ps.main;
+        Color color = main.startColor.color;
+        color.a = alpha;
+        main.startColor = color;
     }
 
     private void OnDestroy()

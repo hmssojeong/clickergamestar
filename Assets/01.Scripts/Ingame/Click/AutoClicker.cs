@@ -41,8 +41,13 @@ public class AutoClicker : MonoBehaviour
             // 2. 공격 애니메이션 시퀀스
             Sequence attackSeq = DOTween.Sequence();
 
-            attackSeq.Append(transform.DOMove(attackPos, _attackSpeed).SetEase(Ease.OutQuad)) // 나무로 돌진
-                     .Append(transform.DOMove(_originalPos, _attackSpeed).SetEase(Ease.InQuad)); // 제자리로 복귀
+            if (SoundManager.Instance != null)
+            {
+                SoundManager.Instance.PlaySFX(ESfx.AutoClickerAttack);
+            }
+
+            attackSeq.Append(transform.DOMove(attackPos, _attackSpeed).SetEase(Ease.OutQuad))
+                     .Append(transform.DOMove(_originalPos, _attackSpeed).SetEase(Ease.InQuad));
 
             // 3. 실제 데미지 입히기
             Clickable clickableScript = target.GetComponent<Clickable>();

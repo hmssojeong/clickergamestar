@@ -65,12 +65,12 @@ public class Tree : MonoBehaviour, Clickable
         // 3. 체력바 UI 업데이트
         UpdateHealthBar();
 
-        // Floating Text (배율 적용된 데미지 표시) ⭐ 수정!
+ /*       // Floating Text (배율 적용된 데미지 표시) ⭐ 수정!
         if (clickInfo.Type == EClickType.Manual && FloatingTextManager.Instance != null)
         {
             Vector3 worldPos = clickInfo.Position;
             FloatingTextManager.Instance.ShowDamage(worldPos, finalDamage);
-        }
+        }*/
 
         // 4. 사과 떨어뜨리기 (수동 클릭만)
         if (clickInfo.Type == EClickType.Manual)

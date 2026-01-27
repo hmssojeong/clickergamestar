@@ -72,7 +72,7 @@ public class UIManager : MonoBehaviour
     {
         if (_appleScoreText != null)
         {
-            _appleScoreText.text = score.ToString();
+            _appleScoreText.text = CurrencyFormatter.Format(score);
 
             // 점수 증가 애니메이션
             AnimateScoreIncrease();
@@ -101,7 +101,7 @@ public class UIManager : MonoBehaviour
     {
         if (_manualDamageText != null)
         {
-            _manualDamageText.text = $"클릭 파워: {damage}";
+            _manualDamageText.text = $"클릭 파워: {CurrencyFormatter.Format(damage)}";
         }
 
         UpdateUpgradeButtons();
@@ -112,7 +112,7 @@ public class UIManager : MonoBehaviour
     {
         if (_autoDamageText != null)
         {
-            _autoDamageText.text = $"자동 파워: {damage}";
+            _autoDamageText.text = $"자동 파워: {CurrencyFormatter.Format(damage)}";
         }
 
         UpdateUpgradeButtons();
@@ -127,27 +127,30 @@ public class UIManager : MonoBehaviour
         // 수동 업그레이드 버튼
         if (_manualUpgradeCostText != null)
         {
-            _manualUpgradeCostText.text = $"{gm.ManualUpgradeCost} 🍎";
+            _manualUpgradeCostText.text = $"{CurrencyFormatter.Format(gm.ManualUpgradeCost)} 🍎";
             _manualUpgradeButton.interactable = gm.Apples >= gm.ManualUpgradeCost;
         }
 
         // 자동 업그레이드 버튼
         if (_autoUpgradeCostText != null)
         {
-            _autoUpgradeCostText.text = $"{gm.AutoUpgradeCost} 🍎";
+            _autoUpgradeCostText.text = $"{CurrencyFormatter.Format(gm.AutoUpgradeCost)} 🍎";
             _autoUpgradeButton.interactable = gm.Apples >= gm.AutoUpgradeCost;
         }
 
         // 자동 클리커 구매 버튼
         if (_autoClickerCostText != null)
         {
-            _autoClickerCostText.text = $"{gm.AutoClickerCost} 🍎";
             _buyAutoClickerButton.interactable = gm.Apples >= gm.AutoClickerCost;
 
-            // 이미 구매했으면 레벨 표시
+            // 이미 구매했으면 레벨 표시, 아니면 [단위 적용] 비용 표시
             if (gm.HasAutoClicker)
             {
                 _autoClickerCostText.text = $"Lv.{gm.AutoClickerLevel}";
+            }
+            else
+            {
+                _autoClickerCostText.text = $"{CurrencyFormatter.Format(gm.AutoClickerCost)} 🍎";
             }
         }
     }
@@ -179,7 +182,7 @@ public class UIManager : MonoBehaviour
 
         if (_totalApplesText != null)
         {
-            _totalApplesText.text = $"총 수확: {gm.TotalApplesCollected}개";
+            _totalApplesText.text = $"총 수확: {CurrencyFormatter.Format(gm.TotalApplesCollected)}개";
         }
 
         UpdateUpgradeButtons();
@@ -274,6 +277,10 @@ public class UIManager : MonoBehaviour
     {
         // TODO: Floating Text 프리팹을 사용하여 데미지 표시
         // FloatingTextManager.Instance.ShowText(position, damage.ToString(), Color.red);
+        if (FloatingTextManager.Instance != null)
+        {
+            FloatingTextManager.Instance.ShowDamage(position, damage);
+        }
     }
 
     private void OnDestroy()
