@@ -35,4 +35,3 @@ public class LocalCurrencyRepository : ICurrencyRepository
         return data;
     }
 }
-}
