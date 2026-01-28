@@ -1,242 +1,251 @@
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
 
+/// <summary>
+/// ì—…ê·¸ë ˆì´ë“œ ì‹œìŠ¤í…œì„ ê´€ë¦¬í•˜ëŠ” ë§¤ë‹ˆì € (ì‚¬ìš©ì GameManagerì™€ í†µí•©)
+/// </summary>
 public class UpgradeManager : MonoBehaviour
 {
-    public static UpgradeManager Instance;
-
-    [Header("UI References")]
-    [SerializeField] private Transform _contentTransform; // ScrollViewÀÇ Content
-    [SerializeField] private GameObject _upgradeItemPrefab; // UpgradeItem Prefab
-
-    [Header("Upgrade Data")]
-    [SerializeField] private List<UpgradeData> _upgradeList = new List<UpgradeData>();
-
-    private Dictionary<string, UpgradeItem> _upgradeItems = new Dictionary<string, UpgradeItem>();
-
-    private void Awake()
+    public static UpgradeManager Instance { get; private set; }
+    
+    [Header("ì—…ê·¸ë ˆì´ë“œ ë°ì´í„°")]
+    public List<UpgradeData> allUpgrades = new List<UpgradeData>();
+    
+    void Awake()
     {
-        // ½Ì±ÛÅæ ÆĞÅÏ
         if (Instance == null)
         {
             Instance = this;
+            InitializeUpgrades();
         }
         else
         {
             Destroy(gameObject);
-            return;
         }
     }
-
-    private void Start()
+    
+    /// <summary>
+    /// ì—…ê·¸ë ˆì´ë“œ ì´ˆê¸°í™”
+    /// </summary>
+    void InitializeUpgrades()
     {
-        InitializeUpgrades();
-
-        // GameManager ÀÌº¥Æ® ±¸µ¶
-        if (GameManager.Instance != null)
+        allUpgrades = new List<UpgradeData>
         {
-            GameManager.Instance.OnAppleChanged.AddListener(OnApplesChanged);
-        }
-    }
-
-    private void OnDestroy()
-    {
-        // ÀÌº¥Æ® ±¸µ¶ ÇØÁ¦
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.OnAppleChanged.RemoveListener(OnApplesChanged);
-        }
-    }
-
-    // ¾÷±×·¹ÀÌµå ¸ñ·Ï ÃÊ±âÈ­
-    private void InitializeUpgrades()
-    {
-        if (_contentTransform == null)
-        {
-            Debug.LogError("Content TransformÀÌ ¿¬°áµÇÁö ¾Ê¾Ò½À´Ï´Ù!");
-            return;
-        }
-
-        if (_upgradeItemPrefab == null)
-        {
-            Debug.LogError("Upgrade Item PrefabÀÌ ¿¬°áµÇÁö ¾Ê¾Ò½À´Ï´Ù!");
-            return;
-        }
-
-        foreach (var data in _upgradeList)
-        {
-            CreateUpgradeItem(data);
-        }
-
-        Debug.Log($"{_upgradeList.Count}°³ÀÇ ¾÷±×·¹ÀÌµå ¾ÆÀÌÅÛ »ı¼º ¿Ï·á");
-    }
-
-    // ¾÷±×·¹ÀÌµå ¾ÆÀÌÅÛ »ı¼º
-    private void CreateUpgradeItem(UpgradeData data)
-    {
-        GameObject itemObj = Instantiate(_upgradeItemPrefab, _contentTransform);
-        UpgradeItem item = itemObj.GetComponent<UpgradeItem>();
-
-        if (item == null)
-        {
-            Debug.LogError("UpgradeItem ½ºÅ©¸³Æ®¸¦ Ã£À» ¼ö ¾ø½À´Ï´Ù!");
-            return;
-        }
-
-        long currentDps = CalculateDps(data);
-        int currentCost = CalculateCost(data);
-
-        item.Initialize(
-            data.id,
-            data.name,
-            data.icon,
-            data.currentLevel,
-            currentDps,
-            currentCost,
-            data.isHired
-        );
-
-        _upgradeItems.Add(data.id, item);
-    }
-
-    // ¾÷±×·¹ÀÌµå ±¸¸Å
-    public void PurchaseUpgrade(string itemId)
-    {
-        UpgradeData data = _upgradeList.Find(x => x.id == itemId);
-        if (data == null)
-        {
-            Debug.LogError($"¾ÆÀÌÅÛ ID¸¦ Ã£À» ¼ö ¾ø½À´Ï´Ù: {itemId}");
-            return;
-        }
-
-        // ºñ¿ë È®ÀÎ
-        int cost = CalculateCost(data);
-        if (GameManager.Instance.Apples < cost)
-        {
-            Debug.Log("»ç°ú°¡ ºÎÁ·ÇÕ´Ï´Ù!");
-            return;
-        }
-
-        // ºñ¿ë Â÷°¨
-        GameManager.Instance.SpendApples(cost);
-
-        // ·¹º§¾÷
-        if (!data.isHired)
-        {
-            // Ã¹ ±¸¸Å (°í¿ë)
-            data.isHired = true;
-            data.currentLevel = 1;
-            Debug.Log($"{data.name} °í¿ë ¿Ï·á!");
-        }
-        else
-        {
-            // ·¹º§¾÷
-            data.currentLevel++;
-            Debug.Log($"{data.name} ·¹º§ {data.currentLevel} ´Ş¼º!");
-        }
-
-        // DPS Áõ°¡ (GameManagerÀÇ AutoDamage¿¡ Ãß°¡)
-        long dpsIncrease = CalculateDpsIncrease(data);
-        GameManager.Instance.AutoDamage += (int)Mathf.Min(dpsIncrease, int.MaxValue);
-
-        // UI ¾÷µ¥ÀÌÆ®
-        RefreshItem(itemId);
-
-        // ´Ù¸¥ ¸ğµç ¾ÆÀÌÅÛÀÇ ¹öÆ° »óÅÂµµ ¾÷µ¥ÀÌÆ® (»ç°ú°¡ ÁÙ¾îµé¾úÀ¸¹Ç·Î)
-        RefreshAllItems();
-    }
-
-    // Æ¯Á¤ ¾ÆÀÌÅÛ UI »õ·Î°íÄ§
-    private void RefreshItem(string itemId)
-    {
-        UpgradeData data = _upgradeList.Find(x => x.id == itemId);
-        if (data == null) return;
-
-        if (_upgradeItems.ContainsKey(itemId))
-        {
-            int cost = CalculateCost(data);
-            long dps = CalculateDps(data);
-            _upgradeItems[itemId].Refresh(data.currentLevel, dps, cost, data.isHired);
-        }
-    }
-
-    // ¸ğµç ¾ÆÀÌÅÛ UI »õ·Î°íÄ§
-    public void RefreshAllItems()
-    {
-        foreach (var data in _upgradeList)
-        {
-            if (_upgradeItems.ContainsKey(data.id))
+            // 1. ì‚¬ê³¼ ìˆ˜í™• ê°•í™” - ManualDamage ì¦ê°€
+            new UpgradeData
             {
-                int cost = CalculateCost(data);
-                long dps = CalculateDps(data);
-                _upgradeItems[data.id].Refresh(data.currentLevel, dps, cost, data.isHired);
+                type = UpgradeType.AppleHarvest,
+                upgradeName = "ì‚¬ê³¼ ìˆ˜í™• ê°•í™”",
+                description = "ë” í° ì‚¬ê³¼ë¥¼ ìˆ˜í™•í•©ë‹ˆë‹¤\ní´ë¦­ë‹¹ ë°ë¯¸ì§€ +10",
+                baseCost = 500,
+                costMultiplier = 1.8f,
+                maxLevel = 10
+            },
+            
+            // 2. ë‹¤ëŒì¥ ê³ ìš© - ìë™ ìˆ˜í™•
+            new UpgradeData
+            {
+                type = UpgradeType.SquirrelHire,
+                upgradeName = "ë‹¤ëŒì¥ ê³ ìš©",
+                description = "ë¶€ì§€ëŸ°í•œ ë‹¤ëŒì¥ê°€ ìë™ìœ¼ë¡œ ì‚¬ê³¼ë¥¼ ëª¨ì•„ì¤ë‹ˆë‹¤\nì´ˆë‹¹ +50 ì‚¬ê³¼",
+                baseCost = 1000,
+                costMultiplier = 2.5f,
+                maxLevel = 5
+            },
+            
+            // 3. í™©ê¸ˆ ì‚¬ê³¼ í–‰ìš´ - í¬ë¦¬í‹°ì»¬ í™•ë¥  ì¦ê°€
+            new UpgradeData
+            {
+                type = UpgradeType.GoldenAppleLuck,
+                upgradeName = "í™©ê¸ˆ ì‚¬ê³¼ í–‰ìš´",
+                description = "í™©ê¸ˆ ì‚¬ê³¼ê°€ ë‚˜ì˜¬ í™•ë¥ ì´ ì¦ê°€í•©ë‹ˆë‹¤\ní¬ë¦¬í‹°ì»¬ í™•ë¥  +5%",
+                baseCost = 2000,
+                costMultiplier = 2.0f,
+                maxLevel = 5
+            },
+            
+            // 4. í”¼ë²„ íƒ€ì„ ë§ˆìŠ¤í„°
+            new UpgradeData
+            {
+                type = UpgradeType.FeverMaster,
+                upgradeName = "í”¼ë²„ íƒ€ì„ ë§ˆìŠ¤í„°",
+                description = "í”¼ë²„ íƒ€ì„ì„ ë”ìš± ê°•ë ¥í•˜ê²Œ ë§Œë“­ë‹ˆë‹¤",
+                baseCost = 3000,
+                costMultiplier = 3.0f,
+                maxLevel = 5
+            },
+            
+            // 5. ìŠˆí¼ í¬ë¦¬í‹°ì»¬ - í¬ë¦¬í‹°ì»¬ ë°°ìˆ˜ ì¦ê°€
+            new UpgradeData
+            {
+                type = UpgradeType.SuperCritical,
+                upgradeName = "ìŠˆí¼ í¬ë¦¬í‹°ì»¬",
+                description = "í¬ë¦¬í‹°ì»¬ ë°œë™ ì‹œ ë” ë§ì€ ì‚¬ê³¼ë¥¼ íšë“í•©ë‹ˆë‹¤\ní¬ë¦¬í‹°ì»¬ ë°°ìˆ˜ +0.5ë°°",
+                baseCost = 5000,
+                costMultiplier = 2.5f,
+                maxLevel = 5
+            }
+        };
+        
+        // ì €ì¥ëœ ë ˆë²¨ ë¶ˆëŸ¬ì˜¤ê¸°
+        LoadUpgradeLevels();
+    }
+    
+    /// <summary>
+    /// ì—…ê·¸ë ˆì´ë“œ êµ¬ë§¤
+    /// </summary>
+    public bool PurchaseUpgrade(UpgradeType type)
+    {
+        UpgradeData upgrade = allUpgrades.FirstOrDefault(u => u.type == type);
+        
+        if (upgrade == null)
+        {
+            Debug.LogError($"ì—…ê·¸ë ˆì´ë“œ íƒ€ì…ì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤: {type}");
+            return false;
+        }
+        
+        // êµ¬ë§¤ ê°€ëŠ¥ ì—¬ë¶€ í™•ì¸
+        if (!upgrade.CanUpgrade(GameManager.Instance.Apples))
+        {
+            Debug.Log("ì‚¬ê³¼ê°€ ë¶€ì¡±í•˜ê±°ë‚˜ ìµœëŒ€ ë ˆë²¨ì…ë‹ˆë‹¤!");
+            return false;
+        }
+        
+        // ë¹„ìš© ì°¨ê°
+        double cost = upgrade.GetCurrentCost();
+        if (!GameManager.Instance.SpendApples(cost))
+        {
+            return false;
+        }
+        
+        // ë ˆë²¨ ì—…
+        upgrade.currentLevel++;
+        
+        // íš¨ê³¼ ì ìš©
+        ApplyUpgradeEffect(type, upgrade.currentLevel);
+        
+        // ë ˆë²¨ ì €ì¥
+        SaveUpgradeLevel(type, upgrade.currentLevel);
+        
+        Debug.Log($"{upgrade.upgradeName} ë ˆë²¨ {upgrade.currentLevel} ë‹¬ì„±!");
+        return true;
+    }
+    
+    /// <summary>
+    /// ì—…ê·¸ë ˆì´ë“œ íš¨ê³¼ ì ìš©
+    /// </summary>
+    void ApplyUpgradeEffect(UpgradeType type, int level)
+    {
+        GameManager gm = GameManager.Instance;
+        
+        switch (type)
+        {
+            case UpgradeType.AppleHarvest:
+                // ManualDamage +10 ì¦ê°€
+                gm.ManualDamage += 10;
+                gm.OnManualDamageChanged?.Invoke(gm.ManualDamage);
+                Debug.Log($"ìˆ˜ë™ ë°ë¯¸ì§€: {gm.ManualDamage}");
+                break;
+                
+            case UpgradeType.SquirrelHire:
+                // ë‹¤ëŒì¥ 1ë§ˆë¦¬ ì¶”ê°€
+                gm.squirrelCount++;
+                Debug.Log($"ë‹¤ëŒì¥ ìˆ˜: {gm.squirrelCount}ë§ˆë¦¬ (ì´ˆë‹¹ {gm.squirrelCount * gm.squirrelApplePerSecond} ì‚¬ê³¼)");
+                break;
+                
+            case UpgradeType.GoldenAppleLuck:
+                // í¬ë¦¬í‹°ì»¬ í™•ë¥  +5% ì¦ê°€
+                gm.criticalChance += 0.05d;
+                double totalCritChance = gm.criticalChance * 100;
+                Debug.Log($"í¬ë¦¬í‹°ì»¬ í™•ë¥ : {totalCritChance:F0}%");
+                break;
+                
+            case UpgradeType.FeverMaster:
+                // ë ˆë²¨ì— ë”°ë¼ ë‹¤ë¥¸ íš¨ê³¼
+                if (level <= 2)
+                {
+                    // ë ˆë²¨ 1-2: í”¼ë²„ ë°œë™ ì¡°ê±´ -10 ê°ì†Œ
+                    gm.feverThreshold -= 10;
+                    Debug.Log($"í”¼ë²„ ë°œë™ ì¡°ê±´: {gm.feverThreshold}íšŒ í´ë¦­");
+                }
+                else if (level <= 4)
+                {
+                    // ë ˆë²¨ 3-4: í”¼ë²„ ë°°ìˆ˜ +0.5 ì¦ê°€
+                    gm.feverMultiplier += 0.5d;
+                    Debug.Log($"í”¼ë²„ ë°°ìˆ˜: {gm.feverMultiplier}ë°°");
+                }
+                else if (level == 5)
+                {
+                    // ë ˆë²¨ 5: í”¼ë²„ ì§€ì†ì‹œê°„ +50%
+                    gm.feverDuration *= 1.5f;
+                    Debug.Log($"í”¼ë²„ ì§€ì†ì‹œê°„: {gm.feverDuration}ì´ˆ");
+                }
+                break;
+                
+            case UpgradeType.SuperCritical:
+                // í¬ë¦¬í‹°ì»¬ ë°°ìˆ˜ +0.5 ì¦ê°€
+                gm.criticalMultiplier += 0.5d;
+                Debug.Log($"í¬ë¦¬í‹°ì»¬ ë°°ìˆ˜: {gm.criticalMultiplier}ë°°");
+                break;
+        }
+    }
+    
+    /// <summary>
+    /// íŠ¹ì • ì—…ê·¸ë ˆì´ë“œ ë°ì´í„° ê°€ì ¸ì˜¤ê¸°
+    /// </summary>
+    public UpgradeData GetUpgradeData(UpgradeType type)
+    {
+        return allUpgrades.FirstOrDefault(u => u.type == type);
+    }
+    
+    /// <summary>
+    /// ì—…ê·¸ë ˆì´ë“œ ë ˆë²¨ ì €ì¥
+    /// </summary>
+    void SaveUpgradeLevel(UpgradeType type, int level)
+    {
+        PlayerPrefs.SetInt($"Upgrade_{type}", level);
+        PlayerPrefs.Save();
+    }
+    
+    /// <summary>
+    /// ëª¨ë“  ì—…ê·¸ë ˆì´ë“œ ë ˆë²¨ ë¶ˆëŸ¬ì˜¤ê¸°
+    /// </summary>
+    void LoadUpgradeLevels()
+    {
+        foreach (var upgrade in allUpgrades)
+        {
+            int savedLevel = PlayerPrefs.GetInt($"Upgrade_{upgrade.type}", 0);
+            
+            // ì €ì¥ëœ ë ˆë²¨ë§Œí¼ íš¨ê³¼ ì ìš©
+            for (int i = 0; i < savedLevel; i++)
+            {
+                upgrade.currentLevel++;
+                ApplyUpgradeEffect(upgrade.type, upgrade.currentLevel);
             }
         }
     }
-
-    // ºñ¿ë °è»ê
-    private int CalculateCost(UpgradeData data)
+    
+    /// <summary>
+    /// ëª¨ë“  ì—…ê·¸ë ˆì´ë“œ ë¦¬ì…‹ (í…ŒìŠ¤íŠ¸ìš©)
+    /// </summary>
+    public void ResetAllUpgrades()
     {
-        if (data.currentLevel == 0 && !data.isHired)
+        foreach (var upgrade in allUpgrades)
         {
-            // Ã¹ ±¸¸Å ºñ¿ë
-            return data.baseCost;
+            upgrade.currentLevel = 0;
+            PlayerPrefs.DeleteKey($"Upgrade_{upgrade.type}");
         }
-
-        // ·¹º§¾÷ ºñ¿ë (1.15¹è¾¿ Áõ°¡)
-        return Mathf.RoundToInt(data.baseCost * Mathf.Pow(1.15f, data.currentLevel));
+        
+        // GameManager ë³´ë„ˆìŠ¤ ì´ˆê¸°í™”
+        GameManager gm = GameManager.Instance;
+        gm.criticalChance = 0.1d;
+        gm.criticalMultiplier = 2.0d;
+        gm.squirrelCount = 0;
+        gm.feverThreshold = 75;
+        gm.feverMultiplier = 2.5d;
+        gm.feverDuration = 10f;
+        
+        Debug.Log("ëª¨ë“  ì—…ê·¸ë ˆì´ë“œê°€ ì´ˆê¸°í™”ë˜ì—ˆìŠµë‹ˆë‹¤!");
     }
-
-    // DPS °è»ê
-    private long CalculateDps(UpgradeData data)
-    {
-        if (data.currentLevel == 0)
-        {
-            return data.baseDps;
-        }
-
-        // ·¹º§´ç 1.5¹è Áõ°¡
-        return (long)(data.baseDps * Mathf.Pow(1.5f, data.currentLevel - 1));
-    }
-
-    // ÀÌ¹ø ·¹º§¾÷À¸·Î Áõ°¡ÇÏ´Â DPS °è»ê
-    private long CalculateDpsIncrease(UpgradeData data)
-    {
-        if (data.currentLevel == 1)
-        {
-            // Ã¹ °í¿ë
-            return data.baseDps;
-        }
-
-        // ÀÌÀü ·¹º§°ú ÇöÀç ·¹º§ÀÇ Â÷ÀÌ
-        long currentDps = (long)(data.baseDps * Mathf.Pow(1.5f, data.currentLevel - 1));
-        long previousDps = (long)(data.baseDps * Mathf.Pow(1.5f, data.currentLevel - 2));
-
-        return currentDps - previousDps;
-    }
-
-    // »ç°ú °³¼ö°¡ º¯°æµÇ¾úÀ» ¶§ È£Ãâ
-    private void OnApplesChanged(double newAmount)
-    {
-        // ¸ğµç ¹öÆ°ÀÇ È°¼ºÈ­ »óÅÂ ¾÷µ¥ÀÌÆ®
-        RefreshAllItems();
-    }
-}
-
-// ¾÷±×·¹ÀÌµå µ¥ÀÌÅÍ Å¬·¡½º
-[System.Serializable]
-public class UpgradeData
-{
-    [Header("Basic Info")]
-    public string id = "unique_id"; // °íÀ¯ ID
-    public string name = "Item Name"; // ¾ÆÀÌÅÛ ÀÌ¸§
-    public Sprite icon; // ¾ÆÀÌÄÜ ÀÌ¹ÌÁö
-
-    [Header("Stats")]
-    public int baseCost = 100; // ±âº» ºñ¿ë
-    public long baseDps = 10; // ±âº» DPS
-
-    [Header("Current State")]
-    public int currentLevel = 0; // ÇöÀç ·¹º§
-    public bool isHired = false; // °í¿ë ¿©ºÎ
 }

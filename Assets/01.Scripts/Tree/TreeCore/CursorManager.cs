@@ -4,6 +4,7 @@ public class CursorManager : MonoBehaviour
 {
     [SerializeField] private SpriteRenderer _cursorSprite;
     [SerializeField] private float _cursorSize = 0.08f;
+    [SerializeField] private float _cursorScale = 0.8f;
 
     private Camera _mainCamera;
 
@@ -26,23 +27,15 @@ public class CursorManager : MonoBehaviour
             mousePos.z = 0f;
             _cursorSprite.transform.position = mousePos;
         }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            _cursorSprite.transform.localScale *= _cursorScale;
+        }
+
+        if (Input.GetMouseButtonUp(0))
+        {
+            _cursorSprite.transform.localScale = Vector3.one * _cursorSize;
+        }
     }
 }
-
-    //void Update()
-    //{
-    //    // 마우스의 월드 좌표를 계산하여 오브젝트 위치를 갱신합니다.
-    //    Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-    //    transform.position = mousePos;
-
-    //    // 클릭 시 피드백 (약간 눌리는 느낌)
-    //    if (Input.GetMouseButtonDown(0))
-    //    {
-    //        transform.localScale = Vector3.one * (_cursorScale * 0.8f);
-    //    }
-
-    //    if (Input.GetMouseButtonUp(0))
-    //    {
-    //        transform.localScale = Vector3.one * _cursorScale;
-    //    }
-    //}
