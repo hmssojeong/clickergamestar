@@ -1014,6 +1014,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5276872436825283012, guid: 67c22a0323c1bb448820728c43daac5d, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -4911003576491168557, guid: 04c936c3eab26f84295a0496ed9dc335, type: 3}
+    - target: {fileID: 5276872436825283012, guid: 67c22a0323c1bb448820728c43daac5d, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5276872436825283012, guid: 67c22a0323c1bb448820728c43daac5d, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5276872436825283012, guid: 67c22a0323c1bb448820728c43daac5d, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7414314888401994098, guid: 67c22a0323c1bb448820728c43daac5d, type: 3}
       propertyPath: m_Name
       value: "UpgradeItem_4_\uD53C\uBC84 \uD0C0\uC784 \uB9C8\uC2A4\uD130"
@@ -1357,6 +1373,22 @@ PrefabInstance:
     - target: {fileID: 324870444224635108, guid: 67c22a0323c1bb448820728c43daac5d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5276872436825283012, guid: 67c22a0323c1bb448820728c43daac5d, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -4911003576491168557, guid: 04c936c3eab26f84295a0496ed9dc335, type: 3}
+    - target: {fileID: 5276872436825283012, guid: 67c22a0323c1bb448820728c43daac5d, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5276872436825283012, guid: 67c22a0323c1bb448820728c43daac5d, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5276872436825283012, guid: 67c22a0323c1bb448820728c43daac5d, type: 3}
+      propertyPath: m_Color.r
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7414314888401994098, guid: 67c22a0323c1bb448820728c43daac5d, type: 3}
       propertyPath: m_Name
@@ -2271,12 +2303,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 471f4858a4afc6c49aad1307756ab2c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UpgradeManager
-  appleHarvestIcon: {fileID: 1847463989, guid: a03c2610221b14940b818fb271b448fa, type: 3}
-  squirrelHireIcon: {fileID: 21300000, guid: cd7def56218f44c49a07cc050bba2e7d, type: 3}
-  goldenAppleLuckIcon: {fileID: -5315848806884345938, guid: cc4a532fd26349643b444ac9b36a729b, type: 3}
-  feverMasterIcon: {fileID: 3349391187094723686, guid: c11cfeac0a7710549a892578d75c0290, type: 3}
-  superCriticalIcon: {fileID: 21300000, guid: bd08f2a7e90c9ea4c9e54ca6ed2465a6, type: 3}
-  _specTable: {fileID: 0}
+  _specTable: {fileID: 11400000, guid: b746ebdff94f98d40bb27b491638c6c8, type: 2}
 --- !u!1 &525517429
 GameObject:
   m_ObjectHideFlags: 0
@@ -2638,14 +2665,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.4156863, g: 0.227451, b: 0, a: 1}
+  m_Color: {r: 0.5283019, g: 0.44731224, b: 0.36632255, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 852c417e195f6f445a5b6635abe9e118, type: 3}
+  m_Sprite: {fileID: -4911003576491168557, guid: 04c936c3eab26f84295a0496ed9dc335, type: 3}
   m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3831,6 +3858,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5276872436825283012, guid: 67c22a0323c1bb448820728c43daac5d, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -4911003576491168557, guid: 04c936c3eab26f84295a0496ed9dc335, type: 3}
+    - target: {fileID: 5276872436825283012, guid: 67c22a0323c1bb448820728c43daac5d, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5276872436825283012, guid: 67c22a0323c1bb448820728c43daac5d, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5276872436825283012, guid: 67c22a0323c1bb448820728c43daac5d, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7414314888401994098, guid: 67c22a0323c1bb448820728c43daac5d, type: 3}
       propertyPath: m_Name
       value: "UpgradeItem_5_\uC288\uD37C \uD06C\uB9AC\uD2F0\uCEEC"
@@ -4298,7 +4341,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1446342218}
   m_Direction: 2
   m_Value: 0.9999998
-  m_Size: 0.4067797
+  m_Size: 0.40677965
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -4316,14 +4359,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.38679248, g: 0.28279638, b: 0.28279638, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 852c417e195f6f445a5b6635abe9e118, type: 3}
+  m_Sprite: {fileID: 3215740371348000199, guid: 900b63750b83e0444bdd4b0f61da6dcf, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -6858,15 +6901,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.6037736, g: 0.48700607, b: 0.48700607, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: 3215740371348000199, guid: 900b63750b83e0444bdd4b0f61da6dcf, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -15876,6 +15919,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5276872436825283012, guid: 67c22a0323c1bb448820728c43daac5d, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -4911003576491168557, guid: 04c936c3eab26f84295a0496ed9dc335, type: 3}
+    - target: {fileID: 5276872436825283012, guid: 67c22a0323c1bb448820728c43daac5d, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5276872436825283012, guid: 67c22a0323c1bb448820728c43daac5d, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5276872436825283012, guid: 67c22a0323c1bb448820728c43daac5d, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7414314888401994098, guid: 67c22a0323c1bb448820728c43daac5d, type: 3}
       propertyPath: m_Name
       value: "UpgradeItem_3_\uD669\uAE08 \uC0AC\uACFC \uD589\uC6B4"
@@ -16100,6 +16159,22 @@ PrefabInstance:
     - target: {fileID: 324870444224635108, guid: 67c22a0323c1bb448820728c43daac5d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5276872436825283012, guid: 67c22a0323c1bb448820728c43daac5d, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -4911003576491168557, guid: 04c936c3eab26f84295a0496ed9dc335, type: 3}
+    - target: {fileID: 5276872436825283012, guid: 67c22a0323c1bb448820728c43daac5d, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5276872436825283012, guid: 67c22a0323c1bb448820728c43daac5d, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5276872436825283012, guid: 67c22a0323c1bb448820728c43daac5d, type: 3}
+      propertyPath: m_Color.r
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7414314888401994098, guid: 67c22a0323c1bb448820728c43daac5d, type: 3}
       propertyPath: m_Name

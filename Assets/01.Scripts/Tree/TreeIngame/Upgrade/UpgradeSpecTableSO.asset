@@ -18,39 +18,53 @@ MonoBehaviour:
     BaseCost: 100
     BaseDamage: 10
     CostMultiplier: 1.5
+    Icon: {fileID: -2994877863233710035, guid: 4c4dc131d2c789e459cc64987d258654, type: 3}
     DamageMultiplier: 1
     Name: "\uC0AC\uACFC \uC218\uD655 \uAC15\uD654"
     Description: "\uD074\uB9AD\uB2F9 \uACFC\uC77C\uC810\uC218 \uC99D\uAC00"
   - Type: 1
     MaxLevel: 10
+    BaseCost: 100
+    BaseDamage: 10
+    CostMultiplier: 1.5
+    Icon: {fileID: 1847463989, guid: a03c2610221b14940b818fb271b448fa, type: 3}
+    DamageMultiplier: 1
+    Name: "\uC0AC\uACFC \uC218\uD655 \uAC15\uD654"
+    Description: "\uD074\uB9AD\uB2F9 \uACFC\uC77C\uC810\uC218 \uC99D\uAC00"
+  - Type: 2
+    MaxLevel: 10
     BaseCost: 500
     BaseDamage: 50
     CostMultiplier: 1.8
+    Icon: {fileID: 21300000, guid: cd7def56218f44c49a07cc050bba2e7d, type: 3}
     DamageMultiplier: 1
     Name: "\uB2E4\uB78C\uC950 \uACE0\uC6A9"
     Description: "\uC790\uB3D9\uC73C\uB85C \uACFC\uC77C\uC744 \uC218\uD655\uD574\uC90D\uB2C8\uB2E4."
-  - Type: 2
+  - Type: 3
     MaxLevel: 10
     BaseCost: 1000
     BaseDamage: 0
     CostMultiplier: 2
+    Icon: {fileID: -5315848806884345938, guid: cc4a532fd26349643b444ac9b36a729b, type: 3}
     DamageMultiplier: 0.05
     Name: "\uD669\uAE08 \uC0AC\uACFC \uD589\uC6B4"
     Description: "\uD669\uAE08\uC0AC\uACFC\uAC00 \uB5A8\uC5B4\uC9C8 \uD655\uB960\uC774
       \uC99D\uAC00\uD569\uB2C8\uB2E4."
-  - Type: 3
+  - Type: 4
     MaxLevel: 5
     BaseCost: 2000
     BaseDamage: 0
     CostMultiplier: 2.5
+    Icon: {fileID: 3349391187094723686, guid: c11cfeac0a7710549a892578d75c0290, type: 3}
     DamageMultiplier: 1
     Name: "\uD53C\uBC84 \uD0C0\uC784 \uB9C8\uC2A4\uD130"
     Description: "\uD53C\uBC84 \uD0C0\uC784 \uD6A8\uACFC\uB97C \uAC15\uD654\uD569\uB2C8\uB2E4."
-  - Type: 3
+  - Type: 5
     MaxLevel: 10
     BaseCost: 500
     BaseDamage: 0
     CostMultiplier: 1.8
+    Icon: {fileID: 21300000, guid: bd08f2a7e90c9ea4c9e54ca6ed2465a6, type: 3}
     DamageMultiplier: 0
     Name: "\uC0AC\uACFC \uC218\uD655 \uAC15\uD654"
     Description: "\uB354 \uD070 \uC0AC\uACFC\uB97C \uC218\uD655\uD569\uB2C8\uB2E4\\n\uD074\uB9AD\uB2F9

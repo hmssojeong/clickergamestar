@@ -9,6 +9,7 @@ public class UpgradeSpecData
     public double BaseCost;
     public double BaseDamage;
     public double CostMultiplier;
+    public Sprite Icon;
     public double DamageMultiplier;
     public string Name;
     public string Description;
