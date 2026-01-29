@@ -1,41 +1,54 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CursorManager : MonoBehaviour
 {
-    [SerializeField] private SpriteRenderer _cursorSprite;
-    [SerializeField] private float _cursorSize = 0.08f;
+    [SerializeField] private RectTransform _cursorRectTransform; // Image의 RectTransform
+    [SerializeField] private float _cursorSize = 80f;
     [SerializeField] private float _cursorScale = 0.8f;
+    [SerializeField] private float _edgePadding = 10f;
 
-    private Camera _mainCamera;
+    private Vector3 _originalScale;
 
     private void Start()
     {
         Cursor.visible = false;
-        _mainCamera = Camera.main;
 
-        if (_cursorSprite != null)
+        if (_cursorRectTransform != null)
         {
-            _cursorSprite.transform.localScale = Vector3.one * _cursorSize;
+            _originalScale = Vector3.one * _cursorSize;
+            _cursorRectTransform.localScale = _originalScale;
+        }
+
+        // Raycast Target 비활성화
+        Image img = _cursorRectTransform.GetComponent<Image>();
+        if (img != null)
+        {
+            img.raycastTarget = false;
         }
     }
 
     private void Update()
     {
-        if (_cursorSprite != null && _mainCamera != null)
+        if (_cursorRectTransform != null)
         {
-            Vector3 mousePos = _mainCamera.ScreenToWorldPoint(Input.mousePosition);
-            mousePos.z = 0f;
-            _cursorSprite.transform.position = mousePos;
+            // 마우스 위치를 화면 범위 내로 제한
+            Vector3 mousePos = Input.mousePosition;
+
+            mousePos.x = Mathf.Clamp(mousePos.x, _edgePadding, Screen.width - _edgePadding);
+            mousePos.y = Mathf.Clamp(mousePos.y, _edgePadding, Screen.height - _edgePadding);
+
+            _cursorRectTransform.position = mousePos;
         }
 
         if (Input.GetMouseButtonDown(0))
         {
-            _cursorSprite.transform.localScale *= _cursorScale;
+            _cursorRectTransform.localScale = _originalScale * _cursorScale;
         }
 
         if (Input.GetMouseButtonUp(0))
         {
-            _cursorSprite.transform.localScale = Vector3.one * _cursorSize;
+            _cursorRectTransform.localScale = _originalScale;
         }
     }
 }

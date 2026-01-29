@@ -2,16 +2,20 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
-/// <summary>
-/// 업그레이드 시스템을 관리하는 매니저 (사용자 GameManager와 통합)
-/// </summary>
 public class UpgradeManager : MonoBehaviour
 {
     public static UpgradeManager Instance { get; private set; }
     
     [Header("업그레이드 데이터")]
     public List<UpgradeData> allUpgrades = new List<UpgradeData>();
-    
+
+    [Header("아이콘 설정")]
+    public Sprite appleHarvestIcon;   
+    public Sprite squirrelHireIcon;    
+    public Sprite goldenAppleLuckIcon; 
+    public Sprite feverMasterIcon; 
+    public Sprite superCriticalIcon;
+
     void Awake()
     {
         if (Instance == null)
@@ -25,9 +29,6 @@ public class UpgradeManager : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// 업그레이드 초기화
-    /// </summary>
     void InitializeUpgrades()
     {
         allUpgrades = new List<UpgradeData>
@@ -38,6 +39,7 @@ public class UpgradeManager : MonoBehaviour
                 type = UpgradeType.AppleHarvest,
                 upgradeName = "사과 수확 강화",
                 description = "더 큰 사과를 수확합니다\n클릭당 데미지 +10",
+                icon = appleHarvestIcon,
                 baseCost = 500,
                 costMultiplier = 1.8f,
                 maxLevel = 10
@@ -49,6 +51,7 @@ public class UpgradeManager : MonoBehaviour
                 type = UpgradeType.SquirrelHire,
                 upgradeName = "다람쥐 고용",
                 description = "부지런한 다람쥐가 자동으로 사과를 모아줍니다\n초당 +50 사과",
+                icon = squirrelHireIcon,
                 baseCost = 1000,
                 costMultiplier = 2.5f,
                 maxLevel = 5
@@ -60,6 +63,7 @@ public class UpgradeManager : MonoBehaviour
                 type = UpgradeType.GoldenAppleLuck,
                 upgradeName = "황금 사과 행운",
                 description = "황금 사과가 나올 확률이 증가합니다\n크리티컬 확률 +5%",
+                icon = goldenAppleLuckIcon,
                 baseCost = 2000,
                 costMultiplier = 2.0f,
                 maxLevel = 5
@@ -71,6 +75,7 @@ public class UpgradeManager : MonoBehaviour
                 type = UpgradeType.FeverMaster,
                 upgradeName = "피버 타임 마스터",
                 description = "피버 타임을 더욱 강력하게 만듭니다",
+                icon = feverMasterIcon,
                 baseCost = 3000,
                 costMultiplier = 3.0f,
                 maxLevel = 5
@@ -82,6 +87,7 @@ public class UpgradeManager : MonoBehaviour
                 type = UpgradeType.SuperCritical,
                 upgradeName = "슈퍼 크리티컬",
                 description = "크리티컬 발동 시 더 많은 사과를 획득합니다\n크리티컬 배수 +0.5배",
+                icon = superCriticalIcon,
                 baseCost = 5000,
                 costMultiplier = 2.5f,
                 maxLevel = 5
@@ -92,9 +98,6 @@ public class UpgradeManager : MonoBehaviour
         LoadUpgradeLevels();
     }
     
-    /// <summary>
-    /// 업그레이드 구매
-    /// </summary>
     public bool PurchaseUpgrade(UpgradeType type)
     {
         UpgradeData upgrade = allUpgrades.FirstOrDefault(u => u.type == type);
@@ -132,9 +135,6 @@ public class UpgradeManager : MonoBehaviour
         return true;
     }
     
-    /// <summary>
-    /// 업그레이드 효과 적용
-    /// </summary>
     void ApplyUpgradeEffect(UpgradeType type, int level)
     {
         GameManager gm = GameManager.Instance;
@@ -191,26 +191,18 @@ public class UpgradeManager : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// 특정 업그레이드 데이터 가져오기
-    /// </summary>
     public UpgradeData GetUpgradeData(UpgradeType type)
     {
         return allUpgrades.FirstOrDefault(u => u.type == type);
     }
     
-    /// <summary>
-    /// 업그레이드 레벨 저장
-    /// </summary>
+    // 업그레이드 저장
     void SaveUpgradeLevel(UpgradeType type, int level)
     {
         PlayerPrefs.SetInt($"Upgrade_{type}", level);
         PlayerPrefs.Save();
     }
     
-    /// <summary>
-    /// 모든 업그레이드 레벨 불러오기
-    /// </summary>
     void LoadUpgradeLevels()
     {
         foreach (var upgrade in allUpgrades)
@@ -226,9 +218,7 @@ public class UpgradeManager : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// 모든 업그레이드 리셋 (테스트용)
-    /// </summary>
+    // 모든 업그레이드 리셋 (테스트용)
     public void ResetAllUpgrades()
     {
         foreach (var upgrade in allUpgrades)
