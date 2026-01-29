@@ -8,6 +8,6 @@ public static class NumberFormatExtension
 
     public static string ToFormattedString(this double value)
     {
-        return "데미지 표기법 넣기";
+        return CurrencyFormatter.Format(value);
     }
 }

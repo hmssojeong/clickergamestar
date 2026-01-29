@@ -32,7 +32,7 @@ public class UpgradeItemUI : MonoBehaviour
 
         bool canLevelUp = UpgradeManager.Instance.CanLevelUp(upgrade.SpecData.Type);
 
-        CostTextUI.color = canLevelUp ? Color.white : Color.red;
+        CostTextUI.color = canLevelUp ? Color.green : Color.red;
         UpgradeButtonImage.sprite = canLevelUp ? CanLevelUpSprite : NotCanLevelUpSprite;
         UpgradeButton.interactable = canLevelUp;
     }
