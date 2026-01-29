@@ -208,7 +208,7 @@ public class UpgradeManager : MonoBehaviour
         }
     }
 
-    // 업그레이드 조회 (읽기 전용)
+    // 업그레이드 조회
     public Upgrade GetUpgrade(EUpgradeType type)
     {
         _upgrades.TryGetValue(type, out Upgrade upgrade);
@@ -235,37 +235,6 @@ public class UpgradeManager : MonoBehaviour
                 upgrade.TryLevelUp();
                 ApplyUpgradeEffect(upgrade);
             }
-        }
-    }
-
-    // 리셋 (테스트용)
-    public void ResetAllUpgrades()
-    {
-        foreach (var upgrade in _upgrades.Values)
-        {
-            upgrade.SetLevel(0);
-            PlayerPrefs.DeleteKey($"Upgrade_{upgrade.Type}");
-        }
-
-        // GameManager 초기화
-        GameManager gm = GameManager.Instance;
-        gm.criticalChance = 0.1;
-        gm.criticalMultiplier = 2.0;
-        gm.squirrelCount = 0;
-        gm.feverThreshold = 75;
-        gm.feverMultiplier = 2.5;
-        gm.feverDuration = 10f;
-
-        Debug.Log("모든 업그레이드가 초기화되었습니다!");
-    }
-
-    // 디버깅: 모든 업그레이드 정보 출력
-    [ContextMenu("Print All Upgrades")]
-    public void PrintAllUpgrades()
-    {
-        foreach (var upgrade in _upgrades.Values)
-        {
-            Debug.Log(upgrade.ToString());
         }
     }
 }

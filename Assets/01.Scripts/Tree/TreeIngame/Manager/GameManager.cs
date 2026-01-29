@@ -23,7 +23,6 @@ public class GameManager : MonoBehaviour
     public bool HasAutoClicker = false;
     public int AutoClickerLevel = 0;
 
-    // ============ 5가지 업그레이드를 위한 새로운 변수들 ============
     [Header("Critical System")]
     public double criticalChance = 0.1d;        // 크리티컬 확률 (10%)
     public double criticalMultiplier = 2.0d;    // 크리티컬 배수 (2배)
@@ -39,7 +38,6 @@ public class GameManager : MonoBehaviour
     public float feverDuration = 10f;           // 피버 지속 시간
     public bool isFeverActive = false;          // 피버 활성화 여부
     private float feverTimer = 0f;              // 피버 남은 시간
-    // ============================================================
 
     [Header("Events")]
     public UnityEvent<double> OnAppleChanged;       // 사과 점수 변경 이벤트
@@ -82,9 +80,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // ============ 기존 함수들 (그대로 유지) ============
-
-    // 사과 점수를 추가합니다
     public void AddApples(double amount)
     {
         Apples += amount;
@@ -126,9 +121,7 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
-    /// <summary>
-    /// 자동 클릭 데미지를 업그레이드합니다
-    /// </summary>
+    // 자동 클릭 데미지를 업그레이드합니다
     public bool UpgradeAutoDamage()
     {
         if (SpendApples(AutoUpgradeCost))
@@ -168,9 +161,8 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
-    /// <summary>
-    /// 나무가 리스폰될 때 호출
-    /// </summary>
+
+    // 나무가 리스폰될 때 호출
     public void OnTreeRespawn()
     {
         // 보너스 사과 지급
@@ -182,12 +174,6 @@ public class GameManager : MonoBehaviour
         Debug.Log($"나무 리스폰! 보너스 사과 +{bonusApples}");
     }
 
-    // ============ 새로운 5가지 업그레이드를 위한 함수들 ============
-
-    /// <summary>
-    /// 나무 클릭 처리 (크리티컬 및 피버 포함)
-    /// 기존 클릭 로직 대신 이 함수를 사용하세요!
-    /// </summary>
     public void OnTreeClick()
     {
         // 기본 데미지 계산
@@ -220,9 +206,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 피버 타임 시작
-    /// </summary>
     void StartFever()
     {
         isFeverActive = true;
@@ -230,24 +213,17 @@ public class GameManager : MonoBehaviour
         clickCount = 0;
 
         OnFeverStartEvent?.Invoke();
-        Debug.Log($"🔥 FEVER TIME! (x{feverMultiplier}) 🔥");
+        Debug.Log($" FEVER TIME! (x{feverMultiplier}) ");
     }
 
-    /// <summary>
-    /// 피버 타임 종료
-    /// </summary>
     void EndFever()
     {
         isFeverActive = false;
         clickCount = 0;
 
         OnFeverEndEvent?.Invoke();
-        Debug.Log("피버 타임 종료!");
     }
 
-    /// <summary>
-    /// 다람쥐 자동 수확 (1초마다 자동 호출)
-    /// </summary>
     void AutoHarvestBySquirrels()
     {
         if (squirrelCount > 0)
@@ -257,17 +233,12 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 피버 남은 시간 가져오기 (UI 표시용)
-    /// </summary>
+
     public float GetFeverRemainingTime()
     {
         return isFeverActive ? feverTimer : 0f;
     }
 
-    /// <summary>
-    /// 현재 클릭당 데미지 가져오기 (UI 표시용)
-    /// </summary>
     public double GetCurrentClickDamage()
     {
         double damage = ManualDamage;
@@ -278,11 +249,6 @@ public class GameManager : MonoBehaviour
         return damage;
     }
 
-    // ============ 저장/로드 함수 (새 변수 추가) ============
-
-    /// <summary>
-    /// 게임 데이터 저장 (PlayerPrefs 사용)
-    /// </summary>
     public void SaveGame()
     {
         // 기존 데이터 저장
@@ -309,9 +275,6 @@ public class GameManager : MonoBehaviour
         Debug.Log("게임 저장 완료!");
     }
 
-    /// <summary>
-    /// 게임 데이터 로드
-    /// </summary>
     public void LoadGame()
     {
         // 기존 데이터 로드
@@ -340,9 +303,6 @@ public class GameManager : MonoBehaviour
         Debug.Log("게임 로드 완료!");
     }
 
-    /// <summary>
-    /// 게임 데이터 리셋
-    /// </summary>
     public void ResetGame()
     {
         PlayerPrefs.DeleteAll();
