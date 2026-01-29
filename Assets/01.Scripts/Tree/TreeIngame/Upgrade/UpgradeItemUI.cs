@@ -2,9 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-/// <summary>
-/// 개별 업그레이드 아이템 UI 컴포넌트 (사용자 GameManager와 통합)
-/// </summary>
 public class UpgradeItemUI : MonoBehaviour
 {
     [Header("UI 참조")]
@@ -15,221 +12,306 @@ public class UpgradeItemUI : MonoBehaviour
     public Button purchaseButton;
     public Image iconImage;
     public GameObject maxLevelPanel;
-    
+
     [Header("색상 설정")]
-    public Color affordableColor = new Color(0.2f, 0.8f, 0.2f);  // 구매 가능 (초록)
-    public Color unaffordableColor = new Color(0.5f, 0.5f, 0.5f); // 구매 불가 (회색)
-    public Color maxLevelColor = new Color(1f, 0.84f, 0f);        // 최대 레벨 (금색)
-    
-    private UpgradeData upgradeData;
-    
-    /// <summary>
-    /// 업그레이드 데이터로 초기화
-    /// </summary>
-    public void Initialize(UpgradeData data)
+    public Color affordableColor = new Color(0.2f, 0.8f, 0.2f);
+    public Color unaffordableColor = new Color(0.5f, 0.5f, 0.5f);
+    public Color maxLevelColor = new Color(1f, 0.84f, 0f);
+
+    [Header("아이콘 크기 설정")]
+    public float iconSize = 80f;
+    public bool preserveAspect = true;
+
+    // 도메인 객체 참조
+    private Upgrade _upgrade;
+
+    public void Initialize(Upgrade upgrade)
     {
-        upgradeData = data;
-        
-        // 구매 버튼 이벤트 연결
+        _upgrade = upgrade;
+
         if (purchaseButton != null)
         {
             purchaseButton.onClick.AddListener(OnPurchaseClicked);
         }
-        
+
+        // 아이콘 크기 설정
+        SetupIcon();
+
         UpdateUI();
     }
-    
-    /// <summary>
-    /// UI 업데이트
-    /// </summary>
+
+    void SetupIcon()
+    {
+        if (iconImage != null)
+        {
+            iconImage.preserveAspect = preserveAspect;
+
+            RectTransform iconRect = iconImage.GetComponent<RectTransform>();
+            if (iconRect != null)
+            {
+                iconRect.sizeDelta = new Vector2(iconSize, iconSize);
+            }
+        }
+    }
+
     public void UpdateUI()
     {
-        if (upgradeData == null) return;
-        
+        if (_upgrade == null) return;
+
         // 이름
         if (nameText != null)
         {
-            nameText.text = upgradeData.upgradeName;
+            nameText.text = _upgrade.Name;
         }
-        
+
         // 레벨
         if (levelText != null)
         {
-            levelText.text = $"Lv.{upgradeData.currentLevel}/{upgradeData.maxLevel}";
+            levelText.text = $"Lv.{_upgrade.Level}/{_upgrade.MaxLevel}";
         }
-        
-        // 설명 (레벨에 따라 동적으로 변경)
+
+        // 설명
         if (descriptionText != null)
         {
             descriptionText.text = GetDynamicDescription();
         }
-        
-        // 최대 레벨 여부
-        bool isMaxLevel = upgradeData.IsMaxLevel();
-        
+
+        // 최대 레벨 패널
         if (maxLevelPanel != null)
         {
-            maxLevelPanel.SetActive(isMaxLevel);
+            maxLevelPanel.SetActive(_upgrade.IsMaxLevel);
         }
-        
-        // 비용 및 구매 가능 여부
-        if (!isMaxLevel)
+
+        // 비용 및 버튼 상태
+        UpdateCostAndButton();
+
+        // 아이콘
+        if (iconImage != null && _upgrade.Icon != null)
         {
-            double cost = upgradeData.GetCurrentCost();
-            bool canAfford = upgradeData.CanUpgrade(GameManager.Instance.Apples);
-            
-            if (costText != null)
-            {
-                costText.text = $"🍎 {FormatNumber(cost)}";
-                costText.color = canAfford ? affordableColor : unaffordableColor;
-            }
-            
-            if (purchaseButton != null)
-            {
-                purchaseButton.interactable = canAfford;
-                
-                // 버튼 색상 변경
-                ColorBlock colors = purchaseButton.colors;
-                colors.normalColor = canAfford ? affordableColor : unaffordableColor;
-                purchaseButton.colors = colors;
-            }
+            iconImage.sprite = _upgrade.Icon;
+            iconImage.enabled = true;
         }
-        else
+    }
+
+    private void UpdateCostAndButton()
+    {
+        if (_upgrade.IsMaxLevel)
         {
+            // 최대 레벨
             if (costText != null)
             {
                 costText.text = "MAX";
                 costText.color = maxLevelColor;
             }
-            
+
             if (purchaseButton != null)
             {
                 purchaseButton.interactable = false;
             }
         }
-        
-        // 아이콘 (옵션)
-        if (iconImage != null && upgradeData.icon != null)
+        else
         {
-            iconImage.sprite = upgradeData.icon;
+            // 구매 가능 레벨
+            double cost = _upgrade.CurrentCost;
+            double currentApples = GetCurrentApples();
+            bool canAfford = _upgrade.CanAfford(currentApples);
+
+            if (costText != null)
+            {
+                costText.text = $"🍎 {CurrencyFormatter.Format(cost)}";
+                costText.color = canAfford ? affordableColor : unaffordableColor;
+            }
+
+            if (purchaseButton != null)
+            {
+                purchaseButton.interactable = canAfford;
+
+                ColorBlock colors = purchaseButton.colors;
+                colors.normalColor = canAfford ? affordableColor : unaffordableColor;
+                purchaseButton.colors = colors;
+            }
         }
     }
-    
-    /// <summary>
-    /// 레벨에 따른 동적 설명 생성
-    /// </summary>
+
+    private double GetCurrentApples()
+    {
+        if (GameManager.Instance == null) return 0;
+
+        var apples = GameManager.Instance.Apples;
+
+        // double 타입인 경우 (가장 일반적)
+        if (apples is double doubleValue)
+        {
+            return doubleValue;
+        }
+
+        // Currency 타입인 경우
+        try
+        {
+            // Currency 타입이 존재하는지 확인
+            var currencyType = System.Type.GetType("Currency");
+            if (currencyType != null && apples.GetType() == currencyType)
+            {
+                var valueProperty = currencyType.GetProperty("Value");
+                if (valueProperty != null)
+                {
+                    return (double)valueProperty.GetValue(apples);
+                }
+            }
+        }
+        catch { }
+
+        // 기본 변환 시도
+        try
+        {
+            return System.Convert.ToDouble(apples);
+        }
+        catch
+        {
+            return 0;
+        }
+    }
+
     string GetDynamicDescription()
     {
         GameManager gm = GameManager.Instance;
-        
-        switch (upgradeData.type)
+        if (gm == null) return _upgrade.Description;
+
+        switch (_upgrade.Type)
         {
-            case UpgradeType.AppleHarvest:
+            case EUpgradeType.AppleHarvest:
                 double nextDamage = gm.ManualDamage + 10;
-                return $"클릭당 데미지 증가\n현재: {FormatNumber(gm.ManualDamage)} → 다음: {FormatNumber(nextDamage)}";
-                
-            case UpgradeType.SquirrelHire:
+                return $"클릭당 과일점수 증가\n현재: {CurrencyFormatter.Format(gm.ManualDamage)} → 다음: {CurrencyFormatter.Format(nextDamage)}";
+
+            case EUpgradeType.SquirrelHire:
                 int currentSquirrels = gm.squirrelCount;
                 double currentAutoApples = currentSquirrels * gm.squirrelApplePerSecond;
                 double nextAutoApples = (currentSquirrels + 1) * gm.squirrelApplePerSecond;
-                return $"자동으로 사과 수확\n현재: 초당 {FormatNumber(currentAutoApples)} → 다음: 초당 {FormatNumber(nextAutoApples)}";
-                
-            case UpgradeType.GoldenAppleLuck:
+                return $"자동으로 과일 수확\n현재: 초당 {CurrencyFormatter.Format(currentAutoApples)} → 다음: 초당 {CurrencyFormatter.Format(nextAutoApples)}";
+
+            case EUpgradeType.GoldenAppleLuck:
                 double currentChance = gm.criticalChance * 100;
-                double nextChance = currentChance + 5.0d;
-                return $"크리티컬 확률 증가\n현재: {currentChance:F0}% → 다음: {nextChance:F0}%";
-                
-            case UpgradeType.FeverMaster:
-                int level = upgradeData.currentLevel;
-                if (level < 2)
-                {
-                    int currentThreshold = gm.feverThreshold;
-                    return $"피버 발동 조건 감소\n현재: {currentThreshold}회 → 다음: {currentThreshold - 10}회";
-                }
-                else if (level < 4)
-                {
-                    double currentMulti = gm.feverMultiplier;
-                    return $"피버 배수 증가\n현재: {currentMulti}배 → 다음: {currentMulti + 0.5d}배";
-                }
-                else if (level == 4)
-                {
-                    float currentDuration = gm.feverDuration;
-                    return $"피버 지속시간 증가\n현재: {currentDuration}초 → 다음: {currentDuration * 1.5f}초";
-                }
-                else
-                {
-                    return "피버 타임 마스터 완성!";
-                }
-                
-            case UpgradeType.SuperCritical:
+                double nextChance = currentChance + 5.0;
+                return $"황금사과 확률 증가\n현재: {currentChance:F0}% → 다음: {nextChance:F0}%";
+
+            case EUpgradeType.FeverMaster:
+                return GetFeverMasterDescription(_upgrade.Level, gm);
+
+            case EUpgradeType.SuperCritical:
                 double currentMultiplier = gm.criticalMultiplier;
-                double nextMultiplier = currentMultiplier + 0.5d;
-                return $"크리티컬 배수 증가\n현재: {currentMultiplier}배 → 다음: {nextMultiplier}배";
-                
+                double nextMultiplier = currentMultiplier + 0.5;
+                return $"나무 크리티컬 배수 증가\n현재: {currentMultiplier}배 → 다음: {nextMultiplier}배";
+
             default:
-                return upgradeData.description;
+                return _upgrade.Description;
         }
     }
-    
-    /// <summary>
-    /// 숫자 포맷팅 (큰 숫자도 읽기 쉽게)
-    /// </summary>
-    string FormatNumber(double number)
+
+    private string GetFeverMasterDescription(int level, GameManager gm)
     {
-        if (number >= 1000000000000) // 1조 이상
-            return (number / 1000000000000).ToString("0.##") + "T";
-        else if (number >= 1000000000) // 10억 이상
-            return (number / 1000000000).ToString("0.##") + "B";
-        else if (number >= 1000000) // 100만 이상
-            return (number / 1000000).ToString("0.##") + "M";
-        else if (number >= 1000) // 1천 이상
-            return (number / 1000).ToString("0.##") + "K";
+        if (level < 2)
+        {
+            int currentThreshold = gm.feverThreshold;
+            return $"피버 발동 조건 감소\n현재: {currentThreshold}회 → 다음: {currentThreshold - 10}회";
+        }
+        else if (level < 4)
+        {
+            double currentMulti = gm.feverMultiplier;
+            return $"피버 배수 증가\n현재: {currentMulti}배 → 다음: {currentMulti + 0.5}배";
+        }
+        else if (level == 4)
+        {
+            float currentDuration = gm.feverDuration;
+            return $"피버 지속시간 증가\n현재: {currentDuration}초 → 다음: {currentDuration * 1.5f}초";
+        }
         else
-            return number.ToString("0");
+        {
+            return "피버 타임 마스터 완성!";
+        }
     }
-    
-    /// <summary>
-    /// 구매 버튼 클릭 처리
-    /// </summary>
+
     void OnPurchaseClicked()
     {
-        if (UpgradeManager.Instance.PurchaseUpgrade(upgradeData.type))
+        if (UpgradeManager.Instance == null)
+        {
+            Debug.LogError("UpgradeManager 인스턴스가 없습니다!");
+            return;
+        }
+
+        if (UpgradeManager.Instance.PurchaseUpgrade(_upgrade.Type))
         {
             UpdateUI();
-            
-            // 구매 성공 이펙트 (옵션)
             PlayPurchaseEffect();
+
+            // 사운드 재생 (SoundManager가 있는 경우에만)
+            PlayPurchaseSound();
         }
         else
         {
-            // 구매 실패 피드백
-            Debug.Log("업그레이드를 구매할 수 없습니다!");
+            Debug.Log($"{_upgrade.Name}: 업그레이드를 구매할 수 없습니다!");
+
+            // 실패 사운드
+            PlayErrorSound();
         }
     }
-    
-    /// <summary>
-    /// 구매 성공 이펙트 (옵션)
-    /// </summary>
+
+    private void PlayPurchaseSound()
+    {
+        var soundManager = GameObject.FindObjectOfType<SoundManager>();
+        if (soundManager != null)
+        {
+            try
+            {
+                var method = soundManager.GetType().GetMethod("PlaySFX");
+                if (method != null)
+                {
+                    // 메서드 호출 시도
+                }
+            }
+            catch
+            {
+                // 사운드 재생 실패해도 게임은 계속
+            }
+        }
+    }
+
+    private void PlayErrorSound()
+    {
+        var soundManager = GameObject.FindObjectOfType<SoundManager>();
+        if (soundManager != null)
+        {
+            try
+            {
+                var method = soundManager.GetType().GetMethod("PlaySFX");
+                if (method != null)
+                {
+                    // 메서드 호출 시도
+                }
+            }
+            catch
+            {
+                // 사운드 재생 실패해도 게임은 계속
+            }
+        }
+    }
+
+
     void PlayPurchaseEffect()
     {
-        // 버튼 스케일 애니메이션이나 파티클 효과 추가 가능
         if (purchaseButton != null)
         {
             StartCoroutine(ButtonScaleEffect());
         }
     }
-    
-    /// <summary>
-    /// 버튼 스케일 이펙트
-    /// </summary>
+
     System.Collections.IEnumerator ButtonScaleEffect()
     {
         Vector3 originalScale = transform.localScale;
         Vector3 targetScale = originalScale * 1.1f;
-        
+
         float duration = 0.1f;
         float elapsed = 0f;
-        
+
         // 확대
         while (elapsed < duration)
         {
@@ -237,9 +319,9 @@ public class UpgradeItemUI : MonoBehaviour
             transform.localScale = Vector3.Lerp(originalScale, targetScale, elapsed / duration);
             yield return null;
         }
-        
+
         elapsed = 0f;
-        
+
         // 축소
         while (elapsed < duration)
         {
@@ -247,7 +329,7 @@ public class UpgradeItemUI : MonoBehaviour
             transform.localScale = Vector3.Lerp(targetScale, originalScale, elapsed / duration);
             yield return null;
         }
-        
+
         transform.localScale = originalScale;
     }
 }

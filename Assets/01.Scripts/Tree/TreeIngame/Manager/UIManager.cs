@@ -10,7 +10,7 @@ public class UIManager : MonoBehaviour
     [Header("Score UI")]
     [SerializeField] private TextMeshProUGUI _appleScoreText;
     [SerializeField] private Image _appleIcon;
-    [SerializeField] private Transform _appleScoreTransform; // 애니메이션용
+    [SerializeField] private Transform _appleScoreTransform;
 
     [Header("Stats UI")]
     [SerializeField] private TextMeshProUGUI _manualDamageText;
@@ -30,6 +30,11 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Image _healthFillImage;
     [SerializeField] private Gradient _healthColorGradient;
 
+    [Header("Fever UI (선택사항)")]
+    [SerializeField] private TextMeshProUGUI _clickCountText;
+    [SerializeField] private GameObject _feverPanel;
+    [SerializeField] private TextMeshProUGUI _feverTimerText;
+
     [Header("Popup UI")]
     [SerializeField] private GameObject _upgradePanel;
     [SerializeField] private GameObject _settingsPanel;
@@ -37,6 +42,9 @@ public class UIManager : MonoBehaviour
     [Header("Animation Settings")]
     [SerializeField] private float _scoreAnimationDuration = 0.3f;
     [SerializeField] private float _scorePunchScale = 1.2f;
+
+    private bool _hasFeverManager = false;
+    private bool _wasFeverActive = false;
 
     private void Awake()
     {
@@ -52,20 +60,188 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
+        // GameManager 이벤트 구독
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnAppleChanged.AddListener(UpdateAppleScore);
             GameManager.Instance.OnManualDamageChanged.AddListener(UpdateManualDamage);
             GameManager.Instance.OnAutoDamageChanged.AddListener(UpdateAutoDamage);
         }
+        else
+        {
+            Debug.LogWarning("GameManager 인스턴스를 찾을 수 없습니다!");
+        }
+
+        // FeverManager 존재 확인
+        CheckFeverManager();
 
         // 버튼 이벤트 연결
-        _manualUpgradeButton?.onClick.AddListener(OnManualUpgradeClicked);
-        _autoUpgradeButton?.onClick.AddListener(OnAutoUpgradeClicked);
-        _buyAutoClickerButton?.onClick.AddListener(OnBuyAutoClickerClicked);
+        if (_manualUpgradeButton != null)
+            _manualUpgradeButton.onClick.AddListener(OnManualUpgradeClicked);
+        if (_autoUpgradeButton != null)
+            _autoUpgradeButton.onClick.AddListener(OnAutoUpgradeClicked);
+        if (_buyAutoClickerButton != null)
+            _buyAutoClickerButton.onClick.AddListener(OnBuyAutoClickerClicked);
 
-        // 초기 UI 업데이트
+        // 피버 패널 초기화
+        if (_feverPanel != null)
+        {
+            _feverPanel.SetActive(false);
+        }
+
         UpdateAllUI();
+    }
+
+    private void CheckFeverManager()
+    {
+        _hasFeverManager = FeverManager.Instance != null;
+
+        if (!_hasFeverManager)
+        {
+            // 피버 UI 숨기기
+            if (_clickCountText != null)
+                _clickCountText.gameObject.SetActive(false);
+            if (_feverPanel != null)
+                _feverPanel.SetActive(false);
+            if (_feverTimerText != null)
+                _feverTimerText.gameObject.SetActive(false);
+        }
+    }
+
+    private void Update()
+    {
+        if (_hasFeverManager)
+        {
+            UpdateFeverUI();
+        }
+    }
+
+    private double GetApplesValue()
+    {
+        if (GameManager.Instance == null) return 0;
+
+        var apples = GameManager.Instance.Apples;
+
+        // double 타입인 경우 (가장 일반적)
+        if (apples is double doubleValue)
+        {
+            return doubleValue;
+        }
+
+        // Currency 타입인 경우
+        try
+        {
+            // Currency 타입이 존재하는지 확인
+            var currencyType = System.Type.GetType("Currency");
+            if (currencyType != null && apples.GetType() == currencyType)
+            {
+                var valueProperty = currencyType.GetProperty("Value");
+                if (valueProperty != null)
+                {
+                    return (double)valueProperty.GetValue(apples);
+                }
+            }
+        }
+        catch { }
+
+        try
+        {
+            return System.Convert.ToDouble(apples);
+        }
+        catch
+        {
+            return 0;
+        }
+    }
+
+    private bool IsGreaterOrEqual(object value1, object value2)
+    {
+        try
+        {
+            double d1 = System.Convert.ToDouble(value1);
+            double d2 = System.Convert.ToDouble(value2);
+            return d1 >= d2;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private void UpdateFeverUI()
+    {
+        if (FeverManager.Instance == null)
+        {
+            _hasFeverManager = false;
+            return;
+        }
+
+        try
+        {
+            if (_clickCountText != null)
+            {
+                int currentClicks = FeverManager.Instance.CurrentClicks;
+                int threshold = FeverManager.Instance.GetClicksNeeded();
+                _clickCountText.text = $"클릭: {currentClicks}/{threshold}";
+            }
+
+            bool isFeverActive = FeverManager.Instance.IsFeverActive;
+
+            if (_feverPanel != null && _feverPanel.activeSelf != isFeverActive)
+            {
+                _feverPanel.SetActive(isFeverActive);
+
+                if (isFeverActive && !_wasFeverActive)
+                {
+                    OnFeverStart();
+                }
+                else if (!isFeverActive && _wasFeverActive)
+                {
+                    OnFeverEnd();
+                }
+
+                _wasFeverActive = isFeverActive;
+            }
+
+            if (_feverTimerText != null && isFeverActive)
+            {
+                float remainingTime = GetFeverRemainingTime();
+                _feverTimerText.text = $"FEVER TIME! {remainingTime:F1}초";
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning($"FeverManager UI 업데이트 실패: {e.Message}");
+            _hasFeverManager = false;
+        }
+    }
+
+    private float GetFeverRemainingTime()
+    {
+        try
+        {
+            var feverType = FeverManager.Instance.GetType();
+            var field = feverType.GetField("_feverTimeRemaining",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+            if (field != null)
+            {
+                return (float)field.GetValue(FeverManager.Instance);
+            }
+        }
+        catch { }
+
+        return 0f;
+    }
+
+    private void OnFeverStart()
+    {
+        Debug.Log("FEVER TIME 시작!");
+    }
+
+    private void OnFeverEnd()
+    {
+        Debug.Log("피버 타임 종료!");
     }
 
     private void UpdateAppleScore(double score)
@@ -73,8 +249,6 @@ public class UIManager : MonoBehaviour
         if (_appleScoreText != null)
         {
             _appleScoreText.text = CurrencyFormatter.Format(score);
-
-            // 점수 증가 애니메이션
             AnimateScoreIncrease();
         }
     }
@@ -83,12 +257,9 @@ public class UIManager : MonoBehaviour
     {
         if (_appleScoreTransform == null) return;
 
-        // DOTween으로 펀치 애니메이션
         _appleScoreTransform.DOKill(true);
-
         _appleScoreTransform.DOPunchScale(Vector3.one * (_scorePunchScale - 1f), _scoreAnimationDuration, 1, 0.5f);
 
-        // 아이콘 회전
         if (_appleIcon != null)
         {
             _appleIcon.transform.DORotate(new Vector3(0, 0, 360f), 0.5f, RotateMode.FastBeyond360)
@@ -96,54 +267,51 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    // 수동
     private void UpdateManualDamage(double damage)
     {
         if (_manualDamageText != null)
         {
             _manualDamageText.text = $"클릭 파워: {CurrencyFormatter.Format(damage)}";
         }
-
         UpdateUpgradeButtons();
     }
 
-    // 자동
     private void UpdateAutoDamage(double damage)
     {
         if (_autoDamageText != null)
         {
             _autoDamageText.text = $"자동 파워: {CurrencyFormatter.Format(damage)}";
         }
-
         UpdateUpgradeButtons();
     }
 
-    // 업그레이드 버튼 UI 업데이트
+
     private void UpdateUpgradeButtons()
     {
         var gm = GameManager.Instance;
         if (gm == null) return;
 
+        double currentApples = GetApplesValue();
+
         // 수동 업그레이드 버튼
-        if (_manualUpgradeCostText != null)
+        if (_manualUpgradeCostText != null && _manualUpgradeButton != null)
         {
             _manualUpgradeCostText.text = $"{CurrencyFormatter.Format(gm.ManualUpgradeCost)} 🍎";
-            _manualUpgradeButton.interactable = gm.Apples >= gm.ManualUpgradeCost;
+            _manualUpgradeButton.interactable = IsGreaterOrEqual(currentApples, gm.ManualUpgradeCost);
         }
 
         // 자동 업그레이드 버튼
-        if (_autoUpgradeCostText != null)
+        if (_autoUpgradeCostText != null && _autoUpgradeButton != null)
         {
             _autoUpgradeCostText.text = $"{CurrencyFormatter.Format(gm.AutoUpgradeCost)} 🍎";
-            _autoUpgradeButton.interactable = gm.Apples >= gm.AutoUpgradeCost;
+            _autoUpgradeButton.interactable = IsGreaterOrEqual(currentApples, gm.AutoUpgradeCost);
         }
 
-        // 자동 클리커 구매 버튼
-        if (_autoClickerCostText != null)
+        // 자동 클리커 버튼
+        if (_autoClickerCostText != null && _buyAutoClickerButton != null)
         {
-            _buyAutoClickerButton.interactable = gm.Apples >= gm.AutoClickerCost;
+            _buyAutoClickerButton.interactable = IsGreaterOrEqual(currentApples, gm.AutoClickerCost);
 
-            // 이미 구매했으면 레벨 표시, 아니면 [단위 적용] 비용 표시
             if (gm.HasAutoClicker)
             {
                 _autoClickerCostText.text = $"Lv.{gm.AutoClickerLevel}";
@@ -155,28 +323,32 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    // 나무 체력 UI 업데이트
     public void UpdateTreeHealth(double healthPercent)
     {
         if (_treeHealthSlider != null)
         {
             _treeHealthSlider.value = (float)healthPercent;
 
-            // 체력에 따른 색상 변화
             if (_healthFillImage != null && _healthColorGradient != null)
             {
-                float normalizedHealth = (float)healthPercent / 100f; // 0~100을 0~1로 변환
+                float normalizedHealth = (float)healthPercent / 100f;
                 _healthFillImage.color = _healthColorGradient.Evaluate(normalizedHealth);
             }
         }
     }
 
+
     public void UpdateAllUI()
     {
         var gm = GameManager.Instance;
-        if (gm == null) return;
+        if (gm == null)
+        {
+            Debug.LogWarning("GameManager가 없어 UI를 업데이트할 수 없습니다!");
+            return;
+        }
 
-        UpdateAppleScore(gm.Apples);
+        double applesValue = GetApplesValue();
+        UpdateAppleScore(applesValue);
         UpdateManualDamage(gm.ManualDamage);
         UpdateAutoDamage(gm.AutoDamage);
 
@@ -188,24 +360,24 @@ public class UIManager : MonoBehaviour
         UpdateUpgradeButtons();
     }
 
-    // 수동 업그레이드 버튼 클릭
     private void OnManualUpgradeClicked()
     {
+        if (GameManager.Instance == null) return;
+
         if (GameManager.Instance.UpgradeManualDamage())
         {
-            // 성공 효과
             PlayUpgradeSuccessEffect(_manualUpgradeButton.transform);
         }
         else
         {
-            // 실패 효과
             PlayUpgradeFailEffect(_manualUpgradeButton.transform);
         }
     }
 
-    // 자동 업그레이드 버튼 클릭
     private void OnAutoUpgradeClicked()
     {
+        if (GameManager.Instance == null) return;
+
         if (GameManager.Instance.UpgradeAutoDamage())
         {
             PlayUpgradeSuccessEffect(_autoUpgradeButton.transform);
@@ -216,9 +388,10 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    // 자동 클리커 구매 버튼 클릭
     private void OnBuyAutoClickerClicked()
     {
+        if (GameManager.Instance == null) return;
+
         if (GameManager.Instance.BuyAutoClicker())
         {
             PlayUpgradeSuccessEffect(_buyAutoClickerButton.transform);
@@ -229,26 +402,18 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    // 업그레이드 성공 효과
     private void PlayUpgradeSuccessEffect(Transform buttonTransform)
     {
+        if (buttonTransform == null) return;
         buttonTransform.DOPunchScale(Vector3.one * 0.2f, 0.3f, 1, 0.5f);
-
-        // 파티클이나 사운드 재생
-        // EffectManager.Instance.PlayUpgradeSuccess();
     }
 
-    // 업그레이드 실패 효과 (돈 부족)
     private void PlayUpgradeFailEffect(Transform buttonTransform)
     {
-        // 좌우 흔들림
+        if (buttonTransform == null) return;
         buttonTransform.DOShakePosition(0.5f, 10f, 20, 90f);
-
-        // 사운드 재생
-        // AudioManager.Instance.PlayFailSound();
     }
 
-    // 업그레이드 패널 토글
     public void ToggleUpgradePanel()
     {
         if (_upgradePanel != null)
@@ -263,7 +428,6 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    // 설정 패널 토글
     public void ToggleSettingsPanel()
     {
         if (_settingsPanel != null)
@@ -272,11 +436,8 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    // 데미지 텍스트 표시 (나무 위에 떠오르는 효과)
     public void ShowDamageText(Vector3 position, double damage)
     {
-        // TODO: Floating Text 프리팹을 사용하여 데미지 표시
-        // FloatingTextManager.Instance.ShowText(position, damage.ToString(), Color.red);
         if (FloatingTextManager.Instance != null)
         {
             FloatingTextManager.Instance.ShowDamage(position, damage);
@@ -285,7 +446,7 @@ public class UIManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        // 이벤트 구독 해제
+        // GameManager 이벤트 구독 해제
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnAppleChanged.RemoveListener(UpdateAppleScore);
