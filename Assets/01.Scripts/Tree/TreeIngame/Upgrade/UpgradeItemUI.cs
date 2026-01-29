@@ -15,7 +15,7 @@ public class UpgradeItemUI : MonoBehaviour
     public Sprite NotCanLevelUpSprite;
 
     private Upgrade _upgrade;
-    public EUpgradeType Type => _upgrade != null ? _upgrade.SpecData.Type : EUpgradeType.None;
+    public EUpgradeType Type => _upgrade != null ? _upgrade.SpecData.Type : EUpgradeType.AppleHarvest;
 
     public void Refresh(Upgrade upgrade)
     {
