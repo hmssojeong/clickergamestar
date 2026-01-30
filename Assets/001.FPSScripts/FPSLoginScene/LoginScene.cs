@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -51,6 +52,22 @@ public class LoginScene : MonoBehaviour
         _gotoLoginButton.gameObject.SetActive(_mode == SceneMode.Register);
         _registerButton.gameObject.SetActive(_mode == SceneMode.Register);
     }
+
+
+    public void OnEmailTextChanged(string email)
+    {
+        var emailSpec = new AccountEmailSpecification();
+        if (!emailSpec.IsSatisfiedBy(email))
+        {
+            _messageTextUI.text = emailSpec.ErrorMessage;
+            _loginButton.enabled = false;
+            return;
+        }
+
+        _messageTextUI.text = "완벽한 이메일입니다.";
+        _loginButton.enabled = true;
+    }
+
 
     private void Login()
     {

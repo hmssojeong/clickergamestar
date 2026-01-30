@@ -95,7 +95,6 @@ public class AccountManager : MonoBehaviour
         // 3. 성공하면 저장!
         PlayerPrefs.SetString(email, password);
 
-
         return new AuthResult()
         {
             Success = true,
