@@ -1,8 +1,6 @@
 using System;
 
-/// <summary>
-/// GameManager의 게임 진행 상태를 저장하는 데이터 클래스
-/// </summary>
+
 [Serializable]
 public class GameStateSaveData
 {

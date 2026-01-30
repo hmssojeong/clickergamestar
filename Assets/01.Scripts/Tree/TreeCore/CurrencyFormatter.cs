@@ -31,4 +31,21 @@ public static class CurrencyFormatter
         if (tempValue >= 10) return $"{tempValue:F1}{_suffixes[suffixIndex]}";
         return $"{tempValue:F2}{_suffixes[suffixIndex]}";
     }
+
+    // Currency 타입을 포맷팅된 문자열로 변환 // (amount.value) -> (amount) value를 안써도된다.
+    public static string Format(Currency currency)
+    {
+        return Format(currency.Value);
+    }
+
+    // double 확장 메서드
+    public static class DoubleExtensions
+    {
+        public static string ToFormattedString(this double value)
+        {
+            return CurrencyFormatter.Format(value);
+        }
+        // double 값을 포맷팅된 문자열로 변환
+        // 예: 1234.5.ToFormattedString() → "1.2K"
+    }
 }

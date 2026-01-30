@@ -4,7 +4,9 @@ using System.Linq;
 using System;
 
 // 업그레이드 시스템 관리자
-// Upgrade 도메인 클래스를 사용하여 게임의 업그레이드를 관리합니다.
+// Upgrade 도메인 클래스를 사용하여 게임의 업그레이드를 관리
+// 업그레이드 시 실제 게임 스탯에 효과 적용
+// SaveLoadManager를 통해 저장/로드
 public class UpgradeManager : MonoBehaviour
 {
     public static UpgradeManager Instance { get; private set; }
@@ -20,6 +22,7 @@ public class UpgradeManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            DontDestroyOnLoad(gameObject);
             InitializeUpgrades(null); // 기본 0레벨로 초기화
         }
         else

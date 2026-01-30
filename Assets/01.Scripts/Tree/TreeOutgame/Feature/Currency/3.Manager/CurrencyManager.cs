@@ -5,8 +5,8 @@ using UnityEngine.Events;
 
 
 // 게임 내 재화를 관리하는 매니저
-// - Repository 패턴을 사용하여 데이터 저장/로드
-// - SaveLoadManager를 통해 저장되므로 직접 저장하지 않음
+// Repository 패턴을 사용하여 데이터 저장/로드
+// SaveLoadManager를 통해 저장되므로 직접 저장하지 않음
 public class CurrencyManager : MonoBehaviour
 {
     public static CurrencyManager Instance { get; private set; }
@@ -54,7 +54,6 @@ public class CurrencyManager : MonoBehaviour
     {
         if (!CanAfford(type, cost))
         {
-            Debug.LogWarning($"{type} 부족: 필요 {cost}, 보유 {Get(type)}");
             return false;
         }
 
@@ -66,7 +65,6 @@ public class CurrencyManager : MonoBehaviour
         }
         catch (Exception e)
         {
-            Debug.LogError($"{type} 소비 실패: {e.Message}");
             return false;
         }
     }
@@ -108,7 +106,6 @@ public class CurrencyManager : MonoBehaviour
         }
 
         OnDataChanged?.Invoke();
-        Debug.Log("재화 데이터 로드 완료");
     }
 
     private void NotifyCurrencyChanged(ECurrencyType type)
