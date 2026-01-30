@@ -1,8 +1,12 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
+
+// ê²Œì„ ë‚´ ì¬í™”ë¥¼ ê´€ë¦¬í•˜ëŠ” ë§¤ë‹ˆì €
+// - Repository íŒ¨í„´ì„ ì‚¬ìš©í•˜ì—¬ ë°ì´í„° ì €ì¥/ë¡œë“œ
+// - SaveLoadManagerë¥¼ í†µí•´ ì €ì¥ë˜ë¯€ë¡œ ì§ì ‘ ì €ì¥í•˜ì§€ ì•ŠìŒ
 public class CurrencyManager : MonoBehaviour
 {
     public static CurrencyManager Instance { get; private set; }
@@ -13,15 +17,7 @@ public class CurrencyManager : MonoBehaviour
 
     public static event Action OnDataChanged;
 
-    [Header("ÀÚµ¿ ÀúÀå ¼³Á¤")]
-    [SerializeField] private bool _autoSave = true;
-    [SerializeField] private float _autoSaveInterval = 30f;
-    [SerializeField] private float _saveDebounceTime = 0.6f;
-
     private Dictionary<ECurrencyType, Currency> _currencies;
-    private float _autoSaveTimer;
-    private float _saveDebounceTimer;
-    private bool _needsSave;
 
     private void Awake()
     {
@@ -37,19 +33,6 @@ public class CurrencyManager : MonoBehaviour
         }
     }
 
-    private void Update()
-    {
-        if (_autoSave)
-        {
-            UpdateAutoSave();
-        }
-
-        if (_needsSave)
-        {
-            UpdateSaveDebounce();
-        }
-    }
-
     private void Initialize()
     {
         _currencies = new Dictionary<ECurrencyType, Currency>();
@@ -57,19 +40,21 @@ public class CurrencyManager : MonoBehaviour
         {
             _currencies[(ECurrencyType)i] = new Currency(0);
         }
-        Load();
     }
 
+    // íŠ¹ì • ì¬í™”ë¥¼ êµ¬ë§¤í•  ìˆ˜ ìˆëŠ”ì§€ í™•ì¸
     public bool CanAfford(ECurrencyType type, Currency cost)
     {
         return Get(type) >= cost;
     }
 
+
+    // ì¬í™”ë¥¼ ì†Œë¹„ ì‹œë„
     public bool TrySpend(ECurrencyType type, Currency cost)
     {
         if (!CanAfford(type, cost))
         {
-            Debug.LogWarning($"{type} ºÎÁ·: ÇÊ¿ä {cost}, º¸À¯ {Get(type)}");
+            Debug.LogWarning($"{type} ë¶€ì¡±: í•„ìš” {cost}, ë³´ìœ  {Get(type)}");
             return false;
         }
 
@@ -81,20 +66,49 @@ public class CurrencyManager : MonoBehaviour
         }
         catch (Exception e)
         {
-            Debug.LogError($"{type} ¼Òºñ ½ÇÆĞ: {e.Message}");
+            Debug.LogError($"{type} ì†Œë¹„ ì‹¤íŒ¨: {e.Message}");
             return false;
         }
     }
 
+    // ì¬í™” ì¶”ê°€
     public void Add(ECurrencyType type, Currency amount)
     {
         _currencies[type] += amount;
         NotifyCurrencyChanged(type);
     }
 
+    // ì¬í™” ì¡°íšŒ
     public Currency Get(ECurrencyType type)
     {
         return _currencies.TryGetValue(type, out var currency) ? currency : new Currency(0);
+    }
+
+    // ì¬í™” ì§ì ‘ ì„¤ì • (ë¡œë“œ ì‹œ ì‚¬ìš©)
+
+    public void Set(ECurrencyType type, Currency amount)
+    {
+        _currencies[type] = amount;
+        NotifyCurrencyChanged(type);
+    }
+
+    // SaveLoadManagerë¡œë¶€í„° ë°ì´í„°ë¥¼ ë¡œë“œ
+    public void LoadFromData(Dictionary<ECurrencyType, double> data)
+    {
+        foreach (var pair in data)
+        {
+            _currencies[pair.Key] = new Currency(Math.Max(0, pair.Value));
+        }
+
+        // ëª¨ë“  ì¬í™” ë³€ê²½ ì•Œë¦¼
+        for (int i = 0; i < (int)ECurrencyType.Count; i++)
+        {
+            ECurrencyType type = (ECurrencyType)i;
+            OnCurrencyChanged?.Invoke(type, _currencies[type]);
+        }
+
+        OnDataChanged?.Invoke();
+        Debug.Log("ì¬í™” ë°ì´í„° ë¡œë“œ ì™„ë£Œ");
     }
 
     private void NotifyCurrencyChanged(ECurrencyType type)
@@ -102,72 +116,17 @@ public class CurrencyManager : MonoBehaviour
         OnCurrencyChanged?.Invoke(type, _currencies[type]);
         OnDataChanged?.Invoke();
 
-        _needsSave = true;
-        _saveDebounceTimer = _saveDebounceTime;
-    }
-
-    private void UpdateAutoSave()
-    {
-        _autoSaveTimer += Time.deltaTime;
-        if (_autoSaveTimer >= _autoSaveInterval)
+        // SaveLoadManagerë¥¼ í†µí•´ ìë™ ì €ì¥ (ë””ë°”ìš´ìŠ¤ ì ìš©)
+        if (SaveLoadManager.Instance != null)
         {
-            _autoSaveTimer = 0f;
-            if (_needsSave) Save();
+            // ë””ë°”ìš´ìŠ¤ë¥¼ ìœ„í•´ ì•½ê°„ì˜ ì§€ì—° í›„ ì €ì¥
+            CancelInvoke(nameof(RequestSave));
+            Invoke(nameof(RequestSave), 0.5f);
         }
     }
 
-    private void UpdateSaveDebounce()
+    private void RequestSave()
     {
-        _saveDebounceTimer -= Time.deltaTime;
-        if (_saveDebounceTimer <= 0f)
-        {
-            Save();
-        }
-    }
-
-    public void Save()
-    {
-        try
-        {
-            foreach (var pair in _currencies)
-            {
-                // Currency Å¬·¡½ºÀÇ Value(double)¸¦ ¹®ÀÚ¿­·Î ÀúÀå
-                PlayerPrefs.SetString($"Currency_{pair.Key}", pair.Value.Value.ToString());
-            }
-            PlayerPrefs.Save();
-            _needsSave = false;
-            Debug.Log("¸ğµç È­Æó µ¥ÀÌÅÍ ÀúÀå ¿Ï·á");
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"È­Æó ÀúÀå ½ÇÆĞ: {e.Message}");
-        }
-    }
-
-    public void Load()
-    {
-        try
-        {
-            for (int i = 0; i < (int)ECurrencyType.Count; i++)
-            {
-                ECurrencyType type = (ECurrencyType)i;
-                string key = $"Currency_{type}";
-
-                if (PlayerPrefs.HasKey(key))
-                {
-                    string valueStr = PlayerPrefs.GetString(key, "0");
-                    if (double.TryParse(valueStr, out double value))
-                    {
-                        _currencies[type] = new Currency(Math.Max(0, value));
-                    }
-                }
-            }
-            _needsSave = false;
-            Debug.Log("È­Æó µ¥ÀÌÅÍ ·Îµå ¿Ï·á");
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"È­Æó ·Îµå ½ÇÆĞ: {e.Message}");
-        }
+        SaveLoadManager.Instance?.SaveGame();
     }
 }
