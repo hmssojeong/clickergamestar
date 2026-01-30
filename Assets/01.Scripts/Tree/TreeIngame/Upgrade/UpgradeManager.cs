@@ -20,7 +20,7 @@ public class UpgradeManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            InitializeUpgrades();
+            InitializeUpgrades(null); // 기본 0레벨로 초기화
         }
         else
         {
@@ -29,18 +29,18 @@ public class UpgradeManager : MonoBehaviour
     }
 
     // 업그레이드 초기화 - 도메인 객체 생성
-    void InitializeUpgrades()
+    public void InitializeUpgrades(Dictionary<EUpgradeType, int> savedLevels = null)
     {
+        _upgrades.Clear();
+
         foreach (var specData in _specTable.Datas)
         {
-            if(_upgrades.ContainsKey(specData.Type))
-            {
-                throw new Exception($"There is already an upgrade with type {specData.Type}");
-            }
+            // 저장된 레벨이 있으면 가져오고, 없으면 0
+            int level = (savedLevels != null && savedLevels.ContainsKey(specData.Type))
+                        ? savedLevels[specData.Type] : 0;
 
-            _upgrades.Add(specData.Type, new Upgrade(specData));
+            _upgrades.Add(specData.Type, new Upgrade(specData, level)); // Upgrade 생성자에 level 매개변수 추가 필요
         }
-
         OnDataChanged?.Invoke();
     }
 

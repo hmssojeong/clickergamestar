@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: UpgradeSpecTableSO
   m_EditorClassIdentifier: Assembly-CSharp::UpgradeSpecTableSO
   Datas:
-  - Type: 1
+  - Type: 0
     MaxLevel: 10
     BaseCost: 100
     BaseDamage: 10
@@ -22,7 +22,7 @@ MonoBehaviour:
     DamageMultiplier: 1
     Name: "\uC0AC\uACFC \uC218\uD655 \uAC15\uD654"
     Description: "\uD074\uB9AD\uB2F9 \uACFC\uC77C\uC810\uC218 {0}\uC99D\uAC00"
-  - Type: 2
+  - Type: 1
     MaxLevel: 10
     BaseCost: 500
     BaseDamage: 50
@@ -31,7 +31,7 @@ MonoBehaviour:
     DamageMultiplier: 1
     Name: "\uB2E4\uB78C\uC950 \uACE0\uC6A9"
     Description: "\uCD08\uB2F9 \uACFC\uC77C {0}\uAC1C \uC218\uD655"
-  - Type: 3
+  - Type: 2
     MaxLevel: 10
     BaseCost: 1000
     BaseDamage: 0
@@ -41,7 +41,7 @@ MonoBehaviour:
     Name: "\uD669\uAE08 \uC0AC\uACFC \uD589\uC6B4"
     Description: "\uD669\uAE08\uC0AC\uACFC\uAC00 \uB5A8\uC5B4\uC9C8 \uD655\uB960\uC774
       \uC99D\uAC00\uD569\uB2C8\uB2E4."
-  - Type: 4
+  - Type: 3
     MaxLevel: 5
     BaseCost: 2000
     BaseDamage: 0
@@ -50,7 +50,7 @@ MonoBehaviour:
     DamageMultiplier: 1
     Name: "\uD53C\uBC84 \uD0C0\uC784 \uB9C8\uC2A4\uD130"
     Description: "\uD53C\uBC84 \uD0C0\uC784 \uD6A8\uACFC\uB97C \uAC15\uD654\uD569\uB2C8\uB2E4."
-  - Type: 5
+  - Type: 4
     MaxLevel: 10
     BaseCost: 3000
     BaseDamage: 0

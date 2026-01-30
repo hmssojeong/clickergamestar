@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using UnityEngine;
 
 // 데이터의 영속성(저장/불러오기)에 대한 책임은 '레포지토리'가 가지고 있다.
@@ -10,28 +11,20 @@ using UnityEngine;
 // - 3) 0000 해진다.
 public class LocalCurrencyRepository : ICurrencyRepository
 {
+    private const string SaveKey = "GameUserData";
+
     public void Save(CurrencySaveData saveData)
     {
-        // 어떻게든 Save한다.
-        for (int i = 0; i < (int)ECurrencyType.Apple; i++)
-        {
-            var type = (ECurrencyType)i;
-            PlayerPrefs.SetString(type.ToString(), saveData.Currencies[i].ToString("G17"));
-        }
+        string json = JsonConvert.SerializeObject(saveData);
+        PlayerPrefs.SetString(SaveKey, json);
+        PlayerPrefs.Save();
     }
 
     public CurrencySaveData Load()
     {
-        CurrencySaveData data = CurrencySaveData.Default;
+        if (!PlayerPrefs.HasKey(SaveKey)) return CurrencySaveData.Default;
 
-        for (int i = 0; i < (int)ECurrencyType.Apple; i++)
-        {
-            if (PlayerPrefs.HasKey(i.ToString()))
-            {
-                data.Currencies[i] = double.Parse(PlayerPrefs.GetString(i.ToString(), "0"));
-            }
-        }
-
-        return data;
+        string json = PlayerPrefs.GetString(SaveKey);
+        return JsonConvert.DeserializeObject<CurrencySaveData>(json);
     }
 }

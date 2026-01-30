@@ -43,6 +43,8 @@ public class UpgradeItemUI : MonoBehaviour
 
         if (UpgradeManager.Instance.TryLevelUp(_upgrade.SpecData.Type))
         {
+            // 성공 시 전체 세이브(도메인->레포지토리)
+            GameManager.Instance.SaveGame();
             // 리프레시를 통해 UI 갱신
             Refresh(_upgrade);
             // todo: 이펙트, 애니메이션, 트위닝
