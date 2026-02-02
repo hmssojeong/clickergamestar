@@ -2,10 +2,8 @@ using UnityEngine;
 using System;
 using Newtonsoft.Json;
 
-/// <summary>
-/// 통합 저장/로드 관리자
-/// 각 Manager에게 저장/로드를 위임
-/// </summary>
+// 통합 저장/로드 관리자
+// 각 Manager에게 저장/로드를 위임
 public class SaveLoadManager : MonoBehaviour
 {
     public static SaveLoadManager Instance { get; private set; }
@@ -39,9 +37,7 @@ public class SaveLoadManager : MonoBehaviour
         Debug.Log($"[SaveLoadManager] 초기화 완료 - 모드: {(_useLocalRepository ? "Local" : "Firebase")}");
     }
 
-    /// <summary>
-    /// 전체 게임 데이터 저장
-    /// </summary>
+    // 전체 게임 데이터 저장
     public void SaveGame()
     {
         try
@@ -60,9 +56,7 @@ public class SaveLoadManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 전체 게임 데이터 로드
-    /// </summary>
+    // 전체 게임 데이터 로드
     public void LoadGame()
     {
         try
@@ -99,9 +93,9 @@ public class SaveLoadManager : MonoBehaviour
         // 업그레이드 데이터 수집
         if (UpgradeManager.Instance != null)
         {
-            foreach (var upgrade in UpgradeManager.Instance.AllUpgrades)
+            foreach (var upgrade in UpgradeManager.Instance.GetAll())
             {
-                saveData.UpgradeLevels[upgrade.Key] = upgrade.Value.Level;
+                saveData.UpgradeLevels[upgrade.Type] = upgrade.Level;
             }
         }
 
@@ -186,9 +180,7 @@ public class SaveLoadManager : MonoBehaviour
         Debug.Log("[SaveLoadManager] 게임 상태 로드 완료");
     }
 
-    /// <summary>
-    /// 모든 저장 데이터를 삭제합니다.
-    /// </summary>
+    // 모든 저장 데이터를 삭제합니다.
     public void ResetAllData()
     {
         PlayerPrefs.DeleteAll();

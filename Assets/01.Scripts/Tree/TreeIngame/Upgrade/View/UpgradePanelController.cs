@@ -1,10 +1,8 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using static UnityEditor.Progress;
 
 public class UpgradePanelController : MonoBehaviour
 {
@@ -27,7 +25,6 @@ public class UpgradePanelController : MonoBehaviour
     private Coroutine animationCoroutine;
 
     private List<UpgradeItemUI> _itemUIList = new List<UpgradeItemUI>();
-
 
     void Start()
     {
@@ -68,7 +65,7 @@ public class UpgradePanelController : MonoBehaviour
         {
             elapsed += Time.deltaTime;
             float t = Mathf.Clamp01(elapsed / animationDuration);
-            t = 1f - Mathf.Pow(1f - t, 3f); // Ease Out Cubic
+            t = 1f - Mathf.Pow(1f - t, 3f);
 
             float currentHeight = Mathf.Lerp(startHeight, targetHeight, t);
             SetPanelHeight(currentHeight);
@@ -100,11 +97,10 @@ public class UpgradePanelController : MonoBehaviour
         if (upgradeItemPrefab == null || upgradeItemsContainer == null) return;
         if (UpgradeManager.Instance == null) return;
 
-        // 기존 아이템 삭제 및 리스트 초기화
         foreach (Transform child in upgradeItemsContainer) Destroy(child.gameObject);
         _itemUIList.Clear();
 
-        foreach (var upgrade in UpgradeManager.Instance.AllUpgrades.Values)
+        foreach (var upgrade in UpgradeManager.Instance.GetAll())
         {
             GameObject itemObj = Instantiate(upgradeItemPrefab, upgradeItemsContainer);
             UpgradeItemUI itemUI = itemObj.GetComponent<UpgradeItemUI>();

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
@@ -8,7 +8,7 @@ public class UpgradeItemUI : MonoBehaviour
     public TextMeshProUGUI DescriptionTextUI;
     public TextMeshProUGUI LevelTextUI;
     public TextMeshProUGUI CostTextUI;
-    public Image IconImage; // 아이콘 표시용 추가
+    public Image IconImage;
     public Image UpgradeButtonImage;
     public Button UpgradeButton;
 
@@ -18,8 +18,8 @@ public class UpgradeItemUI : MonoBehaviour
     public Color AffordableColor = Color.green;
     public Color NotAffordableColor = Color.red;
 
-    private Upgrade _upgrade;
-    public EUpgradeType Type => _upgrade != null ? _upgrade.SpecData.Type : EUpgradeType.AppleHarvest;
+    private IReadonlyUpgrade _upgrade;
+    public EUpgradeType Type => _upgrade != null ? _upgrade.Type : EUpgradeType.AppleHarvest;
 
     private void Start()
     {
@@ -29,7 +29,7 @@ public class UpgradeItemUI : MonoBehaviour
         }
     }
 
-    public void Refresh(Upgrade upgrade)
+    public void Refresh(IReadonlyUpgrade upgrade)
     {
         if (upgrade == null)
         {
@@ -40,17 +40,17 @@ public class UpgradeItemUI : MonoBehaviour
 
         if (NameTextUI != null)
         {
-            NameTextUI.text = upgrade.SpecData.Name;
+            NameTextUI.text = upgrade.Name;
         }
 
         if (IconImage != null)
         {
-            IconImage.sprite = upgrade.SpecData.Icon;
+            IconImage.sprite = upgrade.Icon;
         }
 
         if (DescriptionTextUI != null)
         {
-            DescriptionTextUI.text = string.Format(upgrade.SpecData.Description, upgrade.Damage);
+            DescriptionTextUI.text = string.Format(upgrade.Description, upgrade.Damage);
         }
 
         if (LevelTextUI != null)
@@ -65,11 +65,9 @@ public class UpgradeItemUI : MonoBehaviour
             }
         }
 
-        // 레벨업 가능 여부 체크
         bool canLevelUp = UpgradeManager.Instance != null &&
-                         UpgradeManager.Instance.CanLevelUp(upgrade.SpecData.Type);
+                         UpgradeManager.Instance.CanLevelUp(upgrade.Type);
 
-        // 비용 표시 및 색상 변경
         if (CostTextUI != null)
         {
             if (upgrade.IsMaxLevel)
@@ -84,7 +82,6 @@ public class UpgradeItemUI : MonoBehaviour
             }
         }
 
-        // 버튼 상태 업데이트
         if (UpgradeButton != null)
         {
             UpgradeButton.interactable = canLevelUp && !upgrade.IsMaxLevel;
@@ -100,6 +97,7 @@ public class UpgradeItemUI : MonoBehaviour
     {
         LevelUp();
     }
+
     public void LevelUp()
     {
         if (_upgrade == null)
@@ -112,9 +110,9 @@ public class UpgradeItemUI : MonoBehaviour
             return;
         }
 
-        if (UpgradeManager.Instance.TryLevelUp(_upgrade.SpecData.Type))
+        if (UpgradeManager.Instance.TryLevelUp(_upgrade.Type))
         {
-            var updatedUpgrade = UpgradeManager.Instance.Get(_upgrade.SpecData.Type);
+            var updatedUpgrade = UpgradeManager.Instance.Get(_upgrade.Type);
             if (updatedUpgrade != null)
             {
                 Refresh(updatedUpgrade);
@@ -124,7 +122,6 @@ public class UpgradeItemUI : MonoBehaviour
 
     private void OnDestroy()
     {
-        // 이벤트 해제
         if (UpgradeButton != null)
         {
             UpgradeButton.onClick.RemoveListener(OnLevelUpButtonClicked);
