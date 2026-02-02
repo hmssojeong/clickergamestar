@@ -39,11 +39,13 @@ public class UpgradePanelController : MonoBehaviour
         CreateUpgradeItems();
 
         UpgradeManager.OnDataChanged += RefreshAllItems;
+        CurrencyManager.OnDataChanged += RefreshAllItems;
     }
 
     private void OnDestroy()
     {
         UpgradeManager.OnDataChanged -= RefreshAllItems;
+        CurrencyManager.OnDataChanged -= RefreshAllItems;
     }
 
     public void TogglePanel()
