@@ -15,13 +15,13 @@ public class StudentManager : MonoBehaviour
 
     public event Action OnDataChanged;
 
-    private PlayerPrefsStudentRepository _repository;
+    private IStudentRepository _repository;
 
     private void Awake()
     {
         Instance = this;
 
-        _repository = new PlayerPrefsStudentRepository();
+        _repository = new FirebaseStudentRepository();
 
         foreach (StudentSpecData data in _specTable.SpecDatas)
         {

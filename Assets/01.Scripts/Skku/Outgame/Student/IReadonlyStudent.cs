@@ -1,5 +1,4 @@
 
-
 public interface IReadonlyStudent
 {
     string Name { get; }
