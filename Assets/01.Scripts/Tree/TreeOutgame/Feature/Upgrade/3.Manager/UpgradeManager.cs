@@ -3,17 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 
-// 업그레이드 시스템 관리자
-// Upgrade 도메인 클래스를 사용하여 게임의 업그레이드를 관리
-// 업그레이드 시 실제 게임 스탯에 효과 적용
-// SaveLoadManager를 통해 저장/로드
+/// <summary>
+/// 업그레이드 시스템 관리자
+/// Repository 패턴을 사용하여 데이터 저장/로드
+/// </summary>
 public class UpgradeManager : MonoBehaviour
 {
     public static UpgradeManager Instance { get; private set; }
     public static event Action OnDataChanged;
 
+    [Header("설정")]
     [SerializeField] private UpgradeSpecTableSO _specTable;
 
+    private IUpgradeRepository _repository;
     private Dictionary<EUpgradeType, Upgrade> _upgrades = new();
 
     public IReadOnlyDictionary<EUpgradeType, Upgrade> AllUpgrades => _upgrades;
@@ -23,12 +25,24 @@ public class UpgradeManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            InitializeUpgrades(null); // 기본 0레벨로 초기화
+            InitializeRepository();
         }
         else
         {
             Destroy(gameObject);
         }
+    }
+
+    // Repository 초기화 (Local 또는 Firebase)
+    private void InitializeRepository()
+    {
+        string userId = AccountManager.Instance?.Email ?? "guest";
+
+/*        _repository = _useFirebase
+            ? (IUpgradeRepository)new FirebaseUpgradeRepository(userId)
+            : new LocalUpgradeRepository(userId);
+
+        Debug.Log($"[UpgradeManager] Repository 초기화 완료 - 모드: {(_useFirebase ? "Firebase" : "Local")}, UserID: {userId}");*/
     }
 
     // 업그레이드 초기화 - 도메인 객체 생성
@@ -42,12 +56,35 @@ public class UpgradeManager : MonoBehaviour
             int level = (savedLevels != null && savedLevels.ContainsKey(specData.Type))
                         ? savedLevels[specData.Type] : 0;
 
-            _upgrades.Add(specData.Type, new Upgrade(specData, level)); // Upgrade 생성자에 level 매개변수 추가 필요
+            _upgrades.Add(specData.Type, new Upgrade(specData, level));
         }
 
         ApplyAllUpgradeEffects();
-
         OnDataChanged?.Invoke();
+        
+        Debug.Log($"[UpgradeManager] 업그레이드 초기화 완료 - 총 {_upgrades.Count}개");
+    }
+
+    // 업그레이드 데이터 저장
+    public void SaveUpgrades()
+    {
+        var saveData = new UpgradeSaveData();
+
+        foreach (var upgrade in _upgrades)
+        {
+            saveData.UpgradeLevels[upgrade.Key] = upgrade.Value.Level;
+        }
+
+        _repository.Save(saveData);
+        Debug.Log("[UpgradeManager] 업그레이드 저장 완료");
+    }
+
+    // 업그레이드 데이터 로드
+    public void LoadUpgrades()
+    {
+        var saveData = _repository.Load();
+        InitializeUpgrades(saveData.UpgradeLevels);
+        Debug.Log("[UpgradeManager] 업그레이드 로드 완료");
     }
 
     // 업그레이드 조회
@@ -83,13 +120,14 @@ public class UpgradeManager : MonoBehaviour
     {
         if (!_upgrades.TryGetValue(type, out Upgrade upgrade))
         {
-            Debug.LogWarning($"업그레이드 타입 {type}을 찾을 수 없습니다.");
+            Debug.LogWarning($"[UpgradeManager] 업그레이드 타입 {type}을 찾을 수 없습니다.");
             return false;
         }
 
         // 비용 차감
         if (!CurrencyManager.Instance.TrySpend(ECurrencyType.Apple, upgrade.Cost))
         {
+            Debug.LogWarning($"[UpgradeManager] 재화 부족 - 필요: {upgrade.Cost}");
             return false;
         }
 
@@ -98,6 +136,7 @@ public class UpgradeManager : MonoBehaviour
         {
             // 실패 시 비용 환불
             CurrencyManager.Instance.Add(ECurrencyType.Apple, upgrade.Cost);
+            Debug.LogError($"[UpgradeManager] 레벨업 실패 - 비용 환불");
             return false;
         }
 
@@ -106,13 +145,7 @@ public class UpgradeManager : MonoBehaviour
 
         OnDataChanged?.Invoke();
 
-        // SaveLoadManager를 통해 자동 저장
-        if (SaveLoadManager.Instance != null)
-        {
-            SaveLoadManager.Instance.SaveGame();
-        }
-
-        Debug.Log($"✨ {upgrade.SpecData.Name} 레벨업! (Lv.{upgrade.Level})");
+        Debug.Log($"✨ [UpgradeManager] {upgrade.SpecData.Name} 레벨업! (Lv.{upgrade.Level})");
         return true;
     }
 

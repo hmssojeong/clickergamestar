@@ -1870,9 +1870,6 @@ MonoBehaviour:
   OnCurrencyChanged:
     m_PersistentCalls:
       m_Calls: []
-  _autoSave: 1
-  _autoSaveInterval: 30
-  _saveDebounceTime: 0.6
 --- !u!1 &495738125
 GameObject:
   m_ObjectHideFlags: 0
@@ -4371,8 +4368,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1446342219}
   m_HandleRect: {fileID: 1446342218}
   m_Direction: 2
-  m_Value: 0.99999964
-  m_Size: 0.40677965
+  m_Value: 0.9999998
+  m_Size: 0.40677962
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -8032,12 +8029,6 @@ MonoBehaviour:
   _manualDamageText: {fileID: 1901103004}
   _autoDamageText: {fileID: 811045699}
   _totalApplesText: {fileID: 1806407582}
-  _manualUpgradeButton: {fileID: 0}
-  _manualUpgradeCostText: {fileID: 0}
-  _autoUpgradeButton: {fileID: 0}
-  _autoUpgradeCostText: {fileID: 0}
-  _buyAutoClickerButton: {fileID: 0}
-  _autoClickerCostText: {fileID: 0}
   _treeHealthSlider: {fileID: 1636322085}
   _healthFillImage: {fileID: 1037064180}
   _healthColorGradient:
@@ -15414,13 +15405,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   ManualDamage: 100
   AutoDamage: 100
-  Apples: 0
   TotalApplesCollected: 0
-  ManualUpgradeCost: 10
-  AutoUpgradeCost: 50
-  AutoClickerCost: 100
-  HasAutoClicker: 0
-  AutoClickerLevel: 0
   criticalChance: 0.1
   criticalMultiplier: 2
   squirrelCount: 0
@@ -15430,13 +15415,7 @@ MonoBehaviour:
   feverMultiplier: 2.5
   feverDuration: 10
   isFeverActive: 0
-  OnAppleChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  OnManualDamageChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  OnAutoDamageChanged:
+  OnDataChanged:
     m_PersistentCalls:
       m_Calls: []
   OnTreeRespawnEvent:

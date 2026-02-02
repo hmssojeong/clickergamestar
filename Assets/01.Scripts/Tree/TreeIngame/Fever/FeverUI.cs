@@ -96,8 +96,8 @@ public class FeverUI : MonoBehaviour
             // 게이지 텍스트 업데이트
             if (_gaugeText != null)
             {
-                string current = CurrencyFormatter.Format(currentClicks);
-                string max = CurrencyFormatter.Format(maxClicks);
+                string current = currentClicks.ToString();
+                string max = maxClicks.ToString();
                 _gaugeText.text = $"수동 클릭: {current} / {max}";
             }
 

@@ -2,6 +2,10 @@ using UnityEngine;
 using System;
 using Newtonsoft.Json;
 
+/// <summary>
+/// í†µí•© ì €ì¥/ë¡œë“œ ê´€ë¦¬ì
+/// ê° Managerì—ê²Œ ì €ì¥/ë¡œë“œë¥¼ ìœ„ì„
+/// </summary>
 public class SaveLoadManager : MonoBehaviour
 {
     public static SaveLoadManager Instance { get; private set; }
@@ -9,7 +13,7 @@ public class SaveLoadManager : MonoBehaviour
     [Header("Repository Settings")]
     [SerializeField] private bool _useLocalRepository = true;
 
-    private ICurrencyRepository _repository;
+    private ICurrencyRepository _currencyRepository;
     private const string GameStateKey = "GameState";
 
     private void Awake()
@@ -24,49 +28,66 @@ public class SaveLoadManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-        
     }
 
     private void InitializeRepository()
     {
-        _repository = _useLocalRepository ? new LocalCurrencyRepository() : new FirebaseCurrencyRepository();
+        _currencyRepository = _useLocalRepository 
+            ? new LocalCurrencyRepository() 
+            : new FirebaseCurrencyRepository();
+        
+        Debug.Log($"[SaveLoadManager] ì´ˆê¸°í™” ì™„ë£Œ - ëª¨ë“œ: {(_useLocalRepository ? "Local" : "Firebase")}");
     }
 
+    /// <summary>
+    /// ì „ì²´ ê²Œì„ ë°ì´í„° ì €ì¥
+    /// </summary>
     public void SaveGame()
     {
         try
         {
+            // ì¬í™” + ì—…ê·¸ë ˆì´ë“œ ì €ì¥
             SaveCurrencyAndUpgrades();
 
+            // ê²Œì„ ìƒíƒœ ì €ì¥
             SaveGameState();
+
+            Debug.Log("[SaveLoadManager] ì €ì¥ ì™„ë£Œ! âœ…");
         }
         catch (Exception e)
         {
-            Debug.Log($"°ÔÀÓ ÀúÀå ½ÇÆĞ");
+            Debug.LogError($"[SaveLoadManager] ì €ì¥ ì‹¤íŒ¨: {e.Message}");
         }
     }
 
+    /// <summary>
+    /// ì „ì²´ ê²Œì„ ë°ì´í„° ë¡œë“œ
+    /// </summary>
     public void LoadGame()
     {
         try
         {
+            // ì¬í™” + ì—…ê·¸ë ˆì´ë“œ ë¡œë“œ
             LoadCurrencyAndUpgrades();
 
+            // ê²Œì„ ìƒíƒœ ë¡œë“œ
             LoadGameState();
+
+            Debug.Log("[SaveLoadManager] ë¡œë“œ ì™„ë£Œ! âœ…");
         }
-        catch(Exception e)
+        catch (Exception e)
         {
-            Debug.Log($"°ÔÀÓ ·Îµå ½ÇÆĞ");
+            Debug.LogError($"[SaveLoadManager] ë¡œë“œ ì‹¤íŒ¨: {e.Message}");
         }
     }
 
-    // ÀçÈ­¿Í ¾÷±×·¹ÀÌµå µ¥ÀÌÅÍ¸¦ Repository¸¦ ÅëÇØ ÀúÀå
+    // ì¬í™”ì™€ ì—…ê·¸ë ˆì´ë“œ ë°ì´í„°ë¥¼ Repositoryë¥¼ í†µí•´ ì €ì¥
     private void SaveCurrencyAndUpgrades()
     {
         var saveData = new CurrencySaveData();
 
-        // ÀçÈ­ µ¥ÀÌÅÍ ¼öÁı
-        if(CurrencyManager.Instance != null)
+        // ì¬í™” ë°ì´í„° ìˆ˜ì§‘
+        if (CurrencyManager.Instance != null)
         {
             for (int i = 0; i < (int)ECurrencyType.Count; i++)
             {
@@ -75,38 +96,41 @@ public class SaveLoadManager : MonoBehaviour
             }
         }
 
-        // ¾÷±×·¹ÀÌµå ·¹º§ ¼öÁı
+        // ì—…ê·¸ë ˆì´ë“œ ë°ì´í„° ìˆ˜ì§‘
         if (UpgradeManager.Instance != null)
         {
-            foreach(var upgrade in UpgradeManager.Instance.AllUpgrades)
+            foreach (var upgrade in UpgradeManager.Instance.AllUpgrades)
             {
                 saveData.UpgradeLevels[upgrade.Key] = upgrade.Value.Level;
             }
         }
 
-        // Repository¸¦ ÅëÇØ ÀúÀå
-        _repository.Save(saveData);
+        // Repositoryë¥¼ í†µí•´ ì €ì¥
+        _currencyRepository.Save(saveData);
+        
+        Debug.Log("[SaveLoadManager] ì¬í™” ë° ì—…ê·¸ë ˆì´ë“œ ì €ì¥ ì™„ë£Œ");
     }
 
     private void LoadCurrencyAndUpgrades()
     {
-        var saveData = _repository.Load();
+        var saveData = _currencyRepository.Load();
 
-        // ÀçÈ­ ·Îµå
-        if(CurrencyManager.Instance != null)
+        // ì¬í™” ë¡œë“œ
+        if (CurrencyManager.Instance != null)
         {
             CurrencyManager.Instance.LoadFromData(saveData.Currencies);
+            Debug.Log("[SaveLoadManager] ì¬í™” ë¡œë“œ ì™„ë£Œ");
         }
 
-        // ¾÷±×·¹ÀÌµå ·Îµå
+        // ì—…ê·¸ë ˆì´ë“œ ë¡œë“œ
         if (UpgradeManager.Instance != null)
         {
             UpgradeManager.Instance.InitializeUpgrades(saveData.UpgradeLevels);
+            Debug.Log("[SaveLoadManager] ì—…ê·¸ë ˆì´ë“œ ë¡œë“œ ì™„ë£Œ");
         }
-
     }
 
-    // °ÔÀÓ »óÅÂ¸¦ PlayerPrefs¿¡ ÀúÀå
+    // ê²Œì„ ìƒíƒœë¥¼ PlayerPrefsì— ì €ì¥
     private void SaveGameState()
     {
         if (GameManager.Instance == null)
@@ -127,18 +151,20 @@ public class SaveLoadManager : MonoBehaviour
         };
 
         string json = JsonConvert.SerializeObject(gameState);
-        PlayerPrefs.SetString(gameState.Name, json);
+        PlayerPrefs.SetString(GameStateKey, json);
         PlayerPrefs.Save();
+        
+        Debug.Log("[SaveLoadManager] ê²Œì„ ìƒíƒœ ì €ì¥ ì™„ë£Œ");
     }
 
-    // °ÔÀÓ »óÅÂ¸¦ PlayerPrefs¿¡¼­ ·Îµå
+    // ê²Œì„ ìƒíƒœë¥¼ PlayerPrefsì—ì„œ ë¡œë“œ
     private void LoadGameState()
     {
         if (GameManager.Instance == null) return;
 
         if (!PlayerPrefs.HasKey(GameStateKey))
         {
-            Debug.Log("ÀúÀåµÈ °ÔÀÓ »óÅÂ°¡ ¾ø½À´Ï´Ù. ±âº»°ªÀ¸·Î ½ÃÀÛÇÕ´Ï´Ù.");
+            Debug.LogWarning("[SaveLoadManager] ì €ì¥ëœ ê²Œì„ ìƒíƒœê°€ ì—†ìŠµë‹ˆë‹¤. ê¸°ë³¸ê°’ìœ¼ë¡œ ì‹œì‘í•©ë‹ˆë‹¤.");
             return;
         }
 
@@ -154,13 +180,18 @@ public class SaveLoadManager : MonoBehaviour
         GameManager.Instance.feverMultiplier = gameState.FeverMultiplier;
         GameManager.Instance.feverDuration = gameState.FeverDuration;
 
-        // UI °»½Å
+        // UI ê°±ì‹ 
         GameManager.Instance.NotifyDataChanged();
+        
+        Debug.Log("[SaveLoadManager] ê²Œì„ ìƒíƒœ ë¡œë“œ ì™„ë£Œ");
     }
 
-    // ¸ğµç ÀúÀå µ¥ÀÌÅÍ¸¦ »èÁ¦ÇÕ´Ï´Ù.
+    /// <summary>
+    /// ëª¨ë“  ì €ì¥ ë°ì´í„°ë¥¼ ì‚­ì œí•©ë‹ˆë‹¤.
+    /// </summary>
     public void ResetAllData()
     {
         PlayerPrefs.DeleteAll();
+        Debug.Log("[SaveLoadManager] ëª¨ë“  ë°ì´í„° ì´ˆê¸°í™” ì™„ë£Œ");
     }
 }

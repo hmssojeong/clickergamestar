@@ -1,15 +1,13 @@
+using System;
 
 // 재화를 의미하는 도메인 모델
 // 우리에 게임에서의 재화 규칙을 
-
 // 1. 음수이면 안된다.
 //    1-1. 생성될때
 //    1-2. +,-연산할때
-
 // 2. 정해진 표기법이 있다.
 // 3. 재화간에 +-가 되야된다.
 // 4. 재화간에 ><>=
-
 // [만들어야 하는 경우]
 // 1. 재화가 여러 곳에 사용된다. (UI, 상점, 업그레이드 등 다양한 콘텐츠)
 // 2. 포맷팅이 통일되어야 한다. 무적권!
@@ -19,11 +17,9 @@
 // 1. 게임을 빠르게 만들고 싶다.
 // 2. 재화가 한 종류 뿐이고 사용처도 많지 않다.
 // 3. 팀원 없이 혼자 개발해서 도메인에 대한 지식이 곧 뇌다.
-
 // struct vs class
 // struct은 int, double처럼 값으로 동작하기에 딱이다.
 // 재화는 "값"이 중요하다.
-using System;
 
 public readonly struct Currency
 {
@@ -84,14 +80,14 @@ public readonly struct Currency
         return new Currency(value);
     }
 
-    // Currency -> double 암시적 변환
+    // Currency -> double 명시적 변환
     public static explicit operator double(Currency currency)
     {
         return currency.Value;
     }
 
     // ToString이란 객체를 문자열로 변환될때 암시적으로 호출되는 메서드인데..
-    // 이걸 개조(메서드 오버라이)해서 특정 포맷으로 문자 변환되게끔 강제한다.
+    // 이걸 개조(메서드 오버라이딩)해서 특정 포맷으로 문자 변환되게끔 강제한다.
     public override string ToString()
     {
         return Value.ToFormattedString();

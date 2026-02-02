@@ -27,15 +27,15 @@ public class FloatingTextManager : MonoBehaviour
     // 데미지 텍스트 표시
     public void ShowDamage(Vector3 worldPosition, double damage, bool isCritical = false)
     {
-        string formatted = CurrencyFormatter.Format(damage);
+        string formatted = damage.ToFormattedString();
         ShowText(worldPosition, $"+{formatted}", isCritical);
     }
 
     // 점수 텍스트 표시
     public void ShowScore(Vector3 worldPosition, double score)
     {
-        string formatted = CurrencyFormatter.Format(score);
-        ShowText(worldPosition, $"+{formatted} 🍎", false);
+        string formatted = score.ToFormattedString();
+        ShowText(worldPosition, $"+{formatted}", false);
     }
 
     // 일반 텍스트 표시
