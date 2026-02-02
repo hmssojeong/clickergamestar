@@ -168,8 +168,9 @@ public class UpgradeManager : MonoBehaviour
                 break;
 
             case EUpgradeType.SquirrelHire:
-                GameManager.Instance.squirrelCount = (int)upgrade.Damage;
-                Debug.Log($"Squirrel count: {upgrade.Damage}");
+                GameManager.Instance.squirrelCount = upgrade.Level;
+                GameManager.Instance.AutoDamage = upgrade.Damage;
+                Debug.Log($"Squirrel count: {upgrade.Level}, Auto damage: {upgrade.Damage}");
                 break;
 
             case EUpgradeType.GoldenAppleLuck:

@@ -33,29 +33,38 @@ public class Tree : MonoBehaviour, Clickable
 
         // ========== 업그레이드 시스템 통합 ========== 
 
-        // 1. 크리티컬 확률 (GameManager에서 가져오기)
-        float criticalChance = 0.2f; // 기본 20%
+        // 1. 기본 데미지 (GameManager에서 가져오기 - 업그레이드 반영)
+        double baseDamage = 1.0;
+        if (GameManager.Instance != null)
+        {
+            baseDamage = clickInfo.Type == EClickType.Manual 
+                ? GameManager.Instance.ManualDamage 
+                : GameManager.Instance.AutoDamage;
+        }
+
+        // 2. 크리티컬 확률 (GameManager에서 가져오기)
+        float criticalChance = 0.2f;
         if (GameManager.Instance != null)
         {
             criticalChance = (float)GameManager.Instance.criticalChance;
         }
         bool isCritical = Random.value < criticalChance;
 
-        // 2. 크리티컬 배수 (GameManager에서 가져오기)
+        // 3. 크리티컬 배수 (GameManager에서 가져오기)
         double criticalMultiplier = 2.0;
         if (GameManager.Instance != null)
         {
             criticalMultiplier = GameManager.Instance.criticalMultiplier;
         }
 
-        // 3. 데미지 적용 (피버 배율 적용)
-        double finalDamage = clickInfo.Damage;
+        // 4. 데미지 적용 (피버 배율 적용)
+        double finalDamage = baseDamage;
         if (FeverManager.Instance != null)
         {
             finalDamage *= FeverManager.Instance.GetDamageMultiplier();
         }
 
-        // 4. 크리티컬이면 배수 적용
+        // 5. 크리티컬이면 배수 적용
         if (isCritical)
         {
             finalDamage *= criticalMultiplier;
