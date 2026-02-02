@@ -11,11 +11,23 @@ public class UpgradeItemUI : MonoBehaviour
     public Image IconImage; // 아이콘 표시용 추가
     public Image UpgradeButtonImage;
     public Button UpgradeButton;
+    
     public Sprite CanLevelUpSprite;
     public Sprite NotCanLevelUpSprite;
 
+    public Color AffordableColor = Color.green;
+    public Color NotAffordableColor = Color.red;
+
     private Upgrade _upgrade;
     public EUpgradeType Type => _upgrade != null ? _upgrade.SpecData.Type : EUpgradeType.AppleHarvest;
+
+    private void Start()
+    {
+        if(UpgradeButton != null)
+        {
+            UpgradeButton.onClick.AddListener(OnLevelUpButtonClicked);
+        }
+    }
 
     public void Refresh(Upgrade upgrade)
     {

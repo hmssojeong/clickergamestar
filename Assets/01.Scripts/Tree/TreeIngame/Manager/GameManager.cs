@@ -2,50 +2,42 @@ using UnityEngine;
 using UnityEngine.Events;
 using System;
 
+// 게임의 핵심 플레이 로직을 관리하는 매니저
+// - 재화는 CurrencyManager에게 위임
+// - 업그레이드는 UpgradeManager에게 위임
+// - 게임 플레이 시스템(크리티컬, 피버 등)에만 집중
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
-    [Header("Damage Settings")]
-    public double ManualDamage = 1d;    // 수동 클릭 데미지
-    public double AutoDamage = 1d;       // 자동 클릭 데미지
+    [Header("Stats (Managed by UpgradeManager)")]
+    public double ManualDamage = 1d;    // UpgradeManager가 설정
+    public double AutoDamage = 1d;       // UpgradeManager가 설정
 
-    [Header("Apple Score")]
-    public double Apples = 0d;           // 현재 사과 점수
-    public double TotalApplesCollected = 0d; // 총 수집한 사과
-
-    [Header("Upgrade Costs")]
-    public double ManualUpgradeCost = 10;
-    public double AutoUpgradeCost = 50;
-    public double AutoClickerCost = 100;
-
-    [Header("Auto Clicker")]
-    public bool HasAutoClicker = false;
-    public int AutoClickerLevel = 0;
+    [Header("Game Progress")]
+    public double TotalApplesCollected = 0d; // 총 수집한 사과 (통계용)
 
     [Header("Critical System")]
-    public double criticalChance = 0.1d;        // 크리티컬 확률 (10%)
-    public double criticalMultiplier = 2.0d;    // 크리티컬 배수 (2배)
+    public double criticalChance = 0.1d;        // 크리티컬 확률 (UpgradeManager가 설정 가능)
+    public double criticalMultiplier = 2.0d;    // 크리티컬 배수 (UpgradeManager가 설정 가능)
 
     [Header("Squirrel Auto Harvest")]
-    public int squirrelCount = 0;               // 다람쥐 수
+    public int squirrelCount = 0;               // 다람쥐 수 (UpgradeManager가 설정)
     public double squirrelApplePerSecond = 50d; // 다람쥐당 초당 사과
 
     [Header("Fever System")]
     public int clickCount = 0;                  // 현재 클릭 횟수
-    public int feverThreshold = 75;             // 피버 발동 클릭 횟수
-    public double feverMultiplier = 2.5d;       // 피버 배수
+    public int feverThreshold = 75;             // 피버 발동 클릭 횟수 (UpgradeManager가 설정 가능)
+    public double feverMultiplier = 2.5d;       // 피버 배수 (UpgradeManager가 설정 가능)
     public float feverDuration = 10f;           // 피버 지속 시간
     public bool isFeverActive = false;          // 피버 활성화 여부
     private float feverTimer = 0f;              // 피버 남은 시간
 
     [Header("Events")]
-    public UnityEvent<double> OnAppleChanged;       // 사과 점수 변경 이벤트
-    public UnityEvent<double> OnManualDamageChanged; // 수동 데미지 변경 이벤트
-    public UnityEvent<double> OnAutoDamageChanged;   // 자동 데미지 변경 이벤트
-    public UnityEvent OnTreeRespawnEvent;         // 나무 리스폰 이벤트
-    public UnityEvent OnFeverStartEvent;          // 피버 시작 이벤트
-    public UnityEvent OnFeverEndEvent;            // 피버 종료 이벤트
+    public UnityEvent OnDataChanged;             // 데이터 변경 이벤트
+    public UnityEvent OnTreeRespawnEvent;        // 나무 리스폰 이벤트
+    public UnityEvent OnFeverStartEvent;         // 피버 시작 이벤트
+    public UnityEvent OnFeverEndEvent;           // 피버 종료 이벤트
 
     private void Awake()
     {
@@ -63,8 +55,14 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        // 게임 데이터 로드
+        if (SaveLoadManager.Instance != null)
+        {
+            SaveLoadManager.Instance.LoadGame();
+        }
+
         // 다람쥐 자동 수확 시작 (1초마다 실행)
-        InvokeRepeating("AutoHarvestBySquirrels", 1f, 1f);
+        InvokeRepeating(nameof(AutoHarvestBySquirrels), 1f, 1f);
     }
 
     private void Update()
@@ -80,103 +78,10 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void AddApples(double amount)
-    {
-        Apples += amount;
-        TotalApplesCollected += amount;
-
-        OnAppleChanged?.Invoke(Apples);
-
-        Debug.Log($"사과 +{amount}! 총: {Apples}개");
-    }
-
-    // 사과 점수를 사용합니다 (업그레이드 등)
-    public bool SpendApples(double amount)
-    {
-        if (Apples >= amount)
-        {
-            Apples -= amount;
-            OnAppleChanged?.Invoke(Apples);
-            return true;
-        }
-
-        Debug.Log("사과가 부족합니다!");
-        return false;
-    }
-
-    // 수동 클릭 데미지를 업그레이드합니다
-    public bool UpgradeManualDamage()
-    {
-        if (SpendApples(ManualUpgradeCost))
-        {
-            ManualDamage += 1;
-            ManualUpgradeCost = Math.Round(ManualUpgradeCost * 1.5f); // 비용 50% 증가
-
-            OnManualDamageChanged?.Invoke(ManualDamage);
-
-            Debug.Log($"수동 데미지 업그레이드! 현재: {ManualDamage}");
-            return true;
-        }
-
-        return false;
-    }
-
-    // 자동 클릭 데미지를 업그레이드합니다
-    public bool UpgradeAutoDamage()
-    {
-        if (SpendApples(AutoUpgradeCost))
-        {
-            AutoDamage += 1;
-            AutoUpgradeCost = Math.Round(AutoUpgradeCost * 1.5f);
-
-            OnAutoDamageChanged?.Invoke(AutoDamage);
-
-            Debug.Log($"자동 데미지 업그레이드! 현재: {AutoDamage}");
-            return true;
-        }
-
-        return false;
-    }
-
-    // 자동 클리커를 구매합니다
-    public bool BuyAutoClicker()
-    {
-        if (SpendApples(AutoClickerCost))
-        {
-            HasAutoClicker = true;
-            AutoClickerLevel++;
-            AutoClickerCost = Math.Round(AutoClickerCost * 2f); // 비용 2배 증가
-
-            // AutoClicker 오브젝트 활성화
-            GameObject autoClicker = GameObject.Find("AutoClicker");
-            if (autoClicker != null)
-            {
-                autoClicker.SetActive(true);
-            }
-
-            Debug.Log($"자동 클리커 구매! 레벨: {AutoClickerLevel}");
-            return true;
-        }
-
-        return false;
-    }
-
-
-    // 나무가 리스폰될 때 호출
-    public void OnTreeRespawn()
-    {
-        // 보너스 사과 지급
-        double bonusApples = ManualDamage * 10;
-        AddApples(bonusApples);
-
-        OnTreeRespawnEvent?.Invoke();
-
-        Debug.Log($"나무 리스폰! 보너스 사과 +{bonusApples}");
-    }
-
+    /// 나무 클릭 시 호출
     public void OnTreeClick()
     {
-        // 기본 데미지 계산
+        // 기본 데미지 계산 (UpgradeManager에서 설정된 값 사용)
         double damage = ManualDamage;
 
         // 피버 타임 적용
@@ -193,7 +98,7 @@ public class GameManager : MonoBehaviour
             Debug.Log("⭐ CRITICAL! ⭐");
         }
 
-        // 사과 추가
+        // CurrencyManager를 통해 사과 추가
         AddApples(damage);
 
         // 클릭 카운트 증가
@@ -206,6 +111,34 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // 사과를 추가합니다 (CurrencyManager를 통해)
+    public void AddApples(double amount)
+    {
+        if (CurrencyManager.Instance == null)
+        {
+            Debug.LogError("CurrencyManager가 없습니다!");
+            return;
+        }
+
+        CurrencyManager.Instance.Add(ECurrencyType.Apple, amount);
+        TotalApplesCollected += amount;
+
+        Debug.Log($"사과 +{amount}! 총 수집: {TotalApplesCollected}개");
+    }
+
+    // 나무가 리스폰될 때 호출
+    public void OnTreeRespawn()
+    {
+        // 보너스 사과 지급
+        double bonusApples = ManualDamage * 10;
+        AddApples(bonusApples);
+
+        OnTreeRespawnEvent?.Invoke();
+
+        Debug.Log($"나무 리스폰! 보너스 사과 +{bonusApples}");
+    }
+
+    // 피버 시작
     void StartFever()
     {
         isFeverActive = true;
@@ -216,14 +149,17 @@ public class GameManager : MonoBehaviour
         Debug.Log($" FEVER TIME! (x{feverMultiplier}) ");
     }
 
+    // 피버 종료
     void EndFever()
     {
         isFeverActive = false;
         clickCount = 0;
 
         OnFeverEndEvent?.Invoke();
+        Debug.Log("피버 타임 종료!");
     }
 
+    // 다람쥐 자동 수확
     void AutoHarvestBySquirrels()
     {
         if (squirrelCount > 0)
@@ -233,12 +169,13 @@ public class GameManager : MonoBehaviour
         }
     }
 
-
+    // 피버 남은 시간 조회
     public float GetFeverRemainingTime()
     {
         return isFeverActive ? feverTimer : 0f;
     }
 
+    // 현재 클릭 데미지 계산 (피버 포함)
     public double GetCurrentClickDamage()
     {
         double damage = ManualDamage;
@@ -249,76 +186,24 @@ public class GameManager : MonoBehaviour
         return damage;
     }
 
-    public void SaveGame()
+    // 데이터 변경 알림 (UpgradeManager에서 호출)
+    public void NotifyDataChanged()
     {
-        // 기존 데이터 저장
-        PlayerPrefs.SetString("Apples", Apples.ToString());
-        PlayerPrefs.SetString("TotalApples", TotalApplesCollected.ToString());
-        PlayerPrefs.SetString("ManualDamage", ManualDamage.ToString());
-        PlayerPrefs.SetString("AutoDamage", AutoDamage.ToString());
-        PlayerPrefs.SetString("ManualUpgradeCost", ManualUpgradeCost.ToString());
-        PlayerPrefs.SetString("AutoUpgradeCost", AutoUpgradeCost.ToString());
-        PlayerPrefs.SetString("AutoClickerCost", AutoClickerCost.ToString());
-        PlayerPrefs.SetInt("HasAutoClicker", HasAutoClicker ? 1 : 0);
-        PlayerPrefs.SetString("AutoClickerLevel", AutoClickerLevel.ToString());
-
-        // 새로운 업그레이드 데이터 저장
-        PlayerPrefs.SetString("CriticalChance", criticalChance.ToString());
-        PlayerPrefs.SetString("CriticalMultiplier", criticalMultiplier.ToString());
-        PlayerPrefs.SetString("SquirrelCount", squirrelCount.ToString());
-        PlayerPrefs.SetString("FeverThreshold", feverThreshold.ToString());
-        PlayerPrefs.SetString("FeverMultiplier", feverMultiplier.ToString());
-        PlayerPrefs.SetString("FeverDuration", feverDuration.ToString());
-
-        PlayerPrefs.Save();
-
-        Debug.Log("게임 저장 완료!");
+        OnDataChanged?.Invoke();
     }
 
-    public void LoadGame()
-    {
-        // 기존 데이터 로드
-        Apples = double.Parse(PlayerPrefs.GetString("Apples", "0"));
-        TotalApplesCollected = double.Parse(PlayerPrefs.GetString("TotalApples", "0"));
-        ManualDamage = double.Parse(PlayerPrefs.GetString("ManualDamage", "1"));
-        AutoDamage = double.Parse(PlayerPrefs.GetString("AutoDamage", "1"));
-        ManualUpgradeCost = double.Parse(PlayerPrefs.GetString("ManualUpgradeCost", "10"));
-        AutoUpgradeCost = double.Parse(PlayerPrefs.GetString("AutoUpgradeCost", "50"));
-        AutoClickerCost = double.Parse(PlayerPrefs.GetString("AutoClickerCost", "100"));
-        HasAutoClicker = PlayerPrefs.GetInt("HasAutoClicker", 0) == 1;
-        AutoClickerLevel = int.Parse(PlayerPrefs.GetString("AutoClickerLevel", "0"));
-
-        // 새로운 업그레이드 데이터 로드
-        criticalChance = double.Parse(PlayerPrefs.GetString("CriticalChance", "0.1"));
-        criticalMultiplier = double.Parse(PlayerPrefs.GetString("CriticalMultiplier", "2"));
-        squirrelCount = int.Parse(PlayerPrefs.GetString("SquirrelCount", "0"));
-        feverThreshold = int.Parse(PlayerPrefs.GetString("FeverThreshold", "75"));
-        feverMultiplier = double.Parse(PlayerPrefs.GetString("FeverMultiplier", "2.5"));
-        feverDuration = float.Parse(PlayerPrefs.GetString("FeverDuration", "10"));
-
-        OnAppleChanged?.Invoke(Apples);
-        OnManualDamageChanged?.Invoke(ManualDamage);
-        OnAutoDamageChanged?.Invoke(AutoDamage);
-
-        Debug.Log("게임 로드 완료!");
-    }
-
+    // 게임 리셋
     public void ResetGame()
     {
-        PlayerPrefs.DeleteAll();
+        if (SaveLoadManager.Instance != null)
+        {
+            SaveLoadManager.Instance.ResetAllData();
+        }
 
-        // 기존 변수 리셋
-        Apples = 0;
+        // 변수 리셋
         TotalApplesCollected = 0;
         ManualDamage = 1;
         AutoDamage = 1;
-        ManualUpgradeCost = 10;
-        AutoUpgradeCost = 50;
-        AutoClickerCost = 100;
-        HasAutoClicker = false;
-        AutoClickerLevel = 0;
-
-        // 새로운 변수 리셋
         criticalChance = 0.1d;
         criticalMultiplier = 2.0d;
         squirrelCount = 0;
@@ -328,14 +213,39 @@ public class GameManager : MonoBehaviour
         feverDuration = 10f;
         isFeverActive = false;
 
-        OnAppleChanged?.Invoke(Apples);
+        // CurrencyManager 리셋
+        if (CurrencyManager.Instance != null)
+        {
+            for (int i = 0; i < (int)ECurrencyType.Count; i++)
+            {
+                CurrencyManager.Instance.Set((ECurrencyType)i, new Currency(0));
+            }
+        }
 
-        Debug.Log("게임 리셋!");
+        // UpgradeManager 리셋
+        if (UpgradeManager.Instance != null)
+        {
+            UpgradeManager.Instance.InitializeUpgrades(null);
+        }
+
+        OnDataChanged?.Invoke();
     }
 
     private void OnApplicationQuit()
     {
         // 게임 종료 시 자동 저장
-        SaveGame();
+        if (SaveLoadManager.Instance != null)
+        {
+            SaveLoadManager.Instance.SaveGame();
+        }
+    }
+
+    private void OnApplicationPause(bool pauseStatus)
+    {
+        // 모바일: 앱이 백그라운드로 갈 때 저장
+        if (pauseStatus && SaveLoadManager.Instance != null)
+        {
+            SaveLoadManager.Instance.SaveGame();
+        }
     }
 }
