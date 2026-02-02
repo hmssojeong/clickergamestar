@@ -2,6 +2,7 @@ using NUnit.Framework;
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public class StudentManager : MonoBehaviour
 {
@@ -10,20 +11,59 @@ public class StudentManager : MonoBehaviour
 
     private List<Student> _students = new();
 
-    [SerializeField] private StudentSpecTable _specTable = new();
+    [SerializeField] private StudentSpecTable _specTable;
+
+    public event Action OnDataChanged;
+
+    private PlayerPrefsStudentRepository _repository;
 
     private void Awake()
     {
         Instance = this;
+
+        _repository = new PlayerPrefsStudentRepository();
+
+        foreach (StudentSpecData data in _specTable.SpecDatas)
+        {
+            // 불러오기
+            StudentSaveData saveData = _repository.Load(data.Name);
+
+            bool isAttendance = false;
+            if(saveData != null)
+            {
+                isAttendance = saveData.Attendance;
+            }
+            Student student = new Student(data, isAttendance);
+
+            _students.Add(student);
+        }
     }
 
-    private void Start()
-    {
-        _students.Add(new Student("함소정", 29));
-        _students.Add(new Student("노민균", 24));
-        _students.Add(new Student("고현종", 28));
+    public List<IReadonlyStudent> GetAll()
+    { 
+        return _students.ToList<IReadonlyStudent>();
+    }
 
-        // .... 100명
+    public bool TryAttendance(string studentName)
+    {
+        Student student = _students.Find(student => student.Name == studentName);
+        if(student.IsAttendance)
+        {
+            return false;
+        }
+
+        student.CheckAttendance(true);
+
+/*        CurrencyManager.Instance.Add(ECurrencyType.Apple, 100);*/
+
+        OnDataChanged?.Invoke();
+
+        StudentSaveData saveData = new StudentSaveData();
+        saveData.Attendance = true;
+
+        _repository.Save(studentName, saveData);
+
+        return true;
     }
 
 }

@@ -4,6 +4,6 @@ using UnityEngine;
 [Serializable]
 public class StudentSpecData
 {
-    public string Name { get; private set; }
-    public int Age { get; private set; }
+    public string Name;
+    public int Age;
 }
