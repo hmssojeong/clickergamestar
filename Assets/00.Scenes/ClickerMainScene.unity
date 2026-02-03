@@ -2332,6 +2332,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UpgradeManager
   _specTable: {fileID: 11400000, guid: b746ebdff94f98d40bb27b491638c6c8, type: 2}
+  _useFirebase: 0
 --- !u!1 &525517429
 GameObject:
   m_ObjectHideFlags: 0

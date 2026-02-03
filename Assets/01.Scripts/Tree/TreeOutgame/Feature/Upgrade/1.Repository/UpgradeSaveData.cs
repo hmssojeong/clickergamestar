@@ -1,10 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-/// <summary>
-/// 업그레이드 저장 데이터
-/// Dictionary 기반으로 유연한 저장/로드
-/// </summary>
+// Dictionary 기반으로 유연한 저장/로드
 [Serializable]
 public class UpgradeSaveData
 {
