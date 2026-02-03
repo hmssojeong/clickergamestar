@@ -2,10 +2,10 @@ using UnityEngine;
 
 public enum ECurrencyType
 {
-    Apple = 0,      // »ç°ú (±âº» È­Æó)
+    Apple = 0,      // ì‚¬ê³¼ (ê¸°ë³¸ í™”í)
     Gold = 1,       
     Gem = 2,        
 
-    // ¸¶Áö¸· Ç×¸ñ (¹è¿­ Å©±â °è»ê¿ë)
+    // ë§ˆì§€ë§‰ í•­ëª© (ë°°ì—´ í¬ê¸° ê³„ì‚°ìš©)
     Count
 }

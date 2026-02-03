@@ -3,18 +3,18 @@ using System.Security.Cryptography;
 using System.Text;
 
 /// <summary>
-/// ¾ÏÈ£È­ À¯Æ¿¸®Æ¼ (Repository °èÃş)
-/// SHA256 ÇØ½Ã + Salt Áö¿ø
+/// ì•”í˜¸í™” ìœ í‹¸ë¦¬í‹° (Repository ê³„ì¸µ)
+/// SHA256 í•´ì‹œ + Salt ì§€ì›
 /// </summary>
 public static class Crypto
 {
     /// <summary>
-    /// ºñ¹Ğ¹øÈ£¸¦ SHA256À¸·Î ÇØ½Ã
+    /// ë¹„ë°€ë²ˆí˜¸ë¥¼ SHA256ìœ¼ë¡œ í•´ì‹œ
     /// </summary>
     public static string HashPassword(string plainText, string salt = "")
     {
         if (string.IsNullOrEmpty(plainText))
-            throw new ArgumentException("ÀÔ·Â ¹®ÀÚ¿­ÀÌ ºñ¾î ÀÖÀ» ¼ö ¾ø½À´Ï´Ù.");
+            throw new ArgumentException("ì…ë ¥ ë¬¸ìì—´ì´ ë¹„ì–´ ìˆì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
 
         string combined = plainText + salt;
 
@@ -27,7 +27,7 @@ public static class Crypto
     }
 
     /// <summary>
-    /// ºñ¹Ğ¹øÈ£ °ËÁõ
+    /// ë¹„ë°€ë²ˆí˜¸ ê²€ì¦
     /// </summary>
     public static bool VerifyPassword(string plainText, string hashedPassword, string salt = "")
     {

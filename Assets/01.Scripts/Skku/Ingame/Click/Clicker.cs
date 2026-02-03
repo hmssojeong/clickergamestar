@@ -6,11 +6,11 @@ public class Clicker : MonoBehaviour
 
     private void Update()
     {
-        // 1. ¸¶¿ì½º Å¬¸¯À» °¨ÁöÇÑ´Ù.
+        // 1. ë§ˆìš°ìŠ¤ í´ë¦­ì„ ê°ì§€í•œë‹¤.
         if (Input.GetMouseButtonDown(0))
         {
-            // 2. ¸¶¿ì½º ÁÂÇ¥¸¦ ±¸ÇÑ´Ù.
-            // ¸¶¿ì½º ÁÂÇ¥°è´Â ½ºÅ©¸° ÁÂÇ¥°è
+            // 2. ë§ˆìš°ìŠ¤ ì¢Œí‘œë¥¼ êµ¬í•œë‹¤.
+            // ë§ˆìš°ìŠ¤ ì¢Œí‘œê³„ëŠ” ìŠ¤í¬ë¦° ì¢Œí‘œê³„
             Vector2 mousePos = Input.mousePosition;
             Click(mousePos);
         }
@@ -18,10 +18,10 @@ public class Clicker : MonoBehaviour
 
     private void Click(Vector2 mousePos)
     {
-        // ¸¶¿ì½ºÀÇ ½ºÅ©¸° ÁÂÇ¥°è¸¦ ¿ùµå ÁÂÇ¥°è·Î ¹Ù²ãÁÙ ÇÊ¿ä°¡ ÀÖ´Ù.
+        // ë§ˆìš°ìŠ¤ì˜ ìŠ¤í¬ë¦° ì¢Œí‘œê³„ë¥¼ ì›”ë“œ ì¢Œí‘œê³„ë¡œ ë°”ê¿”ì¤„ í•„ìš”ê°€ ìˆë‹¤.
         Vector2 worldPos = Camera.main.ScreenToWorldPoint(mousePos);
 
-        // 3. ¸¶¿ì½º ÁÂÇ¥·Î °¡»óÀÇ ·¹ÀÌÀú¸¦ ½÷¼­ ±× ·¹ÀÌÀú°¡ Å¬¸¯Å¸°Ù°ú Ãæµ¹Çß´ÂÁö Ã¼Å©
+        // 3. ë§ˆìš°ìŠ¤ ì¢Œí‘œë¡œ ê°€ìƒì˜ ë ˆì´ì €ë¥¼ ì´ì„œ ê·¸ ë ˆì´ì €ê°€ í´ë¦­íƒ€ê²Ÿê³¼ ì¶©ëŒí–ˆëŠ”ì§€ ì²´í¬
         RaycastHit2D hit = Physics2D.Raycast(worldPos, Vector2.zero);
         if (hit == true)
         {
@@ -31,8 +31,8 @@ public class Clicker : MonoBehaviour
             }
 
             Clickable clickable = hit.collider.GetComponent<Clickable>();
-            // ´©°¡ Å¬¸¯Çß´ÂÁö             (ManualClick, AutoClick)
-            // ¾î´ÀÁ¤µµÀÇ °­µµ·Î Å¬¸¯Çß´ÂÁö (int)
+            // ëˆ„ê°€ í´ë¦­í–ˆëŠ”ì§€             (ManualClick, AutoClick)
+            // ì–´ëŠì •ë„ì˜ ê°•ë„ë¡œ í´ë¦­í–ˆëŠ”ì§€ (int)
 
             ClickInfo clickInfo = new ClickInfo
             {

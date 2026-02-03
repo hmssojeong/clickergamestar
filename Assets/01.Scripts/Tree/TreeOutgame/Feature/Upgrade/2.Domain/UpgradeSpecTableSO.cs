@@ -2,8 +2,8 @@ using System;
 using UnityEngine;
 
 
-// SO´Â µ¥ÀÌÅÍ Å¬·¡½º¸¦ À¯´ÏÆ¼¿¡¼­ ¿¡¼ÂÃ³·³ °ü¸®ÇÒ ¼ö ÀÖ°Ô ÇØÁÖ´Â ±â´ÉÀ» °¡Áö°í ÀÖ´Ù.
-// ÄÚµå ¼öÁ¤¾øÀÌ ÇÁ·ÎÁ§Æ® ºä¿¡¼­ ¼öÁ¤°¡´ÉÇÏ¹Ç·Î ÆíÇÏ°Ô ÆíÁıÇÒ ¼ö ÀÖ´Ù.
+// SOëŠ” ë°ì´í„° í´ë˜ìŠ¤ë¥¼ ìœ ë‹ˆí‹°ì—ì„œ ì—ì…‹ì²˜ëŸ¼ ê´€ë¦¬í•  ìˆ˜ ìˆê²Œ í•´ì£¼ëŠ” ê¸°ëŠ¥ì„ ê°€ì§€ê³  ìˆë‹¤.
+// ì½”ë“œ ìˆ˜ì •ì—†ì´ í”„ë¡œì íŠ¸ ë·°ì—ì„œ ìˆ˜ì •ê°€ëŠ¥í•˜ë¯€ë¡œ í¸í•˜ê²Œ í¸ì§‘í•  ìˆ˜ ìˆë‹¤.
 [CreateAssetMenu(fileName = "UpgradeSpecTableSO", menuName = "Scriptable Objects/UpgradeSpecTableSO")]
 public class UpgradeSpecTableSO : ScriptableObject
 {

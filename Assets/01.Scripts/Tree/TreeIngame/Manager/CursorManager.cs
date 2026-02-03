@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class CursorManager : MonoBehaviour
 {
-    [SerializeField] private RectTransform _cursorRectTransform; // ImageÀÇ RectTransform
+    [SerializeField] private RectTransform _cursorRectTransform; // Imageì˜ RectTransform
     [SerializeField] private float _cursorSize = 80f;
     [SerializeField] private float _cursorScale = 0.8f;
     [SerializeField] private float _edgePadding = 10f;
@@ -20,7 +20,7 @@ public class CursorManager : MonoBehaviour
             _cursorRectTransform.localScale = _originalScale;
         }
 
-        // Raycast Target ºñÈ°¼ºÈ­
+        // Raycast Target ë¹„í™œì„±í™”
         Image img = _cursorRectTransform.GetComponent<Image>();
         if (img != null)
         {
@@ -32,7 +32,7 @@ public class CursorManager : MonoBehaviour
     {
         if (_cursorRectTransform != null)
         {
-            // ¸¶¿ì½º À§Ä¡¸¦ È­¸é ¹üÀ§ ³»·Î Á¦ÇÑ
+            // ë§ˆìš°ìŠ¤ ìœ„ì¹˜ë¥¼ í™”ë©´ ë²”ìœ„ ë‚´ë¡œ ì œí•œ
             Vector3 mousePos = Input.mousePosition;
 
             mousePos.x = Mathf.Clamp(mousePos.x, _edgePadding, Screen.width - _edgePadding);

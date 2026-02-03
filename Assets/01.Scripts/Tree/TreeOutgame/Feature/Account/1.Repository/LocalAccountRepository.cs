@@ -7,7 +7,7 @@ public class LocalAccountRepository : IAccountRepository
 
     public bool IsEmailAvailable(string email)
     {
-        // ÀÌ¸ŞÀÏ °Ë»ç
+        // ì´ë©”ì¼ ê²€ì‚¬
         if (PlayerPrefs.HasKey(email))
         {
             return false;
@@ -18,20 +18,20 @@ public class LocalAccountRepository : IAccountRepository
 
     public AuthResult Register(string email, string password)
     {
-        // 1. ÀÌ¸ŞÀÏ Áßº¹°Ë»ç
+        // 1. ì´ë©”ì¼ ì¤‘ë³µê²€ì‚¬
         if (!IsEmailAvailable(email))
         {
             return new AuthResult
             {
                 Success = false,
-                ErrorMessage = "Áßº¹µÈ °èÁ¤ÀÔ´Ï´Ù.",
+                ErrorMessage = "ì¤‘ë³µëœ ê³„ì •ì…ë‹ˆë‹¤.",
             };
         }
 
         string hashedPassword = Crypto.HashPassword(password, SALT);
-        // ÇØ½Ì¹®ÀÚ¿­: ¹®ÀÚ¿­À» Æ¯Á¤ ¾Ë°í¸®ÁòÀ» ÀÌ¿ëÇØ¼­ º¯°æµÈ °íÁ¤µÈ ±æÀÌÀÇ ¹®ÀÚ¿­ 
-        // ¼ºÈÆ¾¾ ¾ÆÀÌµğ : tjdgnd1004
-        //      ºñ¹Ğ¹øÈ£: 10041004!
+        // í•´ì‹±ë¬¸ìì—´: ë¬¸ìì—´ì„ íŠ¹ì • ì•Œê³ ë¦¬ì¦˜ì„ ì´ìš©í•´ì„œ ë³€ê²½ëœ ê³ ì •ëœ ê¸¸ì´ì˜ ë¬¸ìì—´ 
+        // ì„±í›ˆì”¨ ì•„ì´ë”” : tjdgnd1004
+        //      ë¹„ë°€ë²ˆí˜¸: 10041004!
 
         PlayerPrefs.SetString(email, hashedPassword);
 
@@ -44,24 +44,24 @@ public class LocalAccountRepository : IAccountRepository
 
     public AuthResult Login(string email, string password)
     {
-        // 2. °¡ÀÔÇÑÀû ¾ø´Ù¸é ½ÇÆĞ!
+        // 2. ê°€ì…í•œì  ì—†ë‹¤ë©´ ì‹¤íŒ¨!
         if (!PlayerPrefs.HasKey(email))
         {
             return new AuthResult
             {
                 Success = false,
-                ErrorMessage = "¾ÆÀÌµğ¿Í ºñ¹Ğ¹øÈ£¸¦ È®ÀÎÇØÁÖ¼¼¿ä.",
+                ErrorMessage = "ì•„ì´ë””ì™€ ë¹„ë°€ë²ˆí˜¸ë¥¼ í™•ì¸í•´ì£¼ì„¸ìš”.",
             };
         }
 
-        // 3. ºñ¹Ğ¹øÈ£ Æ²·È´Ù¸é ½ÇÆĞ.
+        // 3. ë¹„ë°€ë²ˆí˜¸ í‹€ë ¸ë‹¤ë©´ ì‹¤íŒ¨.
         string myPassword = PlayerPrefs.GetString(email);
         if (Crypto.VerifyPassword(password, myPassword, SALT))
         {
             return new AuthResult
             {
                 Success = false,
-                ErrorMessage = "¾ÆÀÌµğ¿Í ºñ¹Ğ¹øÈ£¸¦ È®ÀÎÇØÁÖ¼¼¿ä.",
+                ErrorMessage = "ì•„ì´ë””ì™€ ë¹„ë°€ë²ˆí˜¸ë¥¼ í™•ì¸í•´ì£¼ì„¸ìš”.",
             };
         }
 
@@ -74,6 +74,6 @@ public class LocalAccountRepository : IAccountRepository
 
     public void Logout()
     {
-        Debug.Log("·Î±×¾Æ¿ô µÆ½À´Ï´Ù.");
+        Debug.Log("ë¡œê·¸ì•„ì›ƒ ëìŠµë‹ˆë‹¤.");
     }
 }

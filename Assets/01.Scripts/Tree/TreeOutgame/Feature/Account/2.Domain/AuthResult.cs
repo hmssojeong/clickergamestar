@@ -1,7 +1,7 @@
 using UnityEngine;
 
-// ÀÎÁõ °á°ú
-// ·Î±×ÀÎ/È¸¿ø°¡ÀÔ¿¡ ´ëÇÑ ¼º°ø ¿©ºÎ¿Í ¿¡·¯¸Ş½ÃÁö¿Í Account
+// ì¸ì¦ ê²°ê³¼
+// ë¡œê·¸ì¸/íšŒì›ê°€ì…ì— ëŒ€í•œ ì„±ê³µ ì—¬ë¶€ì™€ ì—ëŸ¬ë©”ì‹œì§€ì™€ Account
 public struct AuthResult
 {
     public bool Success;

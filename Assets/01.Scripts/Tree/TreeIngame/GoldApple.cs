@@ -26,11 +26,11 @@ public class GoldApple : MonoBehaviour
 
     private void Start()
     {
-        // ½ºÆù ¾Ö´Ï¸ŞÀÌ¼Ç
+        // ìŠ¤í° ì• ë‹ˆë©”ì´ì…˜
         transform.localScale = Vector3.zero;
         transform.DOScale(_targetScale, _spawnScaleDuration).SetEase(_spawnEase);
 
-        // ·£´ı È¸Àü Ãß°¡
+        // ëœë¤ íšŒì „ ì¶”ê°€
         if (_rb != null)
         {
             _rb.angularVelocity = Random.Range(-_rotationSpeed, _rotationSpeed);
@@ -39,7 +39,7 @@ public class GoldApple : MonoBehaviour
 
     private void Update()
     {
-        // È­¸é ¹ÛÀ¸·Î ³ª°¡¸é »èÁ¦
+        // í™”ë©´ ë°–ìœ¼ë¡œ ë‚˜ê°€ë©´ ì‚­ì œ
         if (transform.position.y < -10f)
         {
             Destroy(gameObject);
@@ -48,52 +48,52 @@ public class GoldApple : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        // ¹Ù½ºÄÏÀÌ³ª ¼öÁı ¿µ¿ª¿¡ ´êÀ¸¸é ¼öÁı
+        // ë°”ìŠ¤ì¼“ì´ë‚˜ ìˆ˜ì§‘ ì˜ì—­ì— ë‹¿ìœ¼ë©´ ìˆ˜ì§‘
         if (other.CompareTag("Collector") && !_isCollected)
         {
             CollectApple();
         }
     }
 
-    // »ç°ú¸¦ ¼öÁıÇÕ´Ï´Ù
+    // ì‚¬ê³¼ë¥¼ ìˆ˜ì§‘í•©ë‹ˆë‹¤
     private void CollectApple()
     {
         if (_isCollected) return;
 
         _isCollected = true;
 
-        // 1. ¶³¾îÁ®¼­ ¼öÁıµÉ ¶§ (10Á¡) ÇÃ·ÎÆÃ ÅØ½ºÆ® Ç¥½Ã
+        // 1. ë–¨ì–´ì ¸ì„œ ìˆ˜ì§‘ë  ë•Œ (10ì ) í”Œë¡œíŒ… í…ìŠ¤íŠ¸ í‘œì‹œ
         if (FloatingTextManager.Instance != null)
         {
             FloatingTextManager.Instance.ShowScore(transform.position, 10);
         }
 
-        // ¼öÁı ¾Ö´Ï¸ŞÀÌ¼Ç
+        // ìˆ˜ì§‘ ì• ë‹ˆë©”ì´ì…˜
         transform.DOScale(Vector3.zero, 0.2f).SetEase(Ease.InBack);
 
-        // Á¡¼ö Ãß°¡
+        // ì ìˆ˜ ì¶”ê°€
         GameManager.Instance.AddApples(10);
 
         Destroy(gameObject, 0.3f);
     }
 
-    // »ç°ú¸¦ Å¬¸¯ÇßÀ» ¶§ (º¸³Ê½º Á¡¼ö 15Á¡)
+    // ì‚¬ê³¼ë¥¼ í´ë¦­í–ˆì„ ë•Œ (ë³´ë„ˆìŠ¤ ì ìˆ˜ 15ì )
     private void OnMouseDown()
     {
         if (!_isCollected)
         {
-            _isCollected = true; // Áßº¹ Å¬¸¯ ¹æÁö
+            _isCollected = true; // ì¤‘ë³µ í´ë¦­ ë°©ì§€
 
-            // 2. Å¬¸¯ ½Ã (15Á¡) ÇÃ·ÎÆÃ ÅØ½ºÆ® Ç¥½Ã (Å©¸®Æ¼ÄÃÃ³·³ °­Á¶ÇÏ°í ½Í´Ù¸é ShowText »ç¿ë °¡´É)
+            // 2. í´ë¦­ ì‹œ (15ì ) í”Œë¡œíŒ… í…ìŠ¤íŠ¸ í‘œì‹œ (í¬ë¦¬í‹°ì»¬ì²˜ëŸ¼ ê°•ì¡°í•˜ê³  ì‹¶ë‹¤ë©´ ShowText ì‚¬ìš© ê°€ëŠ¥)
             if (FloatingTextManager.Instance != null)
             {
                 FloatingTextManager.Instance.ShowScore(transform.position, 15);
             }
 
-            // Á¡¼ö Ãß°¡
+            // ì ìˆ˜ ì¶”ê°€
             GameManager.Instance.AddApples(15);
 
-            // ¾Ö´Ï¸ŞÀÌ¼Ç ¹× ÆÄ±« ·ÎÁ÷ (CollectAppleÀ» È£ÃâÇÏ´Â ´ë½Å Á÷Á¢ Ã³¸®ÇÏ¿© Á¡¼ö Áßº¹ ¹æÁö)
+            // ì• ë‹ˆë©”ì´ì…˜ ë° íŒŒê´´ ë¡œì§ (CollectAppleì„ í˜¸ì¶œí•˜ëŠ” ëŒ€ì‹  ì§ì ‘ ì²˜ë¦¬í•˜ì—¬ ì ìˆ˜ ì¤‘ë³µ ë°©ì§€)
             transform.DOScale(Vector3.zero, 0.2f).SetEase(Ease.InBack);
             Destroy(gameObject, 0.3f);
         }

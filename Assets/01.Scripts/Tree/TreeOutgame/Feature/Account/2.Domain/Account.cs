@@ -2,12 +2,12 @@ using System;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-// °´Ã¼ : ¾î¶² ´ë»ó/°³³ä¿¡ ´ëÇÑ ¼Ó¼º(µ¥ÀÌÅÍ) + ±â´É(¸Ş¼­µå)
-// µµ¸ŞÀÎ: ¾î¶² °³³ä¿¡ ÁıÁßÇØ¼­ °´Ã¼·Î Ç¥ÇöÇÑ °Í
+// ê°ì²´ : ì–´ë–¤ ëŒ€ìƒ/ê°œë…ì— ëŒ€í•œ ì†ì„±(ë°ì´í„°) + ê¸°ëŠ¥(ë©”ì„œë“œ)
+// ë„ë©”ì¸: ì–´ë–¤ ê°œë…ì— ì§‘ì¤‘í•´ì„œ ê°ì²´ë¡œ í‘œí˜„í•œ ê²ƒ
 public class Account
 {
-    // ÀÌ¸ŞÀÏ
-    // ºñ¹Ğ¹øÈ£
+    // ì´ë©”ì¼
+    // ë¹„ë°€ë²ˆí˜¸
     public readonly string Email;
     public readonly string Password;
 
@@ -21,21 +21,21 @@ public class Account
             throw new ArgumentException(emailSpec.ErrorMessage);
         }
 
-        if (string.IsNullOrEmpty(password)) throw new ArgumentException($"ºñ¹Ğ¹øÈ£´Â ºñ¾îÀÖÀ» ¼ö ¾ø½À´Ï´Ù.");
-        if (password.Length < 6 || 15 < password.Length) throw new ArgumentException($"ºñ¹Ğ¹øÈ£´Â 6~15ÀÚ »çÀÌ¾î¾ßÇÕ´Ï´Ù.");
+        if (string.IsNullOrEmpty(password)) throw new ArgumentException($"ë¹„ë°€ë²ˆí˜¸ëŠ” ë¹„ì–´ìˆì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
+        if (password.Length < 6 || 15 < password.Length) throw new ArgumentException($"ë¹„ë°€ë²ˆí˜¸ëŠ” 6~15ì ì‚¬ì´ì–´ì•¼í•©ë‹ˆë‹¤.");
 
         Email = email;
         Password = password;
     }
 
-    // ÀÌ¸ŞÀÏ ±ÔÄ¢:
-    // 0. ºñ¾îÀÖÀ¸¸é ¾ÈµÈ´Ù.
-    // 1. ¿Ã¹Ù¸¥ ÀÌ¸ŞÀÏÀÌ¾î¾ßÇÑ´Ù.
-    // 2. µ¿ÀÏÇÑ ÀÌ¸ŞÀÏÀÌ¸é Áßº¹ ¾ÈµÈ´Ù..
+    // ì´ë©”ì¼ ê·œì¹™:
+    // 0. ë¹„ì–´ìˆìœ¼ë©´ ì•ˆëœë‹¤.
+    // 1. ì˜¬ë°”ë¥¸ ì´ë©”ì¼ì´ì–´ì•¼í•œë‹¤.
+    // 2. ë™ì¼í•œ ì´ë©”ì¼ì´ë©´ ì¤‘ë³µ ì•ˆëœë‹¤..
 
-    // ºñ¹Ğ¹øÈ£ ±ÔÄ¢
-    // 0. ºñ¾îÀÖÀ¸¸é ¾ÈµÈ´Ù.
-    // 1. 6ÀÚ¸® ÀÌ»ó 15ÀÚ ÀÌÇÏ  //(´ë¹®ÀÚ 1°³ÀÌ»ó Æ÷ÇÔ, Æ¯¼ö¹®ÀÚ 1°³ ÀÌ»óÆ÷ÇÔ)
+    // ë¹„ë°€ë²ˆí˜¸ ê·œì¹™
+    // 0. ë¹„ì–´ìˆìœ¼ë©´ ì•ˆëœë‹¤.
+    // 1. 6ìë¦¬ ì´ìƒ 15ì ì´í•˜  //(ëŒ€ë¬¸ì 1ê°œì´ìƒ í¬í•¨, íŠ¹ìˆ˜ë¬¸ì 1ê°œ ì´ìƒí¬í•¨)
 
 
 

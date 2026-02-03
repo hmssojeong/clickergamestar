@@ -1,9 +1,9 @@
 using System;
 using UnityEngine;
 
-// ¸Å´ÏÀúÀÇ ¿ªÇÒ:
-// 1. µµ¸ŞÀÎ °ü¸® : »ı¼º/Á¶È¸/¼öÁ¤/»èÁ¦¿Í °°Àº ºñÁî´Ï½º ·ÎÁ÷ 
-// 2. ¿ÜºÎ¿ÍÀÇ ¼ÒÅë Ã¢±¸
+// ë§¤ë‹ˆì €ì˜ ì—­í• :
+// 1. ë„ë©”ì¸ ê´€ë¦¬ : ìƒì„±/ì¡°íšŒ/ìˆ˜ì •/ì‚­ì œì™€ ê°™ì€ ë¹„ì¦ˆë‹ˆìŠ¤ ë¡œì§ 
+// 2. ì™¸ë¶€ì™€ì˜ ì†Œí†µ ì°½êµ¬
 public class AccountManager : MonoBehaviour
 {
     public static AccountManager Instance { get; private set; }
@@ -25,7 +25,7 @@ public class AccountManager : MonoBehaviour
 
     public AuthResult TryLogin(string email, string password)
     {
-        // 1.À¯È¿¼º °Ë»ç
+        // 1.ìœ íš¨ì„± ê²€ì‚¬
         try
         {
             Account account = new Account(email, password);
@@ -39,7 +39,7 @@ public class AccountManager : MonoBehaviour
             };
         }
 
-        // 2. ·¹Æ÷ÁöÅä¸®¸¦ ÀÌ¿ëÇÑ ·Î±×ÀÎ
+        // 2. ë ˆí¬ì§€í† ë¦¬ë¥¼ ì´ìš©í•œ ë¡œê·¸ì¸
         AuthResult result = _repository.Login(email, password);
         if (result.Success)
         {
@@ -62,7 +62,7 @@ public class AccountManager : MonoBehaviour
 
     public AuthResult TryRegister(string email, string password)
     {
-        // À¯È¿¼º °Ë»ç
+        // ìœ íš¨ì„± ê²€ì‚¬
         try
         {
             Account account = new Account(email, password);

@@ -6,21 +6,21 @@ using DG.Tweening;
 public class FeverUI : MonoBehaviour
 {
     [Header("Fever Gauge UI")]
-    [SerializeField] private Slider _feverGaugeSlider; // ÇÇ¹ö °ÔÀÌÁö ½½¶óÀÌ´õ
-    [SerializeField] private Image _gaugeFillImage; // °ÔÀÌÁö Ã¤¿ì±â ÀÌ¹ÌÁö
-    [SerializeField] private TextMeshProUGUI _gaugeText; // "50 / 75" Çü½Ä
-    [SerializeField] private Gradient _gaugeColorGradient; // °ÔÀÌÁö »ö»ó ±×¶óµ¥ÀÌ¼Ç
+    [SerializeField] private Slider _feverGaugeSlider; // í”¼ë²„ ê²Œì´ì§€ ìŠ¬ë¼ì´ë”
+    [SerializeField] private Image _gaugeFillImage; // ê²Œì´ì§€ ì±„ìš°ê¸° ì´ë¯¸ì§€
+    [SerializeField] private TextMeshProUGUI _gaugeText; // "50 / 75" í˜•ì‹
+    [SerializeField] private Gradient _gaugeColorGradient; // ê²Œì´ì§€ ìƒ‰ìƒ ê·¸ë¼ë°ì´ì…˜
 
     [Header("Fever Timer UI")]
-    [SerializeField] private GameObject _feverTimerPanel; // ÇÇ¹ö Å¸ÀÌ¸Ó ÆÐ³Î
-    [SerializeField] private Slider _feverTimerSlider; // ÇÇ¹ö ³²Àº ½Ã°£ ½½¶óÀÌ´õ
-    [SerializeField] private TextMeshProUGUI _feverTimerText; // "12.5s" Çü½Ä
+    [SerializeField] private GameObject _feverTimerPanel; // í”¼ë²„ íƒ€ì´ë¨¸ íŒ¨ë„
+    [SerializeField] private Slider _feverTimerSlider; // í”¼ë²„ ë‚¨ì€ ì‹œê°„ ìŠ¬ë¼ì´ë”
+    [SerializeField] private TextMeshProUGUI _feverTimerText; // "12.5s" í˜•ì‹
 
     [Header("Fever Effect UI")]
-    [SerializeField] private GameObject _feverEffectPanel; // "FEVER TIME!" ÅØ½ºÆ® ÆÐ³Î
+    [SerializeField] private GameObject _feverEffectPanel; // "FEVER TIME!" í…ìŠ¤íŠ¸ íŒ¨ë„
     [SerializeField] private TextMeshProUGUI _feverEffectText;
-    [SerializeField] private Image _screenOverlay; // È­¸é ÀüÃ¼ ¿À¹ö·¹ÀÌ
-    [SerializeField] private Color _feverOverlayColor = new Color(1f, 0.5f, 0f, 0.2f); // ÁÖÈ²»ö
+    [SerializeField] private Image _screenOverlay; // í™”ë©´ ì „ì²´ ì˜¤ë²„ë ˆì´
+    [SerializeField] private Color _feverOverlayColor = new Color(1f, 0.5f, 0f, 0.2f); // ì£¼í™©ìƒ‰
 
     [Header("Animation Settings")]
     [SerializeField] private float _gaugePulseScale = 1.1f;
@@ -30,7 +30,7 @@ public class FeverUI : MonoBehaviour
     [SerializeField] private SpriteRenderer _skyUp;  
     [SerializeField] private SpriteRenderer _skyBottom; 
     [SerializeField] private Color _feverSkyColor = new Color32(0x54, 0x59, 0x7B, 0xFF);
-    [SerializeField] private float _colorTransitionDuration = 0.5f; // »ö º¯È­ ½Ã°£
+    [SerializeField] private float _colorTransitionDuration = 0.5f; // ìƒ‰ ë³€í™” ì‹œê°„
 
     [Header("Rain Particle Settings")]
     [SerializeField] private ParticleSystem _rainFallParticle;
@@ -59,14 +59,14 @@ public class FeverUI : MonoBehaviour
 
         if (FeverManager.Instance != null)
         {
-            // ÀÌº¥Æ® ±¸µ¶
+            // ì´ë²¤íŠ¸ êµ¬ë…
             FeverManager.Instance.OnClickCountChanged.AddListener(UpdateFeverGauge);
             FeverManager.Instance.OnFeverStart.AddListener(OnFeverStart);
             FeverManager.Instance.OnFeverEnd.AddListener(OnFeverEnd);
             FeverManager.Instance.OnFeverTimeChanged.AddListener(UpdateFeverTimer);
         }
 
-        // ÃÊ±â »óÅÂ ¼³Á¤
+        // ì´ˆê¸° ìƒíƒœ ì„¤ì •
         if (_feverTimerPanel != null)
             _feverTimerPanel.SetActive(false);
 
@@ -75,11 +75,11 @@ public class FeverUI : MonoBehaviour
 
         if (_screenOverlay != null)
         {
-            _screenOverlay.color = new Color(1, 1, 1, 0); // Åõ¸í
+            _screenOverlay.color = new Color(1, 1, 1, 0); // íˆ¬ëª…
         }
     }
 
-    // ÇÇ¹ö °ÔÀÌÁö ¾÷µ¥ÀÌÆ®
+    // í”¼ë²„ ê²Œì´ì§€ ì—…ë°ì´íŠ¸
     private void UpdateFeverGauge(int currentClicks, int maxClicks)
     {
         if (_feverGaugeSlider != null)
@@ -87,21 +87,21 @@ public class FeverUI : MonoBehaviour
             float progress = (float)currentClicks / maxClicks;
             _feverGaugeSlider.value = progress;
 
-            // °ÔÀÌÁö »ö»ó º¯°æ
+            // ê²Œì´ì§€ ìƒ‰ìƒ ë³€ê²½
             if (_gaugeFillImage != null && _gaugeColorGradient != null)
             {
                 _gaugeFillImage.color = _gaugeColorGradient.Evaluate(progress);
             }
 
-            // °ÔÀÌÁö ÅØ½ºÆ® ¾÷µ¥ÀÌÆ®
+            // ê²Œì´ì§€ í…ìŠ¤íŠ¸ ì—…ë°ì´íŠ¸
             if (_gaugeText != null)
             {
                 string current = currentClicks.ToString();
                 string max = maxClicks.ToString();
-                _gaugeText.text = $"¼öµ¿ Å¬¸¯: {current} / {max}";
+                _gaugeText.text = $"ìˆ˜ë™ í´ë¦­: {current} / {max}";
             }
 
-            // °ÔÀÌÁö ²Ë Â÷¸é ÆÞ½º ¾Ö´Ï¸ÞÀÌ¼Ç
+            // ê²Œì´ì§€ ê½‰ ì°¨ë©´ íŽ„ìŠ¤ ì• ë‹ˆë©”ì´ì…˜
             if (progress >= 1f)
             {
                 AnimateGaugeFull();
@@ -109,7 +109,7 @@ public class FeverUI : MonoBehaviour
         }
     }
 
-    // °ÔÀÌÁö ²Ë Ã¡À» ¶§ ¾Ö´Ï¸ÞÀÌ¼Ç
+    // ê²Œì´ì§€ ê½‰ ì°¼ì„ ë•Œ ì• ë‹ˆë©”ì´ì…˜
     private void AnimateGaugeFull()
     {
         if (_feverGaugeSlider != null)
@@ -124,7 +124,7 @@ public class FeverUI : MonoBehaviour
         }
     }
 
-    // ÇÇ¹ö Å¸ÀÌ¸Ó ¾÷µ¥ÀÌÆ®
+    // í”¼ë²„ íƒ€ì´ë¨¸ ì—…ë°ì´íŠ¸
     private void UpdateFeverTimer(float remainingTime)
     {
         if (_feverTimerSlider != null && FeverManager.Instance != null)
@@ -139,7 +139,7 @@ public class FeverUI : MonoBehaviour
         }
     }
 
-    // ÇÇ¹ö ½ÃÀÛ ½Ã È£Ãâ
+    // í”¼ë²„ ì‹œìž‘ ì‹œ í˜¸ì¶œ
     private void OnFeverStart()
     {
         if (_feverAudioSource != null && _feverStartClip != null)
@@ -147,7 +147,7 @@ public class FeverUI : MonoBehaviour
             _feverAudioSource.PlayOneShot(_feverStartClip);
         }
 
-        // BGM Àç»ý ¹× ÆäÀÌµå ÀÎ
+        // BGM ìž¬ìƒ ë° íŽ˜ì´ë“œ ì¸
         if (_feverAudioSource != null && _feverBGMClip != null)
         {
             _feverAudioSource.clip = _feverBGMClip;
@@ -163,7 +163,7 @@ public class FeverUI : MonoBehaviour
             _gaugeText.transform.DOShakePosition(0.5f, 5f);
         }
 
-        // Å¸ÀÌ¸Ó ÆÐ³Î Ç¥½Ã
+        // íƒ€ì´ë¨¸ íŒ¨ë„ í‘œì‹œ
         if (_feverTimerPanel != null)
         {
             _feverTimerPanel.SetActive(true);
@@ -171,14 +171,14 @@ public class FeverUI : MonoBehaviour
             _feverTimerPanel.transform.DOScale(Vector3.one, 0.3f).SetEase(Ease.OutBack);
         }
 
-        // "FEVER TIME!" ÅØ½ºÆ® Ç¥½Ã
+        // "FEVER TIME!" í…ìŠ¤íŠ¸ í‘œì‹œ
         if (_feverEffectPanel != null)
         {
             _feverEffectPanel.SetActive(true);
             _feverEffectText.DOFade(0f, 2f).From(1f);
             _feverEffectPanel.transform.DOScale(1.5f, 2f).From(0.5f).SetEase(Ease.OutQuad);
 
-            // 2ÃÊ ÈÄ ÆäÀÌµå ¾Æ¿ô
+            // 2ì´ˆ í›„ íŽ˜ì´ë“œ ì•„ì›ƒ
             DOVirtual.DelayedCall(2f, () =>
             {
                 if (_feverEffectPanel != null)
@@ -186,7 +186,7 @@ public class FeverUI : MonoBehaviour
             });
         }
 
-        // È­¸é ¿À¹ö·¹ÀÌ ÆäÀÌµå ÀÎ
+        // í™”ë©´ ì˜¤ë²„ë ˆì´ íŽ˜ì´ë“œ ì¸
         if (_screenOverlay != null)
         {
             _screenOverlay.DOColor(_feverOverlayColor, 0.5f);
@@ -213,24 +213,24 @@ public class FeverUI : MonoBehaviour
         }
     }
 
-    // ÇÇ¹ö Á¾·á ½Ã È£Ãâ
+    // í”¼ë²„ ì¢…ë£Œ ì‹œ í˜¸ì¶œ
     private void OnFeverEnd()
     {
         if (_feverAudioSource != null)
         {
             _feverAudioSource.DOFade(0f, _soundFadeDuration).OnComplete(() => {
                 _feverAudioSource.Stop();
-                _feverAudioSource.clip = null; // Å¬¸³ Á¦°Å
+                _feverAudioSource.clip = null; // í´ë¦½ ì œê±°
             });
         }
 
         if (_gaugeText != null && FeverManager.Instance != null)
         {
-            // ÇÇ¹ö°¡ ³¡³ª¸é Å¬¸¯ ¼ö°¡ 0À¸·Î ¸®¼ÂµÇ¹Ç·Î "0 / 75" ÇüÅÂ·Î Ç¥½Ã
+            // í”¼ë²„ê°€ ëë‚˜ë©´ í´ë¦­ ìˆ˜ê°€ 0ìœ¼ë¡œ ë¦¬ì…‹ë˜ë¯€ë¡œ "0 / 75" í˜•íƒœë¡œ í‘œì‹œ
             _gaugeText.text = $"0 / {FeverManager.Instance.GetClicksNeeded()}";
         }
 
-        // Å¸ÀÌ¸Ó ÆÐ³Î ¼û±â±â
+        // íƒ€ì´ë¨¸ íŒ¨ë„ ìˆ¨ê¸°ê¸°
         if (_feverTimerPanel != null)
         {
             _feverTimerPanel.transform.DOScale(Vector3.zero, 0.3f)
@@ -238,7 +238,7 @@ public class FeverUI : MonoBehaviour
                 .OnComplete(() => _feverTimerPanel.SetActive(false));
         }
 
-        // È­¸é ¿À¹ö·¹ÀÌ ÆäÀÌµå ¾Æ¿ô
+        // í™”ë©´ ì˜¤ë²„ë ˆì´ íŽ˜ì´ë“œ ì•„ì›ƒ
         if (_screenOverlay != null)
         {
             _screenOverlay.DOColor(new Color(1, 1, 1, 0), 0.5f);
@@ -268,7 +268,7 @@ public class FeverUI : MonoBehaviour
             color.a = x;
             main.startColor = color;
         }, targetAlpha, _fadeDuration).OnComplete(() => {
-            // ÆäÀÌµå ¾Æ¿ôÀÌ ¿Ï·áµÇ¾ú°í, stopOnComplete°¡ true¶ó¸é ½Ã½ºÅÛ Á¤Áö
+            // íŽ˜ì´ë“œ ì•„ì›ƒì´ ì™„ë£Œë˜ì—ˆê³ , stopOnCompleteê°€ trueë¼ë©´ ì‹œìŠ¤í…œ ì •ì§€
             if (stopOnComplete && targetAlpha <= 0f)
             {
                 ps.Stop();
@@ -287,7 +287,7 @@ public class FeverUI : MonoBehaviour
 
     private void OnDestroy()
     {
-        // ÀÌº¥Æ® ±¸µ¶ ÇØÁ¦
+        // ì´ë²¤íŠ¸ êµ¬ë… í•´ì œ
         if (FeverManager.Instance != null)
         {
             FeverManager.Instance.OnClickCountChanged.RemoveListener(UpdateFeverGauge);

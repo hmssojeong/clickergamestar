@@ -3,10 +3,10 @@ using System;
 using System.Collections.Generic;
 public class CurrencySaveData
 {
-    // ÀçÈ­
+    // ì¬í™”
     public Dictionary<ECurrencyType, double> Currencies = new();
 
-    // Å¸ÀÔº° ÇöÀç ·¹º§ ÀúÀå
+    // íƒ€ì…ë³„ í˜„ì¬ ë ˆë²¨ ì €ì¥
     public Dictionary<EUpgradeType, int> UpgradeLevels = new();
 
     public static CurrencySaveData Default => new CurrencySaveData();

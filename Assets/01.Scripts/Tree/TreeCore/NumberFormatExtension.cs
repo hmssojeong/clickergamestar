@@ -29,7 +29,7 @@ public static class NumberFormatExtension
             suffixIndex++;
         }
 
-        // ¼Ò¼öÁ¡ Ã³¸® ·ÎÁ÷
+        // ì†Œìˆ˜ì  ì²˜ë¦¬ ë¡œì§
         if (value >= 100) return $"{value:F0}{_suffixes[suffixIndex]}";
         if (value >= 10) return $"{value:F1}{_suffixes[suffixIndex]}";
         return $"{value:F2}{_suffixes[suffixIndex]}";

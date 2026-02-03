@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// È¿°úÀ½ Á¾·ù¸¦ Á¤ÀÇÇÏ´Â Enum
+// íš¨ê³¼ìŒ ì¢…ë¥˜ë¥¼ ì •ì˜í•˜ëŠ” Enum
 public enum ESfx
 {
     AutoClickerAttack,
@@ -53,10 +53,10 @@ public class SoundManager : MonoBehaviour
         }
     }
 
-    // È¿°úÀ½À» Àç»ı
+    // íš¨ê³¼ìŒì„ ì¬ìƒ
     public void PlaySFX(ESfx sfxType, float volumeMultiplier = 1f)
     {
-        int index = (int)sfxType; // EnumÀ» Á¤¼ö ÀÎµ¦½º·Î º¯È¯
+        int index = (int)sfxType; // Enumì„ ì •ìˆ˜ ì¸ë±ìŠ¤ë¡œ ë³€í™˜
 
         if (index < 0 || index >= _playerSfxs.Length)
         {
@@ -69,7 +69,7 @@ public class SoundManager : MonoBehaviour
         AudioSource availableSource = GetAvailableSource();
         if (availableSource != null)
         {
-            // ÀÚ¿¬½º·¯¿î »ç¿îµå¸¦ À§ÇØ ÇÇÄ¡¸¦ »ìÂ¦ ·£´ıÇÏ°Ô Á¶Àı
+            // ìì—°ìŠ¤ëŸ¬ìš´ ì‚¬ìš´ë“œë¥¼ ìœ„í•´ í”¼ì¹˜ë¥¼ ì‚´ì§ ëœë¤í•˜ê²Œ ì¡°ì ˆ
             availableSource.pitch = Random.Range(0.95f, 1.05f);
             availableSource.PlayOneShot(clip, _sfxVolume * volumeMultiplier);
         }
@@ -81,7 +81,7 @@ public class SoundManager : MonoBehaviour
         {
             if (!source.isPlaying) return source;
         }
-        // ¸ğµç ¼Ò½º°¡ »ç¿ë ÁßÀÌ¸é Ã¹ ¹øÂ° ¼Ò½º Àç»ç¿ë
+        // ëª¨ë“  ì†ŒìŠ¤ê°€ ì‚¬ìš© ì¤‘ì´ë©´ ì²« ë²ˆì§¸ ì†ŒìŠ¤ ì¬ì‚¬ìš©
         return _sfxSourcePool[0];
     }
 }

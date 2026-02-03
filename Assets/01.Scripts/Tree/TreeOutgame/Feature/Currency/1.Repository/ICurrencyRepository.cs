@@ -2,7 +2,7 @@ using UnityEngine;
 
 public interface ICurrencyRepository
 {
-    // ÀúÀå¼Ò°¡ °¡Á®¾ßÇÒ ¾à¼Ó!
+    // ì €ì¥ì†Œê°€ ê°€ì ¸ì•¼í•  ì•½ì†!
     public void Save(CurrencySaveData saveData);
     public CurrencySaveData Load();
 }

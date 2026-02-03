@@ -95,7 +95,7 @@ public class GameManager : MonoBehaviour
         if (isCritical)
         {
             damage *= criticalMultiplier;
-            Debug.Log("⭐ CRITICAL! ⭐");
+            Debug.Log("CRITICAL!");
         }
 
         // CurrencyManager를 통해 사과 추가

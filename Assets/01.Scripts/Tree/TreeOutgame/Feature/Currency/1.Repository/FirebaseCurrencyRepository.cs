@@ -4,14 +4,14 @@ public class FirebaseCurrencyRepository : ICurrencyRepository
 {
     public void Save(CurrencySaveData saveData)
     {
-        // ÆÄÀÌ¾îº£ÀÌ½º µ¥ÀÌÅÍ¸¦ ¼­¹ö¿¡ ÀúÀåÇÏ´Â ÇÃ·§Æû
+        // íŒŒì´ì–´ë² ì´ìŠ¤ ë°ì´í„°ë¥¼ ì„œë²„ì— ì €ì¥í•˜ëŠ” í”Œë«í¼
 
-        // Todo: ´ÙÀ½ÁÖ¿¡ ÆÄÀÌ¾îº£ÀÌ½º¸¦ ¹è¿ì¸é Ã¤¿ï°ÍÀÌ´Ù.
+        // Todo: ë‹¤ìŒì£¼ì— íŒŒì´ì–´ë² ì´ìŠ¤ë¥¼ ë°°ìš°ë©´ ì±„ìš¸ê²ƒì´ë‹¤.
     }
 
     public CurrencySaveData Load()
     {
-        // Todo: ´ÙÀ½ÁÖ¿¡ ÆÄÀÌ¾îº£ÀÌ½º¸¦ ¹è¿ì¸é Ã¤¿ï°ÍÀÌ´Ù.
+        // Todo: ë‹¤ìŒì£¼ì— íŒŒì´ì–´ë² ì´ìŠ¤ë¥¼ ë°°ìš°ë©´ ì±„ìš¸ê²ƒì´ë‹¤.
 
 
         return CurrencySaveData.Default;

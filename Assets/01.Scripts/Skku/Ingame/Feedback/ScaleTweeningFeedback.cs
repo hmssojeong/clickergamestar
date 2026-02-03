@@ -10,7 +10,7 @@ public class ScaleTweeningFeedback : MonoBehaviour, IFeedback
         _owner = GetComponent<ClickTarget>();
     }
 
-    // ¿ªÇÒ: ½ºÄÉÀÏ Æ®À§´× ÇÇµå¹é¿¡ ´ëÇÑ ·ÎÁ÷À» ´ã´ç
+    // ì—­í• : ìŠ¤ì¼€ì¼ íŠ¸ìœ„ë‹ í”¼ë“œë°±ì— ëŒ€í•œ ë¡œì§ì„ ë‹´ë‹¹
     public void Play(ClickInfo clickInfo)
     {
         _owner.transform.DOKill();

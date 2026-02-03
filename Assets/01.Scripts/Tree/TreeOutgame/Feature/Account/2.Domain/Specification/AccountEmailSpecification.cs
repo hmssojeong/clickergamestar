@@ -1,11 +1,11 @@
 
-// AccountÀÇ Email¿¡ ´ëÇÑ ¸í¼¼(±ÔÄ¢)
+// Accountì˜ Emailì— ëŒ€í•œ ëª…ì„¸(ê·œì¹™)
 
 using System.Text.RegularExpressions;
 
 public class AccountEmailSpecification
 {
-    // ¦¡¦¡ Á¤±ÔÇ¥Çö½Ä (ÄÄÆÄÀÏÇÏ¿© ¼º´É ÃÖÀûÈ­) ¦¡¦¡
+    // â”€â”€ ì •ê·œí‘œí˜„ì‹ (ì»´íŒŒì¼í•˜ì—¬ ì„±ëŠ¥ ìµœì í™”) â”€â”€
     private static readonly Regex EmailRegex = new Regex(
         @"^[^@\s]+@[^@\s]+\.[^@\s]+$",
         RegexOptions.Compiled | RegexOptions.IgnoreCase
@@ -20,13 +20,13 @@ public class AccountEmailSpecification
     {
         if (string.IsNullOrEmpty(email))
         {
-            _errorMessage = "ÀÌ¸ŞÀÏÀº ºñ¾îÀÖÀ» ¼ö ¾ø½À´Ï´Ù.";
+            _errorMessage = "ì´ë©”ì¼ì€ ë¹„ì–´ìˆì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.";
             return false;
         }
 
         if (!EmailRegex.IsMatch(email))
         {
-            _errorMessage = "¿Ã¹Ù¸£Áö ¾ÊÀº ÀÌ¸ŞÀÏ Çü½ÄÀÔ´Ï´Ù.";
+            _errorMessage = "ì˜¬ë°”ë¥´ì§€ ì•Šì€ ì´ë©”ì¼ í˜•ì‹ì…ë‹ˆë‹¤.";
             return false;
         }
 

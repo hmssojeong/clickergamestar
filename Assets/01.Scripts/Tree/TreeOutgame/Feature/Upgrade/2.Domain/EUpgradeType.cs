@@ -2,11 +2,11 @@ using UnityEngine;
 
 public enum EUpgradeType
 {
-    AppleHarvest,      // »ç°ú ¼öÈ® °­È­ (ManualDamage Áõ°¡)
-    SquirrelHire,      // ´Ù¶÷Áã °í¿ë (ÀÚµ¿ ¼öÈ®)
-    GoldenAppleLuck,   // È²±İ »ç°ú Çà¿î (Å©¸®Æ¼ÄÃ È®·ü)
-    FeverMaster,       // ÇÇ¹ö Å¸ÀÓ ¸¶½ºÅÍ
-    SuperCritical,      // ½´ÆÛ Å©¸®Æ¼ÄÃ (Å©¸®Æ¼ÄÃ ¹è¼ö)
+    AppleHarvest,      // ì‚¬ê³¼ ìˆ˜í™• ê°•í™” (ManualDamage ì¦ê°€)
+    SquirrelHire,      // ë‹¤ëŒì¥ ê³ ìš© (ìë™ ìˆ˜í™•)
+    GoldenAppleLuck,   // í™©ê¸ˆ ì‚¬ê³¼ í–‰ìš´ (í¬ë¦¬í‹°ì»¬ í™•ë¥ )
+    FeverMaster,       // í”¼ë²„ íƒ€ì„ ë§ˆìŠ¤í„°
+    SuperCritical,      // ìŠˆí¼ í¬ë¦¬í‹°ì»¬ (í¬ë¦¬í‹°ì»¬ ë°°ìˆ˜)
 
     Count
 }
