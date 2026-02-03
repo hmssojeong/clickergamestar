@@ -10,12 +10,12 @@ public class Student : IReadonlyStudent
     {
         if(string.IsNullOrEmpty(data.Name))
         {
-            throw new System.ArgumentNullException("ÀÌ¸§Àº ºñ¾îÀÖÀ» ¼ö ¾ø½À´Ï´Ù.");
+            throw new System.ArgumentNullException("ì´ë¦„ì€ ë¹„ì–´ìˆì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
         }
 
         if(data.Age < 19)
         {
-            throw new System.ArgumentOutOfRangeException("¼ºÀÎ¸¸ Âü¿©ÇÒ ¼ö ÀÖ½À´Ï´Ù.");
+            throw new System.ArgumentOutOfRangeException("ì„±ì¸ë§Œ ì°¸ì—¬í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤.");
         }
 
         Name = data.Name;

@@ -6,7 +6,7 @@ using System.Linq;
 
 public class StudentManager : MonoBehaviour
 {
-    // -----------------½ºÆå µ¥ÀÌÅÍ
+    // -----------------ìŠ¤í™ ë°ì´í„°
     public static StudentManager Instance { get; private set; }
 
     private List<Student> _students = new();
@@ -25,7 +25,7 @@ public class StudentManager : MonoBehaviour
 
         foreach (StudentSpecData data in _specTable.SpecDatas)
         {
-            // ºÒ·¯¿À±â
+            // ë¶ˆëŸ¬ì˜¤ê¸°
             StudentSaveData saveData = _repository.Load(data.Name);
 
             bool isAttendance = false;

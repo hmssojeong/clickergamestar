@@ -47,6 +47,17 @@ public class FirebaseTutorial : MonoBehaviour
     {
         // 콜백 함수 : 특정 이벤트가 발생하고 나면 자동으로 호출되는 함수
         // 접속에 1MS ~~~ 
+
+        // 유니티는 MonoBehaviour 실행에 있어서 싱글쓰레드
+        // Task 타입이란 비동기에 대한 진행사항과 완료되었을 때 결과값을 가지고 있는 객체
+
+        // <정리과제>
+        // 1. 파이어베이스 로그인/로그아웃, CRUD를 공부하시고
+        // 2. Task, async, await
+        //    - 단점이 무엇인지 (메인쓰레드로 돌아오지 않을 확률이 크다.)
+        // 3. Unity만의 Task : UniTask
+        //    - 장점이 무엇인지
+
         Firebase.FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task => {
             if (task.Result == DependencyStatus.Available)
             {
