@@ -1,4 +1,4 @@
-﻿using DG.Tweening;
+using DG.Tweening;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -56,7 +56,7 @@ public class AutoClicker : MonoBehaviour
                 ClickInfo clickInfo = new ClickInfo
                 {
                     Type = EClickType.Auto,
-                    Damage = GameManager.Instance.AutoDamage,
+                    Damage = GameplayManager.Instance.AutoDamage,
                     Position = target.transform.position
                 };
                 clickableScript.OnClick(clickInfo);

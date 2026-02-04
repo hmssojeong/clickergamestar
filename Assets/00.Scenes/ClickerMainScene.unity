@@ -1652,6 +1652,7 @@ MonoBehaviour:
   OnCurrencyChanged:
     m_PersistentCalls:
       m_Calls: []
+  _useFirebase: 0
 --- !u!1 &495738125
 GameObject:
   m_ObjectHideFlags: 0
@@ -2144,7 +2145,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 627f2a2452799334899d78b8f86e8bbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Clicker
-  _damage: 100
+  _damage: 10
 --- !u!4 &525517431
 Transform:
   m_ObjectHideFlags: 0
@@ -7847,8 +7848,6 @@ MonoBehaviour:
   _clickCountText: {fileID: 0}
   _feverPanel: {fileID: 0}
   _feverTimerText: {fileID: 0}
-  _upgradePanel: {fileID: 0}
-  _settingsPanel: {fileID: 0}
   _scoreAnimationDuration: 0.3
   _scorePunchScale: 1.2
 --- !u!4 &1742392474
@@ -15166,7 +15165,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1886041074}
-  - component: {fileID: 1886041073}
+  - component: {fileID: 1886041075}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -15174,42 +15173,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1886041073
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1886041072}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d9744b07ba6bb6a4187a407bbb97e557, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GameManager
-  ManualDamage: 100
-  AutoDamage: 100
-  TotalApplesCollected: 0
-  criticalChance: 0.1
-  criticalMultiplier: 2
-  squirrelCount: 0
-  squirrelApplePerSecond: 50
-  clickCount: 0
-  feverThreshold: 75
-  feverMultiplier: 2.5
-  feverDuration: 10
-  isFeverActive: 0
-  OnDataChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  OnTreeRespawnEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  OnFeverStartEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  OnFeverEndEvent:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!4 &1886041074
 Transform:
   m_ObjectHideFlags: 0
@@ -15225,6 +15188,30 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1427044820}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1886041075
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1886041072}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27181311384d6fb409b7a6414cc97cf8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameplayManager
+  OnFeverStarted:
+    m_PersistentCalls:
+      m_Calls: []
+  OnFeverEnded:
+    m_PersistentCalls:
+      m_Calls: []
+  OnTreeRespawned:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDataChanged:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1901103002
 GameObject:
   m_ObjectHideFlags: 0
@@ -21062,7 +21049,7 @@ PrefabInstance:
     - target: {fileID: 8098874408935979316, guid: 3052a29734d13884481e98b951bae049, type: 3}
       propertyPath: _audio
       value: 
-      objectReference: {fileID: 1390593052}
+      objectReference: {fileID: 1514688185}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
