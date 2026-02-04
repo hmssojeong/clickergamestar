@@ -1,9 +1,7 @@
 using UnityEngine;
 using DG.Tweening;
 
-/// <summary>
-/// 나무가 클릭될 때 스케일이 변하는 효과
-/// </summary>
+// 나무가 클릭될 때 스케일이 변하는 효과
 public class TreeShakeFeedback : MonoBehaviour, IFeedback
 {
     [SerializeField] private Transform _treeTransform;
@@ -30,9 +28,7 @@ public class TreeShakeFeedback : MonoBehaviour, IFeedback
         }
     }
 
-    /// <summary>
-    /// 나무를 작아졌다 커지게 합니다
-    /// </summary>
+    // 나무를 작아졌다 커지게 합니다
     private void ScaleTree()
     {
         // 기존 트윈 중단
