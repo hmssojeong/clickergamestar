@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using UnityEngine;
 using Newtonsoft.Json;
+using Cysharp.Threading.Tasks;
 
 /// <summary>
 /// 로컬 파일 시스템을 사용한 업그레이드 데이터 저장소
@@ -20,13 +21,15 @@ public class LocalUpgradeRepository : IUpgradeRepository
         Debug.Log($"[LocalUpgradeRepository] 초기화 - 저장 경로: {_filePath}");
     }
 
-    public void Save(UpgradeSaveData data)
+    public async UniTaskVoid Save(UpgradeSaveData data)
     {
         try
         {
             data.LastSaveTime = DateTime.Now.ToString("o");
             string json = JsonConvert.SerializeObject(data, Formatting.Indented);
-            File.WriteAllText(_filePath, json);
+            
+            // 비동기로 파일 쓰기
+            await File.WriteAllTextAsync(_filePath, json);
             
             Debug.Log($"[LocalUpgradeRepository] 저장 완료 - 파일: {_filePath}");
         }
@@ -37,7 +40,7 @@ public class LocalUpgradeRepository : IUpgradeRepository
         }
     }
 
-    public UpgradeSaveData Load()
+    public async UniTask<UpgradeSaveData> Load()
     {
         try
         {
@@ -47,7 +50,8 @@ public class LocalUpgradeRepository : IUpgradeRepository
                 return UpgradeSaveData.Default;
             }
 
-            string json = File.ReadAllText(_filePath);
+            // 비동기로 파일 읽기
+            string json = await File.ReadAllTextAsync(_filePath);
             var data = JsonConvert.DeserializeObject<UpgradeSaveData>(json);
             
             Debug.Log($"[LocalUpgradeRepository] 로드 완료 - 파일: {_filePath}");

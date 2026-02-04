@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -127,18 +127,14 @@ public class CurrencyManager : MonoBehaviour
         SaveLoadManager.Instance?.SaveGame();
     }
 
-    /// <summary>
-    /// 재화 데이터 저장 (SaveLoadManager가 호출)
-    /// </summary>
+    // 재화 데이터 저장 (SaveLoadManager가 호출)
     public void SaveCurrencies()
     {
         Debug.Log("[CurrencyManager] 재화 저장 완료");
         // SaveLoadManager가 데이터를 가져가서 저장하므로 여기서는 로그만
     }
 
-    /// <summary>
-    /// 재화 데이터 로드 (SaveLoadManager가 호출)
-    /// </summary>
+    // 재화 데이터 로드 (SaveLoadManager가 호출)
     public void LoadCurrencies()
     {
         Debug.Log("[CurrencyManager] 재화 로드 완료");

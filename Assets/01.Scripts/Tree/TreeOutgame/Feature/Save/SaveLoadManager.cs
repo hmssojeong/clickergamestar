@@ -1,9 +1,13 @@
 using UnityEngine;
 using System;
 using Newtonsoft.Json;
+using Cysharp.Threading.Tasks;
 
-// 통합 저장/로드 관리자
-// 각 Manager에게 저장/로드를 위임
+/// <summary>
+/// 통합 저장/로드 관리자
+/// Repository 패턴을 사용하여 각 Manager의 데이터를 저장/로드
+/// async/await를 사용한 비동기 처리
+/// </summary>
 public class SaveLoadManager : MonoBehaviour
 {
     public static SaveLoadManager Instance { get; private set; }
@@ -12,6 +16,9 @@ public class SaveLoadManager : MonoBehaviour
     [SerializeField] private bool _useLocalRepository = true;
 
     private ICurrencyRepository _currencyRepository;
+    private IUpgradeRepository _upgradeRepository;
+    private string _currentUserId = "guest"; // 기본 사용자 ID
+    
     private const string GameStateKey = "GameState";
 
     private void Awake()
@@ -28,24 +35,40 @@ public class SaveLoadManager : MonoBehaviour
         }
     }
 
-    private void InitializeRepository()
+    /// <summary>
+    /// Repository 초기화 (로그인 시 호출)
+    /// </summary>
+    public void InitializeRepository(string userId = "guest")
     {
-        _currencyRepository = _useLocalRepository 
-            ? new LocalCurrencyRepository() 
-            : new FirebaseCurrencyRepository();
+        _currentUserId = userId;
         
-        Debug.Log($"[SaveLoadManager] 초기화 완료 - 모드: {(_useLocalRepository ? "Local" : "Firebase")}");
+        if (_useLocalRepository)
+        {
+            _currencyRepository = new LocalCurrencyRepository();
+            _upgradeRepository = new LocalUpgradeRepository(userId);
+        }
+        else
+        {
+            _currencyRepository = new FirebaseCurrencyRepository(userId);
+            _upgradeRepository = new FirebaseUpgradeRepository(userId);
+        }
+        
+        Debug.Log($"[SaveLoadManager] 초기화 완료 - 모드: {(_useLocalRepository ? "Local" : "Firebase")}, UserID: {userId}");
     }
 
-    // 전체 게임 데이터 저장
-    public void SaveGame()
+    /// <summary>
+    /// 전체 게임 데이터 저장 (비동기)
+    /// </summary>
+    public async UniTaskVoid SaveGame()
     {
         try
         {
+            Debug.Log("[SaveLoadManager] 저장 시작...");
+            
             // 재화 + 업그레이드 저장
-            SaveCurrencyAndUpgrades();
+            await SaveCurrencyAndUpgrades();
 
-            // 게임 상태 저장
+            // 게임 상태 저장 (동기)
             SaveGameState();
 
             Debug.Log("[SaveLoadManager] 저장 완료! ✅");
@@ -56,15 +79,19 @@ public class SaveLoadManager : MonoBehaviour
         }
     }
 
-    // 전체 게임 데이터 로드
-    public void LoadGame()
+    /// <summary>
+    /// 전체 게임 데이터 로드 (비동기)
+    /// </summary>
+    public async UniTask LoadGame()
     {
         try
         {
+            Debug.Log("[SaveLoadManager] 로드 시작...");
+            
             // 재화 + 업그레이드 로드
-            LoadCurrencyAndUpgrades();
+            await LoadCurrencyAndUpgrades();
 
-            // 게임 상태 로드
+            // 게임 상태 로드 (동기)
             LoadGameState();
 
             Debug.Log("[SaveLoadManager] 로드 완료! ✅");
@@ -75,56 +102,71 @@ public class SaveLoadManager : MonoBehaviour
         }
     }
 
-    // 재화와 업그레이드 데이터를 Repository를 통해 저장
-    private void SaveCurrencyAndUpgrades()
+    /// <summary>
+    /// 재화와 업그레이드 데이터를 Repository를 통해 저장 (비동기)
+    /// </summary>
+    private async UniTask SaveCurrencyAndUpgrades()
     {
-        var saveData = new CurrencySaveData();
-
-        // 재화 데이터 수집
+        // === 재화 데이터 저장 ===
+        var currencySaveData = new CurrencySaveData();
+        
         if (CurrencyManager.Instance != null)
         {
             for (int i = 0; i < (int)ECurrencyType.Count; i++)
             {
                 ECurrencyType type = (ECurrencyType)i;
-                saveData.Currencies[type] = CurrencyManager.Instance.Get(type).Value;
+                currencySaveData.Currencies[type] = CurrencyManager.Instance.Get(type).Value;
             }
         }
 
-        // 업그레이드 데이터 수집
+        _currencyRepository.Save(currencySaveData).Forget();
+        Debug.Log("[SaveLoadManager] 재화 저장 완료");
+
+        // === 업그레이드 데이터 저장 ===
+        var upgradeSaveData = new UpgradeSaveData();
+        
         if (UpgradeManager.Instance != null)
         {
             foreach (var upgrade in UpgradeManager.Instance.GetAll())
             {
-                saveData.UpgradeLevels[upgrade.Type] = upgrade.Level;
+                upgradeSaveData.UpgradeLevels[upgrade.Type] = upgrade.Level;
             }
         }
 
-        // Repository를 통해 저장
-        _currencyRepository.Save(saveData);
+        _upgradeRepository.Save(upgradeSaveData).Forget();
+        Debug.Log("[SaveLoadManager] 업그레이드 저장 완료");
         
-        Debug.Log("[SaveLoadManager] 재화 및 업그레이드 저장 완료");
+        // 저장이 완료될 때까지 잠시 대기
+        await UniTask.Delay(100);
     }
 
-    private void LoadCurrencyAndUpgrades()
+    /// <summary>
+    /// 재화와 업그레이드 데이터를 Repository에서 로드 (비동기)
+    /// </summary>
+    private async UniTask LoadCurrencyAndUpgrades()
     {
-        var saveData = _currencyRepository.Load();
-
-        // 재화 로드
+        // === 재화 데이터 로드 ===
+        var currencySaveData = await _currencyRepository.Load();
+        
         if (CurrencyManager.Instance != null)
         {
-            CurrencyManager.Instance.LoadFromData(saveData.Currencies);
+            CurrencyManager.Instance.LoadFromData(currencySaveData.Currencies);
             Debug.Log("[SaveLoadManager] 재화 로드 완료");
         }
 
-        // 업그레이드 로드
+        // === 업그레이드 데이터 로드 ===
+        var upgradeSaveData = await _upgradeRepository.Load();
+        
         if (UpgradeManager.Instance != null)
         {
-            UpgradeManager.Instance.InitializeUpgrades(saveData.UpgradeLevels);
+            UpgradeManager.Instance.InitializeUpgrades(upgradeSaveData.UpgradeLevels);
             Debug.Log("[SaveLoadManager] 업그레이드 로드 완료");
         }
     }
 
-    // 게임 상태를 PlayerPrefs에 저장
+    /// <summary>
+    /// 게임 상태를 PlayerPrefs에 저장 (동기)
+    /// </summary>
     private void SaveGameState()
     {
         if (GameManager.Instance == null)
@@ -151,7 +193,9 @@ public class SaveLoadManager : MonoBehaviour
         Debug.Log("[SaveLoadManager] 게임 상태 저장 완료");
     }
 
-    // 게임 상태를 PlayerPrefs에서 로드
+    /// <summary>
+    /// 게임 상태를 PlayerPrefs에서 로드 (동기)
+    /// </summary>
     private void LoadGameState()
     {
         if (GameManager.Instance == null) return;
@@ -180,10 +224,30 @@ public class SaveLoadManager : MonoBehaviour
         Debug.Log("[SaveLoadManager] 게임 상태 로드 완료");
     }
 
-    // 모든 저장 데이터를 삭제합니다.
+    /// <summary>
+    /// 모든 저장 데이터를 삭제합니다.
+    /// </summary>
     public void ResetAllData()
     {
         PlayerPrefs.DeleteAll();
         Debug.Log("[SaveLoadManager] 모든 데이터 초기화 완료");
+    }
+
+    /// <summary>
+    /// Repository 모드 변경 (런타임)
+    /// </summary>
+    public void SwitchToLocal()
+    {
+        _useLocalRepository = true;
+        InitializeRepository(_currentUserId);
+    }
+
+    /// <summary>
+    /// Repository 모드 변경 (런타임)
+    /// </summary>
+    public void SwitchToFirebase()
+    {
+        _useLocalRepository = false;
+        InitializeRepository(_currentUserId);
     }
 }

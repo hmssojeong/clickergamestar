@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using DG.Tweening;
+using UnityEngine.Pool;
 
 public class FloatingText : MonoBehaviour
 {
@@ -17,6 +18,9 @@ public class FloatingText : MonoBehaviour
     private Canvas _canvas;
     private RectTransform _rectTransform;
 
+    private IObjectPool<FloatingText> _managedPool;
+
+
     private void Awake()
     {
         _canvas = GetComponentInParent<Canvas>();
@@ -26,9 +30,16 @@ public class FloatingText : MonoBehaviour
             _text = GetComponent<TextMeshProUGUI>();
     }
 
+    public void SetPool(IObjectPool<FloatingText> pool)
+    {
+        _managedPool = pool;
+    }
+
     // 플로팅 텍스트 초기화 및 재생
     public void Initialize(string text, Vector3 worldPosition, bool isCritical = false)
     {
+        _text.alpha = 1f;
+
         _text.color = isCritical ? _criticalColor : _normalColor;
         _text.text = text;
 
@@ -55,30 +66,37 @@ public class FloatingText : MonoBehaviour
     // 떠오르는 애니메이션
     private void PlayAnimation(bool isCritical)
     {
+        transform.DOKill();
+        _rectTransform.DOKill();
+        _text.DOKill();
+
         // 1. 기본 크기 설정 (크리티컬이면 1.5배, 아니면 1배)
         float targetScale = isCritical ? 1.8f : 1.0f;
 
         transform.localScale = Vector3.zero;
 
-        if (isCritical)
-        {
-            transform.DOScale(Vector3.one * targetScale, 0.2f).SetEase(Ease.OutBack);
-        }
-        else
-        {
-            transform.DOScale(Vector3.one * targetScale, 0.2f).SetEase(Ease.OutQuad);
-        }
+        // 애니메이션 시퀀스 생성 (완료 시점을 정확히 잡기 위함)
+        Sequence seq = DOTween.Sequence();
+
+        // 크기 조절
+        seq.Join(transform.DOScale(Vector3.one * targetScale, 0.2f)
+            .SetEase(isCritical ? Ease.OutBack : Ease.OutQuad));
 
         // 위로 떠오름
-        _rectTransform.DOAnchorPosY(_rectTransform.anchoredPosition.y + _floatHeight * 100f, _floatDuration)
-            .SetEase(_floatEase);
+        seq.Join(_rectTransform.DOAnchorPosY(_rectTransform.anchoredPosition.y + _floatHeight * 100f, _floatDuration)
+            .SetEase(_floatEase));
 
         // 페이드 아웃
-        _text.DOFade(0f, _floatDuration)
-            .SetEase(Ease.InQuad);
+        seq.Join(_text.DOFade(0f, _floatDuration).SetEase(Ease.InQuad));
 
-        // 애니메이션 완료 후 삭제
-        Destroy(gameObject, _floatDuration);
+        // 5. 핵심: 애니메이션이 끝나면 Destroy 대신 Release 호출
+        seq.OnComplete(() =>
+        {
+            if (_managedPool != null)
+                _managedPool.Release(this);
+            else
+                Destroy(gameObject);
+        });
     }
 
     // 랜덤 방향으로 조금 움직이기

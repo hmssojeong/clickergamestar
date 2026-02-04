@@ -1,7 +1,9 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using Cysharp.Threading.Tasks;
+
 
 public class UpgradeManager : MonoBehaviour
 {
@@ -59,7 +61,7 @@ public class UpgradeManager : MonoBehaviour
         Debug.Log($"[UpgradeManager] Upgrades initialized - Total: {_upgrades.Count}");
     }
 
-    public void SaveUpgrades()
+public async UniTaskVoid SaveUpgrades()
     {
         var saveData = new UpgradeSaveData();
 
@@ -68,13 +70,14 @@ public class UpgradeManager : MonoBehaviour
             saveData.UpgradeLevels[upgrade.Key] = upgrade.Value.Level;
         }
 
-        _repository.Save(saveData);
+        _repository.Save(saveData).Forget();
+        await UniTask.Yield();
         Debug.Log("[UpgradeManager] Upgrades saved");
     }
 
-    public void LoadUpgrades()
+public async UniTask LoadUpgrades()
     {
-        var saveData = _repository.Load();
+        var saveData = await _repository.Load();
         InitializeUpgrades(saveData.UpgradeLevels);
         Debug.Log("[UpgradeManager] Upgrades loaded");
     }
