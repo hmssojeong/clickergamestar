@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using Firebase;
@@ -18,26 +19,62 @@ public class FirebaseTutorial : MonoBehaviour
 
     private async void Start()
     {
+        Debug.Log("현재 CPU 번호:" + Thread.CurrentThread.ManagedThreadId);
+
         await InitFirebase();
         _progressText.text = "파이어베이스 초기화 완료";
         Debug.Log("파이어베이스 초기화 완료");
+
+        Debug.Log("현재 CPU 번호:" + Thread.CurrentThread.ManagedThreadId);
 
         Logout();
         _progressText.text = "로그아웃 완료";
         Debug.Log("로그아웃 완료");
 
+        Debug.Log("현재 CPU 번호:" + Thread.CurrentThread.ManagedThreadId);
+
         await Login("hongil@skku.re.kr", "12345678");
         _progressText.text = "로그인 완료";
         Debug.Log("로그인 완료");
 
+
+
+        await Task.Delay(1000);
+        await Task.Run(() =>
+        {
+            int sum = 0;
+            for (int i = 0; i < 10; ++i)
+            {
+                // 이 작업은 유니티가 실행중 CPU 1에게 작업을 시킬수도 있고 아니면 CPU 2에게 작업을 시킬수도 있다.
+                // 작업이 완료되고 나서
+                // 유니티가 실행중인 CPU1에서 작업을 이어나가는게 아니라 CPU2에서 Monobehaviour 작업을 이어나가려하면 유니티를 모르기때문에 뻗어버린다.
+                // 이것을 유니티는 쓰레드 세이프하지 않다고 한다.. 그래서 Task 사용 지양한다.
+                sum = (sum + i) % 20000;
+                Debug.Log("현재 CPU 번호:" + Thread.CurrentThread.ManagedThreadId);
+                _progressText.text = sum.ToString();
+            }
+        });
+
+
+        Debug.Log("현재 CPU 번호:" + Thread.CurrentThread.ManagedThreadId);
+
         await SaveDog();
         _progressText.text = "강아지 추가 완료";
         Debug.Log("강아지 추가 완료");
+
+        Debug.Log("현재 CPU 번호:" + Thread.CurrentThread.ManagedThreadId);
+
+
+
+
     }
 
     private async Task InitFirebase()
     {
         DependencyStatus status = await FirebaseApp.CheckAndFixDependenciesAsync();
+        // 이 작업은 유니티가 실행중 CPU 1에게 작업을 시킬수도 있고 아니면 CPU 2에게 작업을 시킬수도 있다.
+        // 작업이 완료되고 나서
+        // 유니티가 실행중인 CPU1에서 작업을 이어나가는게 아니라 CPU2에서 Monobehaviour 작업을 이어나가려하면 유니티를 모르기때문에 뻗어버린다.
         try
         {
             if (status == DependencyStatus.Available)
