@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using Firebase;
 using Firebase.Auth;
@@ -12,73 +14,57 @@ public class FirebaseTutorial : MonoBehaviour
     private FirebaseAuth _auth = null;
     private FirebaseFirestore _db = null;
 
-    private TextMeshPro _progressText;
-    private void Start()
-    {
-        // 과제.
-        // 이 씬이 시작되면 아래 내용을 단계적으로 수행한다.
-        // - 각 단계 마다 ProgressText의 내용이 바뀐다. (ex. 로그아웃 완료)
-        // - 각 단계 마다 Debug.Log로 완료를 알린다. (ex. 로그아웃 완료)
-        // 1. 파이베이스 초기화
-        // 2. 로그아웃
-        // 3. 재로그인
-        // 4. 강아지 추가 (전제조건: 파이어스토어 규칙에 로그인한 사람만 글 쓰기 가능)
-        // ㄴ 위 내용이 에러없이 잘 이어지게
+    public TextMeshProUGUI _progressText;
 
-        InitFirebase();
-        _progressText.text = "파이어베이스 초기화 완료"; 
+    private async void Start()
+    {
+        await InitFirebase();
+        _progressText.text = "파이어베이스 초기화 완료";
         Debug.Log("파이어베이스 초기화 완료");
 
         Logout();
         _progressText.text = "로그아웃 완료";
         Debug.Log("로그아웃 완료");
 
-        Login("hongil@skku.re.kr", "12345678");
+        await Login("hongil@skku.re.kr", "12345678");
         _progressText.text = "로그인 완료";
         Debug.Log("로그인 완료");
 
-        SaveDog();
+        await SaveDog();
         _progressText.text = "강아지 추가 완료";
         Debug.Log("강아지 추가 완료");
-
     }
 
-    private void InitFirebase()
+    private async Task InitFirebase()
     {
-        // 콜백 함수 : 특정 이벤트가 발생하고 나면 자동으로 호출되는 함수
-        // 접속에 1MS ~~~ 
-
-        // 유니티는 MonoBehaviour 실행에 있어서 싱글쓰레드
-        // Task 타입이란 비동기에 대한 진행사항과 완료되었을 때 결과값을 가지고 있는 객체
-
-        // <정리과제>
-        // 1. 파이어베이스 로그인/로그아웃, CRUD를 공부하시고
-        // 2. Task, async, await
-        //    - 단점이 무엇인지 (메인쓰레드로 돌아오지 않을 확률이 크다.)
-        // 3. Unity만의 Task : UniTask
-        //    - 장점이 무엇인지
-
-        Firebase.FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task => {
-            if (task.Result == DependencyStatus.Available)
+        DependencyStatus status = await FirebaseApp.CheckAndFixDependenciesAsync();
+        try
+        {
+            if (status == DependencyStatus.Available)
             {
                 // 1. 파이어베이스 연결에 성공했다면..
-                _app = FirebaseApp.DefaultInstance;       // 파이어베이스 앱   모듈 가져오기
-                _auth = FirebaseAuth.DefaultInstance;      // 파이어베이스 인증 모듈 가져오기 
+                _app = FirebaseApp.DefaultInstance; // 파이어베이스 앱   모듈 가져오기
+                _auth = FirebaseAuth.DefaultInstance; // 파이어베이스 인증 모듈 가져오기 
                 _db = FirebaseFirestore.DefaultInstance; // 파이어베이스  DB 모듈 가져오기
 
                 Debug.Log("Firebase 초기화 성공!");
             }
-            else
-            {
-                Debug.LogError("Firebase 초기화 실패: " + task.Result);
-            }
-        });
+        }
+        catch (FirebaseException e)
+        {
+            Debug.LogError("Firebase 초기화 실패: " + e.Message);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("실패: " + e.Message);
+        }
     }
 
 
     private void Register(string email, string password)
     {
-        _auth.CreateUserWithEmailAndPasswordAsync(email, password).ContinueWithOnMainThread(task => {
+        _auth.CreateUserWithEmailAndPasswordAsync(email, password).ContinueWithOnMainThread(task =>
+        {
             if (task.IsCanceled || task.IsFaulted)
             {
                 Debug.LogError("회원가입이 실패했습니다: " + task.Exception);
@@ -90,24 +76,22 @@ public class FirebaseTutorial : MonoBehaviour
         });
     }
 
-    private void Login(string email, string password)
+    private async Task Login(string email, string password)
     {
-        _auth.SignInWithEmailAndPasswordAsync(email, password).ContinueWithOnMainThread(task => {
-            if (task.IsCanceled || task.IsFaulted)
-            {
-                Debug.LogError("로그인 실패: " + task.Exception);
-                return;
-            }
-
-            Firebase.Auth.AuthResult result = task.Result;
-
-
-            // 로그인에 성공하면은 반환되는 결과값의 유저와 auth 모듈의 CurrentUser가 둘 다 로그인한 유저로 같다.
-            FirebaseUser resultUser = task.Result.User;
-            FirebaseUser user = _auth.CurrentUser;
-
+        try
+        {
+            Firebase.Auth.AuthResult result = await _auth.SignInWithEmailAndPasswordAsync(email, password);
             Debug.LogFormat("로그인 성공!: {0} ({1})", result.User.Email, result.User.UserId);
-        });
+        }
+        catch (FirebaseException e)
+        {
+            Debug.LogError("파이어베이스 로그인 실패: " + e.Message);
+
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("로그인 실패: " + e.Message);
+        }
     }
 
     private void Logout()
@@ -129,33 +113,28 @@ public class FirebaseTutorial : MonoBehaviour
         }
     }
 
-    private void SaveDog()
+    private async Task SaveDog()
     {
         Dog dog = new Dog("소똥이", 4);
 
-        _db.Collection("Dogs").AddAsync(dog).ContinueWithOnMainThread(task =>
-        //_db.Collection("Dogs").Document("개").SetAsync(dog).ContinueWithOnMainThread(task =>
+        try
         {
-            // Add vs Set
-            // Add: 추가한다.
-            // Set: 이미 아이디의 문서가 있다면 수정하고, 없다면 추가한다.
-
-            if (task.IsCompletedSuccessfully)
-            {
-                string documentId = task.Result.Id;
-                Debug.LogError("저장 성공! 문서 ID: " + documentId);
-                Debug.LogError("저장 성공!");
-            }
-            else
-            {
-                Debug.LogError("저장 실패: " + task.Exception);
-            }
-        });
+            DocumentReference reference = await _db.Collection("Dogs").AddAsync(dog);
+            Debug.Log("저장 성공! 문서 ID: " + reference.Id);
+        }
+        catch (FirebaseException e)
+        {
+            Debug.LogError("파이어베이스 저장 실패: " + e.Message);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("저장 실패!" + e.Message);
+        }
     }
 
     private void LoadMyDog()
     {
-        _db.Collection("Dogs").Document("개").GetSnapshotAsync().ContinueWithOnMainThread(task =>
+        _db.Collection("Dogs").Document("홍일이 개").GetSnapshotAsync().ContinueWithOnMainThread(task =>
         {
             if (task.IsCompletedSuccessfully)
             {
@@ -175,7 +154,6 @@ public class FirebaseTutorial : MonoBehaviour
                 Debug.LogError("불러오기 실패: " + task.Exception);
             }
         });
-
     }
 
     private void LoadDogs()
@@ -274,5 +252,4 @@ public class FirebaseTutorial : MonoBehaviour
             LoadDogs();
         }
     }
-
 }
