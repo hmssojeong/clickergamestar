@@ -27,7 +27,7 @@ public class AutoClicker : MonoBehaviour
         }
     }
 
-    private void ExecuteAutoClick()
+private void ExecuteAutoClick()
     {
         // 1. 나무(타겟) 찾기
         GameObject target = GameObject.FindGameObjectWithTag("Clickable");
@@ -50,16 +50,27 @@ public class AutoClicker : MonoBehaviour
                      .Append(transform.DOMove(_originalPos, _attackSpeed).SetEase(Ease.InQuad));
 
             // 3. 실제 데미지 입히기
-            Clickable clickableScript = target.GetComponent<Clickable>();
-            if (clickableScript != null)
+            // Clickable 대신 Tree 컴포넌트 찾기
+            Tree treeScript = target.GetComponent<Tree>();
+            if (treeScript != null)
             {
-                ClickInfo clickInfo = new ClickInfo
+                Vector2 clickPosition = target.transform.position;
+                treeScript.OnClick(clickPosition, EClickType.Auto);
+            }
+            else
+            {
+                // 호환성을 위해 Clickable도 지원
+                Clickable clickableScript = target.GetComponent<Clickable>();
+                if (clickableScript != null)
                 {
-                    Type = EClickType.Auto,
-                    Damage = GameplayManager.Instance.AutoDamage,
-                    Position = target.transform.position
-                };
-                clickableScript.OnClick(clickInfo);
+                    ClickInfo clickInfo = new ClickInfo
+                    {
+                        Type = EClickType.Auto,
+                        Damage = GameplayManager.Instance.AutoDamage,
+                        Position = target.transform.position
+                    };
+                    clickableScript.OnClick(clickInfo);
+                }
             }
         }
     }

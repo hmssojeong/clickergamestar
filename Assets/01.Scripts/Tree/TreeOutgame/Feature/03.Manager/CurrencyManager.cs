@@ -6,6 +6,21 @@ using Cysharp.Threading.Tasks;
 
 public class CurrencyManager : MonoBehaviour
 {
+
+private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+            Initialize();
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
     public static CurrencyManager Instance { get; private set; }
 
     [Serializable]
@@ -20,21 +35,7 @@ public class CurrencyManager : MonoBehaviour
     private ICurrencyRepository _repository;
     private Dictionary<ECurrencyType, Currency> _currencies;
 
-    private void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-            Initialize();
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
 
-        _repository = new FirebaseCurrencyRepository();
-    }
 
     private void Initialize()
     {
@@ -47,7 +48,7 @@ public class CurrencyManager : MonoBehaviour
         InitializeRepository();
     }
 
-    private void InitializeRepository()
+private void InitializeRepository()
     {
         string userId = AccountManager.Instance?.Email ?? "guest";
 
@@ -55,7 +56,7 @@ public class CurrencyManager : MonoBehaviour
                 ? (ICurrencyRepository)new FirebaseCurrencyRepository()
                 : new LocalCurrencyRepository();
 
-        Debug.Log($"Repository 초기화");
+        Debug.Log($"[CurrencyManager] Repository 초기화 완료 - Firebase: {_useFirebase}");
     }
 
     public bool CanAfford(ECurrencyType type, Currency cost)

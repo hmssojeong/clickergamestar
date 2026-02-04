@@ -86,11 +86,11 @@ public class LoginScene : MonoBehaviour
         }
     }
 
-    private async void Register()
+private async void Register()
     {
         string email = _idInputField.text;
         string password = _passwordInputField.text;
-        string password2 = _passwordInputField.text;
+        string password2 = _passwordConfirmInputField.text;
 
         if (string.IsNullOrEmpty(password2) || password != password2)
         {
@@ -101,7 +101,7 @@ public class LoginScene : MonoBehaviour
         var result = await AccountManager.Instance.TryRegister(email, password);
         if (result.Success)
         {
-            GotoLogin();
+            _messageTextUI.text = result.ErrorMessage;
         }
         else
         {

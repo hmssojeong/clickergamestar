@@ -65,7 +65,7 @@ public class GameplayManager : MonoBehaviour
         _feverSystem?.Update(Time.deltaTime);
     }
 
-    public void ProcessTreeClick(ClickInfo clickInfo)
+public void ProcessTreeClick(ClickInfo clickInfo)
     {
         // 1. 피버 클릭 카운트 증가 (수동 클릭만)
         if (clickInfo.Type == EClickType.Manual)
@@ -85,6 +85,12 @@ public class GameplayManager : MonoBehaviour
         );
 
         AddApples(finalDamage);
+
+        // 3. Floating Damage 표시 추가
+        if (FloatingTextManager.Instance != null)
+        {
+            FloatingTextManager.Instance.ShowDamage(clickInfo.Position, finalDamage, isCritical);
+        }
 
         OnDataChanged?.Invoke();
     }

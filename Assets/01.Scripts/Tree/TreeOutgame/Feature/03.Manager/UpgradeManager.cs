@@ -32,13 +32,15 @@ public class UpgradeManager : MonoBehaviour
         }
     }
 
-    private void InitializeRepository()
+private void InitializeRepository()
     {
         string userId = AccountManager.Instance?.Email ?? "guest";
 
         _repository = _useFirebase
-            ? (IUpgradeRepository)new FirebaseUpgradeRepository(userId)
+            ? (IUpgradeRepository)new FirebaseUpgradeRepository()
             : new LocalUpgradeRepository(userId);
+
+        Debug.Log($"[UpgradeManager] Repository 초기화 완료 - Firebase: {_useFirebase}");
     }
 
     public void InitializeUpgrades(Dictionary<EUpgradeType, int> savedLevels = null)
@@ -134,7 +136,7 @@ public class UpgradeManager : MonoBehaviour
         ApplyUpgradeEffect(type, upgrade);
         OnDataChanged?.Invoke();
 
-        Debug.Log($"[UpgradeManager] {upgrade.Name} 레벨업! (Lv.{upgrade.Level})");
+        Debug.Log($"{upgrade.Name} 레벨업! (Lv.{upgrade.Level})");
         return true;
     }
 
@@ -150,7 +152,7 @@ public class UpgradeManager : MonoBehaviour
     {
         if (GameplayManager.Instance == null)
         {
-            Debug.LogWarning("[UpgradeManager] GameplayManager가 없어 효과를 적용할 수 없습니다.");
+            Debug.LogWarning("GameplayManager가 없어 효과를 적용할 수 없습니다.");
             return;
         }
 
@@ -178,7 +180,7 @@ public class UpgradeManager : MonoBehaviour
                 break;
 
             default:
-                Debug.LogWarning($"[UpgradeManager] 알 수 없는 업그레이드 타입: {type}");
+                Debug.LogWarning($"알 수 없는 업그레이드 타입: {type}");
                 break;
         }
     }

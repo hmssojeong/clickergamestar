@@ -1319,7 +1319,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32e7cb25df90c004292cb2fed63e18fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FloatingTextManager
-  _floatingTextPrefab: {fileID: 9002109899189350827, guid: fb8b55a9a62454c4cbfa2601f57ecbcd, type: 3}
+  _floatingTextPrefab: {fileID: 1207363786}
   _canvasTransform: {fileID: 477619758}
   _defaultCapacity: 10
   _maxPoolSize: 20
@@ -4070,6 +4070,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fb8b55a9a62454c4cbfa2601f57ecbcd, type: 3}
+--- !u!1 &1207363786 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 9002109899189350827, guid: fb8b55a9a62454c4cbfa2601f57ecbcd, type: 3}
+  m_PrefabInstance: {fileID: 1207363785}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1269271816
 GameObject:
   m_ObjectHideFlags: 0
@@ -4152,8 +4157,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1446342219}
   m_HandleRect: {fileID: 1446342218}
   m_Direction: 2
-  m_Value: 0.9999998
-  m_Size: 0.40677965
+  m_Value: 0.99999964
+  m_Size: 0.4067797
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
