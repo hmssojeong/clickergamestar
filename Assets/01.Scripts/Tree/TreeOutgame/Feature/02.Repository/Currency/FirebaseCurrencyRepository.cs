@@ -1,51 +1,56 @@
 using Cysharp.Threading.Tasks;
-using Firebase.Auth;
 using Firebase.Firestore;
-using Newtonsoft.Json;
 using System;
 using UnityEngine;
 
-
 public class FirebaseCurrencyRepository : ICurrencyRepository
 {
-    private string CURRENCY_COLLECTION_NAME = "Currency";
+    private readonly string CURRENCY_COLLECTION_NAME = "Currency";
+    private readonly string _userId; 
+    private readonly FirebaseFirestore _db;
 
-    private FirebaseAuth _auth = FirebaseAuth.DefaultInstance;
-    private FirebaseFirestore _db = FirebaseFirestore.DefaultInstance;
+    public FirebaseCurrencyRepository()
+    {
+        _db = FirebaseFirestore.DefaultInstance;
+    }
 
     public async UniTaskVoid Save(CurrencySaveData saveData)
     {
+        if (string.IsNullOrEmpty(_userId))
+        {
+            return;
+        }
+
         try
         {
-            string email = _auth.CurrentUser.Email;
-
-            await _db.Collection(CURRENCY_COLLECTION_NAME).Document(email).SetAsync(saveData);
+            await _db.Collection(CURRENCY_COLLECTION_NAME).Document(_userId).SetAsync(saveData);
         }
         catch (Exception e)
         {
-            Debug.LogError("Currency 저장 실패: " + e.Message);
+            Debug.LogError($"재화 저장 실패: {e.Message}");
         }
     }
 
     public async UniTask<CurrencySaveData> Load()
     {
+        if (string.IsNullOrEmpty(_userId))
+        {
+            return CurrencySaveData.Default;
+        }
+
         try
         {
-            string email = _auth.CurrentUser.Email;
+            DocumentSnapshot snapshot = await _db.Collection(CURRENCY_COLLECTION_NAME).Document(_userId).GetSnapshotAsync();
 
-            DocumentSnapshot snapshot = await _db.Collection(CURRENCY_COLLECTION_NAME).Document(email).GetSnapshotAsync();
-
-            CurrencySaveData data = snapshot.ConvertTo<CurrencySaveData>();
-            if (data != null)
+            if (snapshot.Exists)
             {
-                return data;
+                CurrencySaveData data = snapshot.ConvertTo<CurrencySaveData>();
+                if (data != null) return data;
             }
-
-            return CurrencySaveData.Default;
         }
         catch (Exception e)
         {
-            Debug.LogError("Currency 로드 실패: " + e.Message);
+            Debug.LogError($"재화 로드 실패: {e.Message}");
         }
 
         return CurrencySaveData.Default;

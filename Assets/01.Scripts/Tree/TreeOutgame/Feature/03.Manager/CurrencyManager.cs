@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.Events;
 using Cysharp.Threading.Tasks;
 
-// - Repository 패턴 사용
 public class CurrencyManager : MonoBehaviour
 {
     public static CurrencyManager Instance { get; private set; }
@@ -53,10 +52,10 @@ public class CurrencyManager : MonoBehaviour
         string userId = AccountManager.Instance?.Email ?? "guest";
 
         _repository = _useFirebase
-            ? (ICurrencyRepository)new FirebaseCurrencyRepository(userId)
-            : new LocalCurrencyRepository();
+                ? (ICurrencyRepository)new FirebaseCurrencyRepository()
+                : new LocalCurrencyRepository();
 
-        Debug.Log($"[CurrencyManager] Repository 초기화 - Mode: {(_useFirebase ? "Firebase" : "Local")}");
+        Debug.Log($"Repository 초기화");
     }
 
     public bool CanAfford(ECurrencyType type, Currency cost)
@@ -105,7 +104,7 @@ public class CurrencyManager : MonoBehaviour
         _repository.Save(saveData).Forget();
         await UniTask.Yield();
 
-        Debug.Log("[CurrencyManager] Repository에 저장 완료");
+        Debug.Log("Repository에 저장 완료");
     }
 
     public async UniTask LoadFromRepository()
@@ -113,7 +112,7 @@ public class CurrencyManager : MonoBehaviour
         var saveData = await _repository.Load();
         LoadFromData(saveData.Currencies);
 
-        Debug.Log("[CurrencyManager] Repository에서 로드 완료");
+        Debug.Log("Repository에서 로드 완료");
     }
 
     public void LoadFromData(Dictionary<ECurrencyType, double> data)
