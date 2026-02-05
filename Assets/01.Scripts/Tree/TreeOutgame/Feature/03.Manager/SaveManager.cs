@@ -56,7 +56,7 @@ public class SaveManager : MonoBehaviour
             // 2. 업그레이드 저장 (UpgradeManager가 Repository를 통해 저장)
             if (UpgradeManager.Instance != null)
             {
-                UpgradeManager.Instance.SaveUpgrades().Forget();
+                await UpgradeManager.Instance.SaveUpgrades();
             }
 
             // 3. 게임 상태 저장 (PlayerPrefs)

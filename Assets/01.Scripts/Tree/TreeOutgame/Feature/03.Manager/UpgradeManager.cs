@@ -4,7 +4,6 @@ using System.Linq;
 using System;
 using Cysharp.Threading.Tasks;
 
-// - GameplayManager에 업그레이드 효과 적용
 public class UpgradeManager : MonoBehaviour
 {
     public static UpgradeManager Instance { get; private set; }
@@ -38,7 +37,7 @@ private void InitializeRepository()
 
         _repository = _useFirebase
             ? (IUpgradeRepository)new FirebaseUpgradeRepository()
-            : new LocalUpgradeRepository(userId);
+            : new LocalUpgradeRepository();
 
         Debug.Log($"Repository 초기화 완료 - Firebase: {_useFirebase}");
     }
@@ -59,7 +58,7 @@ private void InitializeRepository()
         OnDataChanged?.Invoke();
     }
 
-    public async UniTaskVoid SaveUpgrades()
+    public async UniTask SaveUpgrades()
     {
         var saveData = new UpgradeSaveData();
 
@@ -67,8 +66,6 @@ private void InitializeRepository()
         {
             saveData.UpgradeLevels[pair.Key.ToString()] = pair.Value.Level;
         }
-
-        saveData.LastSaveTime = DateTime.Now.ToString("o");
 
         _repository.Save(saveData).Forget();
         await UniTask.Yield();

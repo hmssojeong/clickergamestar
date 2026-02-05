@@ -16,6 +16,11 @@ public class FirebaseUpgradeRepository : IUpgradeRepository
         _auth = FirebaseAuth.DefaultInstance;
         _db = FirebaseFirestore.DefaultInstance;
 
+        if(_auth.CurrentUser != null)
+        {
+            _userId = _auth.CurrentUser.Email;
+        }
+
         // AccountManager를 통한 초기 ID 세팅 (CurrencyRepository 방식 적용)
         if (AccountManager.Instance != null && AccountManager.Instance.IsLogin)
         {
@@ -36,21 +41,14 @@ public class FirebaseUpgradeRepository : IUpgradeRepository
     {
         try
         {
-            // 실시간으로 현재 유저 확인
-            var user = _auth.CurrentUser;
-            if (user == null)
-            {
-                Debug.LogError("저장 실패: 로그인된 사용자가 없습니다.");
-                return;
-            }
+            string email = _auth.CurrentUser.Email;
 
-            string email = user.Email;
             await _db.Collection(UPGRADE_COLLECTION_NAME).Document(email).SetAsync(saveData);
-            Debug.Log($"업그레이드 저장 성공 - UserID: {email}");
+            Debug.Log($"재화 저장 성공 - UserID: {email}");
         }
         catch (Exception e)
         {
-            Debug.LogError($"업그레이드 저장 실패: {e.Message}");
+            Debug.LogError($"재화 저장 실패: {e.Message}");
         }
     }
 

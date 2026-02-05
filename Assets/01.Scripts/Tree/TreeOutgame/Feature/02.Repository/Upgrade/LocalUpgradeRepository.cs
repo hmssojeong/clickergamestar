@@ -10,28 +10,20 @@ using Cysharp.Threading.Tasks;
 /// </summary>
 public class LocalUpgradeRepository : IUpgradeRepository
 {
-    private readonly string _filePath;
-    private readonly string _userId;
-
-    public LocalUpgradeRepository(string userId)
-    {
-        _userId = userId;
-        _filePath = Path.Combine(Application.persistentDataPath, $"{userId}_upgrade_save.json");
-        
-        Debug.Log($"[LocalUpgradeRepository] 초기화 - 저장 경로: {_filePath}");
-    }
+    private const string SaveKey = "UpgradeData";
 
     public async UniTaskVoid Save(UpgradeSaveData data)
     {
         try
         {
             data.LastSaveTime = DateTime.Now.ToString("o");
-            string json = JsonConvert.SerializeObject(data, Formatting.Indented);
-            
-            // 비동기로 파일 쓰기
-            await File.WriteAllTextAsync(_filePath, json);
-            
-            Debug.Log($"[LocalUpgradeRepository] 저장 완료 - 파일: {_filePath}");
+            string json = JsonConvert.SerializeObject(data);
+            PlayerPrefs.SetString(SaveKey, json);
+            PlayerPrefs.Save();
+
+            await UniTask.Yield();
+
+            Debug.Log("[LocalUpgradeRepository] PlayerPrefs에 업그레이드 저장 완료");
         }
         catch (Exception e)
         {
@@ -44,17 +36,18 @@ public class LocalUpgradeRepository : IUpgradeRepository
     {
         try
         {
-            if (!File.Exists(_filePath))
+            if (!PlayerPrefs.HasKey(SaveKey))
             {
-                Debug.LogWarning($"[LocalUpgradeRepository] 저장 파일 없음 - 기본값 반환: {_filePath}");
+                Debug.LogWarning("[LocalUpgradeRepository] 저장된 데이터 없음 - 기본값 반환");
                 return UpgradeSaveData.Default;
             }
 
-            // 비동기로 파일 읽기
-            string json = await File.ReadAllTextAsync(_filePath);
+            string json = PlayerPrefs.GetString(SaveKey);
             var data = JsonConvert.DeserializeObject<UpgradeSaveData>(json);
-            
-            Debug.Log($"[LocalUpgradeRepository] 로드 완료 - 파일: {_filePath}");
+
+            await UniTask.Yield();
+
+            Debug.Log("[LocalUpgradeRepository] PlayerPrefs에서 업그레이드 로드 완료");
             return data ?? UpgradeSaveData.Default;
         }
         catch (Exception e)
