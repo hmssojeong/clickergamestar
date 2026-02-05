@@ -24,16 +24,16 @@ public class FirebaseUpgradeRepository : IUpgradeRepository
             
             if (string.IsNullOrEmpty(email))
             {
-                Debug.LogError("[FirebaseUpgradeRepository] 저장 실패: 로그인된 사용자가 없습니다.");
+                Debug.LogError("저장 실패: 로그인된 사용자가 없습니다.");
                 return;
             }
 
             await _db.Collection(UPGRADE_COLLECTION_NAME).Document(email).SetAsync(saveData);
-            Debug.Log($"[FirebaseUpgradeRepository] 업그레이드 저장 성공 - UserID: {email}");
+            Debug.Log($"업그레이드 저장 성공 - UserID: {email}");
         }
         catch (Exception e)
         {
-            Debug.LogError($"[FirebaseUpgradeRepository] 업그레이드 저장 실패: {e.Message}");
+            Debug.LogError($"업그레이드 저장 실패: {e.Message}");
         }
     }
 
@@ -45,7 +45,7 @@ public class FirebaseUpgradeRepository : IUpgradeRepository
             
             if (string.IsNullOrEmpty(email))
             {
-                Debug.LogError("[FirebaseUpgradeRepository] 로드 실패: 로그인된 사용자가 없습니다.");
+                Debug.LogError("로드 실패: 로그인된 사용자가 없습니다.");
                 return UpgradeSaveData.Default;
             }
 
@@ -56,18 +56,18 @@ public class FirebaseUpgradeRepository : IUpgradeRepository
                 UpgradeSaveData data = snapshot.ConvertTo<UpgradeSaveData>();
                 if (data != null)
                 {
-                    Debug.Log($"[FirebaseUpgradeRepository] 업그레이드 로드 성공 - UserID: {email}");
+                    Debug.Log($" 업그레이드 로드 성공 - UserID: {email}");
                     return data;
                 }
             }
             else
             {
-                Debug.LogWarning($"[FirebaseUpgradeRepository] 저장된 데이터가 없습니다. 기본값 사용 - UserID: {email}");
+                Debug.LogWarning($"저장된 데이터가 없습니다. 기본값 사용 - UserID: {email}");
             }
         }
         catch (Exception e)
         {
-            Debug.LogError($"[FirebaseUpgradeRepository] 업그레이드 로드 실패: {e.Message}");
+            Debug.LogError($"업그레이드 로드 실패: {e.Message}");
         }
 
         return UpgradeSaveData.Default;

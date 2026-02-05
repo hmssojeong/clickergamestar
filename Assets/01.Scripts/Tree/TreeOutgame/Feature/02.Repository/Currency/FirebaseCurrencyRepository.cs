@@ -60,8 +60,13 @@ public class FirebaseCurrencyRepository : ICurrencyRepository
     {
         try
         {
-            string email = _auth.CurrentUser.Email;
+            var user = _auth.CurrentUser;
+            if (user == null)
+            {
+                return CurrencySaveData.Default;
+            }
 
+            string email = user.Email;
             DocumentSnapshot snapshot = await _db.Collection(CURRENCY_COLLECTION_NAME).Document(email).GetSnapshotAsync();
 
             CurrencySaveData data = snapshot.ConvertTo<CurrencySaveData>();

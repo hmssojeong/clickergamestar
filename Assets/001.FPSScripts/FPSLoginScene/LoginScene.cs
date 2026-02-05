@@ -53,7 +53,6 @@ public class LoginScene : MonoBehaviour
         _registerButton.gameObject.SetActive(_mode == SceneMode.Register);
     }
 
-
     public void OnEmailTextChanged(string email)
     {
         var emailSpec = new AccountEmailSpecification();
@@ -78,11 +77,17 @@ public class LoginScene : MonoBehaviour
         var result = await AccountManager.Instance.TryLogin(email, password);
         if (result.Success)
         {
+            if(SaveManager.Instance != null)
+            {
+                await SaveManager.Instance.LoadGame();
+            }
+
             SceneManager.LoadScene("ClickerMainScene");
         }
         else
         {
             _messageTextUI.text = result.ErrorMessage;
+            Debug.Log(result.ErrorMessage);
         }
     }
 
@@ -101,10 +106,11 @@ private async void Register()
         var result = await AccountManager.Instance.TryRegister(email, password);
         if (result.Success)
         {
-            _messageTextUI.text = result.ErrorMessage;
+            GotoLogin();
         }
         else
         {
+            Debug.LogError(result.ErrorMessage);
             _messageTextUI.text = result.ErrorMessage;
         }
 

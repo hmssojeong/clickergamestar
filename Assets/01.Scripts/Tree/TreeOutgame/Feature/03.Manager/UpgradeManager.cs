@@ -40,7 +40,7 @@ private void InitializeRepository()
             ? (IUpgradeRepository)new FirebaseUpgradeRepository()
             : new LocalUpgradeRepository(userId);
 
-        Debug.Log($"[UpgradeManager] Repository 초기화 완료 - Firebase: {_useFirebase}");
+        Debug.Log($"Repository 초기화 완료 - Firebase: {_useFirebase}");
     }
 
     public void InitializeUpgrades(Dictionary<EUpgradeType, int> savedLevels = null)
@@ -71,7 +71,7 @@ private void InitializeRepository()
         _repository.Save(saveData).Forget();
         await UniTask.Yield();
 
-        Debug.Log("[UpgradeManager] Upgrades 저장 완료");
+        Debug.Log("Upgrades 저장 완료");
     }
 
     public async UniTask LoadUpgrades()
@@ -79,7 +79,7 @@ private void InitializeRepository()
         var saveData = await _repository.Load();
         InitializeUpgrades(saveData.UpgradeLevels);
 
-        Debug.Log("[UpgradeManager] Upgrades 로드 완료");
+        Debug.Log("Upgrades 로드 완료");
     }
 
     public IReadonlyUpgrade Get(EUpgradeType type)
@@ -116,20 +116,20 @@ private void InitializeRepository()
     {
         if (!_upgrades.TryGetValue(type, out Upgrade upgrade))
         {
-            Debug.LogWarning($"[UpgradeManager] Upgrade type {type} not found");
+            Debug.LogWarning($"Upgrade type {type} not found");
             return false;
         }
 
         if (!CurrencyManager.Instance.TrySpend(ECurrencyType.Apple, upgrade.Cost))
         {
-            Debug.LogWarning($"[UpgradeManager] 재화 부족 - 필요: {upgrade.Cost}");
+            Debug.LogWarning($"재화 부족 - 필요: {upgrade.Cost}");
             return false;
         }
 
         if (!upgrade.TryLevelUp())
         {
             CurrencyManager.Instance.Add(ECurrencyType.Apple, upgrade.Cost);
-            Debug.LogError($"[UpgradeManager] 레벨업 실패 - 재화 환불");
+            Debug.LogError($"레벨업 실패 - 재화 환불");
             return false;
         }
 
