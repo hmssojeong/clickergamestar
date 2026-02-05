@@ -99,7 +99,7 @@ private void InitializeRepository()
 
         foreach (var pair in _currencies)
         {
-            saveData.Currencies[pair.Key] = pair.Value.Value;
+            saveData.Currencies[pair.Key.ToString()] = pair.Value.Value;
         }
 
         _repository.Save(saveData).Forget();
@@ -111,7 +111,20 @@ private void InitializeRepository()
     public async UniTask LoadFromRepository()
     {
         var saveData = await _repository.Load();
-        LoadFromData(saveData.Currencies);
+
+        // string을 enum으로 변환해서 로드
+        var currencyData = new Dictionary<ECurrencyType, double>();
+
+        foreach (var pair in saveData.Currencies)
+        {
+            // string을 ECurrencyType enum으로 변환
+            if (Enum.TryParse<ECurrencyType>(pair.Key, out ECurrencyType type))
+            {
+                currencyData[type] = pair.Value;
+            }
+        }
+
+        LoadFromData(currencyData);
 
         Debug.Log("Repository에서 로드 완료");
     }

@@ -63,10 +63,12 @@ private void InitializeRepository()
     {
         var saveData = new UpgradeSaveData();
 
-        foreach (var upgrade in _upgrades)
+        foreach (var pair in _upgrades)
         {
-            saveData.UpgradeLevels[upgrade.Key] = upgrade.Value.Level;
+            saveData.UpgradeLevels[pair.Key.ToString()] = pair.Value.Level;
         }
+
+        saveData.LastSaveTime = DateTime.Now.ToString("o");
 
         _repository.Save(saveData).Forget();
         await UniTask.Yield();
@@ -77,7 +79,20 @@ private void InitializeRepository()
     public async UniTask LoadUpgrades()
     {
         var saveData = await _repository.Load();
-        InitializeUpgrades(saveData.UpgradeLevels);
+
+        // string을 enum으로 변환
+        var loadedLevels = new Dictionary<EUpgradeType, int>();
+
+        foreach (var pair in saveData.UpgradeLevels)
+        {
+            if (Enum.TryParse<EUpgradeType>(pair.Key, out EUpgradeType type))
+            {
+                loadedLevels[type] = pair.Value;
+            }
+        }
+
+        InitializeUpgrades(loadedLevels);
+        ApplyAllUpgradeEffects();
 
         Debug.Log("Upgrades 로드 완료");
     }

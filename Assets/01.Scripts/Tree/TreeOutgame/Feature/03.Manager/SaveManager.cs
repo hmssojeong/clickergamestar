@@ -45,7 +45,7 @@ public class SaveManager : MonoBehaviour
     {
         try
         {
-            Debug.Log("[SaveManager] 저장 시작...");
+            Debug.Log("저장 시작...");
 
             // 1. 재화 저장 (CurrencyManager가 Repository를 통해 저장)
             if (CurrencyManager.Instance != null)
@@ -62,11 +62,11 @@ public class SaveManager : MonoBehaviour
             // 3. 게임 상태 저장 (PlayerPrefs)
             SaveGameplayState();
 
-            Debug.Log("[SaveManager] 저장 완료! ✅");
+            Debug.Log("저장 완료!");
         }
         catch (Exception e)
         {
-            Debug.LogError($"[SaveManager] 저장 실패: {e.Message}");
+            Debug.LogError($"저장 실패: {e.Message}");
         }
     }
 
@@ -74,7 +74,7 @@ public class SaveManager : MonoBehaviour
     {
         try
         {
-            Debug.Log("[SaveManager] 로드 시작...");
+            Debug.Log("로드 시작...");
 
             // 1. 재화 로드
             if (CurrencyManager.Instance != null)
@@ -91,11 +91,11 @@ public class SaveManager : MonoBehaviour
             // 3. 게임 상태 로드
             LoadGameplayState();
 
-            Debug.Log("[SaveManager] 로드 완료! ✅");
+            Debug.Log("로드 완료!");
         }
         catch (Exception e)
         {
-            Debug.LogError($"[SaveManager] 로드 실패: {e.Message}");
+            Debug.LogError($"로드 실패: {e.Message}");
         }
     }
 
@@ -117,7 +117,7 @@ public class SaveManager : MonoBehaviour
         PlayerPrefs.SetString(GameStateKey, json);
         PlayerPrefs.Save();
 
-        Debug.Log("[SaveManager] 게임 상태 저장 완료");
+        Debug.Log("게임 상태 저장 완료");
     }
 
     private void LoadGameplayState()
@@ -126,7 +126,7 @@ public class SaveManager : MonoBehaviour
 
         if (!PlayerPrefs.HasKey(GameStateKey))
         {
-            Debug.LogWarning("[SaveManager] 저장된 게임 상태가 없습니다.");
+            Debug.LogWarning("저장된 게임 상태가 없습니다.");
             return;
         }
 
@@ -140,13 +140,13 @@ public class SaveManager : MonoBehaviour
         GameplayManager.Instance.SetCriticalMultiplier(state.CriticalMultiplier);
         GameplayManager.Instance.SetSquirrelCount(state.SquirrelCount);
 
-        Debug.Log("[SaveManager] 게임 상태 로드 완료");
+        Debug.Log("게임 상태 로드 완료");
     }
 
     public void ResetAllData()
     {
         PlayerPrefs.DeleteAll();
-        Debug.Log("[SaveManager] 모든 데이터 초기화 완료");
+        Debug.Log("모든 데이터 초기화 완료");
     }
 
     [System.Serializable]
