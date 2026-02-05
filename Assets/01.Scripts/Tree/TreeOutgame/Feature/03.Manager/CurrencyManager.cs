@@ -56,7 +56,7 @@ private void InitializeRepository()
                 ? (ICurrencyRepository)new FirebaseCurrencyRepository()
                 : new LocalCurrencyRepository();
 
-        Debug.Log($"[CurrencyManager] Repository 초기화 완료 - Firebase: {_useFirebase}");
+        Debug.Log($"Repository 초기화 완료 - Firebase: {_useFirebase}");
     }
 
     public bool CanAfford(ECurrencyType type, Currency cost)
