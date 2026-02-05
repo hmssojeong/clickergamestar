@@ -47,7 +47,7 @@ public class FirebaseCurrencyRepository : ICurrencyRepository
         {
             string email = _auth.CurrentUser.Email;
 
-            await _db.Collection(CURRENCY_COLLECTION_NAME).Document(email).SetAsync(saveData);
+            await _db.Collection(email).Document(CURRENCY_COLLECTION_NAME).SetAsync(saveData);
             Debug.Log($"재화 저장 성공 - UserID: {email}");
         }
         catch (Exception e)
@@ -67,7 +67,7 @@ public class FirebaseCurrencyRepository : ICurrencyRepository
             }
 
             string email = user.Email;
-            DocumentSnapshot snapshot = await _db.Collection(CURRENCY_COLLECTION_NAME).Document(email).GetSnapshotAsync();
+            DocumentSnapshot snapshot = await _db.Collection(email).Document(CURRENCY_COLLECTION_NAME).GetSnapshotAsync();
 
             CurrencySaveData data = snapshot.ConvertTo<CurrencySaveData>();
             if (data != null)

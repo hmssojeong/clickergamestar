@@ -72,6 +72,8 @@ private void InitializeRepository()
         }
 
         _currencies[type] -= cost;
+        // save
+        SaveToRepository().Forget();
         NotifyCurrencyChanged(type);
         return true;
     }
@@ -79,6 +81,8 @@ private void InitializeRepository()
     public void Add(ECurrencyType type, Currency amount)
     {
         _currencies[type] += amount;
+        // save
+        SaveToRepository().Forget();
         NotifyCurrencyChanged(type);
     }
 

@@ -146,6 +146,8 @@ private void InitializeRepository()
         }
 
         ApplyUpgradeEffect(type, upgrade);
+        // save
+        SaveUpgrades().Forget();
         OnDataChanged?.Invoke();
 
         Debug.Log($"{upgrade.Name} 레벨업! (Lv.{upgrade.Level})");

@@ -43,7 +43,7 @@ public class FirebaseUpgradeRepository : IUpgradeRepository
         {
             string email = _auth.CurrentUser.Email;
 
-            await _db.Collection(UPGRADE_COLLECTION_NAME).Document(email).SetAsync(saveData);
+            await _db.Collection(email).Document(UPGRADE_COLLECTION_NAME).SetAsync(saveData);
             Debug.Log($"재화 저장 성공 - UserID: {email}");
         }
         catch (Exception e)
@@ -64,7 +64,7 @@ public class FirebaseUpgradeRepository : IUpgradeRepository
             }
 
             string email = user.Email;
-            DocumentSnapshot snapshot = await _db.Collection(UPGRADE_COLLECTION_NAME).Document(email).GetSnapshotAsync();
+            DocumentSnapshot snapshot = await _db.Collection(email).Document(UPGRADE_COLLECTION_NAME).GetSnapshotAsync();
 
             if (snapshot.Exists)
             {
