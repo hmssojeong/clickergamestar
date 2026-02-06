@@ -29,7 +29,7 @@ public async UniTask<AccountResult> Register(string email, string password)
             return new AccountResult()
             {
                 Success = false,
-                ErrorMessage = GetKoreanErrorMessage(e.Message)
+                ErrorMessage = e.Message
             };
         }
     }
@@ -49,35 +49,9 @@ public async UniTask<AccountResult> Login(string email, string password)
             return new AccountResult()
             {
                 Success = false,
-                ErrorMessage = GetKoreanErrorMessage(e.Message)
+                ErrorMessage = e.Message
             };
         }
-    }
-
-    
-    private string GetKoreanErrorMessage(string firebaseError)
-    {
-        // Firebase 에러 메시지를 한글로 변환
-        if (firebaseError.Contains("email") && firebaseError.Contains("not found"))
-            return "아이디를 확인해주세요.";
-        if (firebaseError.Contains("password") && firebaseError.Contains("wrong"))
-            return "아이디를 확인해주세요.";
-        if (firebaseError.Contains("user-not-found"))
-            return "아이디를 확인해주세요.";
-        if (firebaseError.Contains("wrong-password"))
-            return "아이디를 확인해주세요.";
-        if (firebaseError.Contains("invalid-credential"))
-            return "아이디를 확인해주세요.";
-        if (firebaseError.Contains("email-already-in-use"))
-            return "이미 사용중인 이메일입니다.";
-        if (firebaseError.Contains("weak-password"))
-            return "비밀번호가 너무 약합니다.";
-        if (firebaseError.Contains("invalid-email"))
-            return "잘못된 이메일 형식입니다.";
-        if (firebaseError.Contains("network"))
-            return "네트워크 연결을 확인해주세요.";
-        
-        return "로그인에 실패했습니다.";
     }
 
     
