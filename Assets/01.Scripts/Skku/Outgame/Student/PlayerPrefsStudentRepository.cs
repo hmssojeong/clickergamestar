@@ -1,7 +1,6 @@
-using UnityEditor;
 using UnityEngine;
 
-public class PlayerPrefsStudentRepository
+public class PlayerPrefsStudentRepository : IStudentRepository
 {
     public void Save(string name, StudentSaveData saveData)
     {

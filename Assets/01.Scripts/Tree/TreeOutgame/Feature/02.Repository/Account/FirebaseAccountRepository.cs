@@ -1,3 +1,4 @@
+#if !UNITY_WEBGL || UNITY_EDITOR
 using System;
 using Cysharp.Threading.Tasks;
 using Firebase;
@@ -65,3 +66,4 @@ public void Logout()
         throw new NotImplementedException();
     }
 }
+#endif

@@ -33,11 +33,14 @@ public class UpgradeManager : MonoBehaviour
 
 private void InitializeRepository()
     {
+#if !UNITY_WEBGL || UNITY_EDITOR
         string userId = AccountManager.Instance?.Email ?? "guest";
-
         _repository = _useFirebase ? new FirebaseUpgradeRepository() : new LocalUpgradeRepository();
-
         Debug.Log($"Repository 초기화 완료 - Firebase: {_useFirebase}");
+#else
+        _repository = new LocalUpgradeRepository();
+        Debug.Log("Repository 초기화 완료 - WebGL: LocalUpgradeRepository");
+#endif
     }
 
     public void InitializeUpgrades(Dictionary<EUpgradeType, int> savedLevels = null)
