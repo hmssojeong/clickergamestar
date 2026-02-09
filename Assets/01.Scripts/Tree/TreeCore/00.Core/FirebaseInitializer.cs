@@ -1,3 +1,4 @@
+#if !UNITY_WEBGL || UNITY_EDITOR
 using Cysharp.Threading.Tasks;
 using System;
 using UnityEngine;
@@ -51,3 +52,4 @@ public class FirebaseInitializer : MonoBehaviour
 #endif
     }
 }
+#endif

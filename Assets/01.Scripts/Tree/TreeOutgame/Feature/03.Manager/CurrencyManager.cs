@@ -50,11 +50,14 @@ private void Awake()
 
 private void InitializeRepository()
     {
+#if !UNITY_WEBGL || UNITY_EDITOR
         string userId = AccountManager.Instance?.Email ?? "guest";
-
         _repository = _useFirebase ? new FirebaseCurrencyRepository(): new LocalCurrencyRepository();
-
         Debug.Log($"Repository 초기화 완료 - Firebase: {_useFirebase}");
+#else
+        _repository = new LocalCurrencyRepository();
+        Debug.Log("Repository 초기화 완료 - WebGL: LocalCurrencyRepository");
+#endif
     }
 
     public bool CanAfford(ECurrencyType type, Currency cost)
