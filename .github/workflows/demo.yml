@@ -1,39 +1,53 @@
-# 이 파일은 작업지시서(workflow)다.
-# - 언제(on) = "main에 push하면..."
-# - 작업(jobs) = 할 일 목록
-#   - Build:
-#          어디서? : 깃허브 서버 컴퓨터에서 (runner)
-#            단계  : 1. 코드 가져와 -> 2. 빌드해
+name: Unity Build
 
-# 1. 작업지시서의 이름
-name: Unity WebGL Build
-
-# 2. 언제 실행할 것인가? (트리거, 이벤트)
 on:
   push:
-    branches: [main]
-    
-# 3. 무엇을?
+    branches: [ web-build ]
+
 jobs:
   build:
-    # 어디서?
     runs-on: ubuntu-latest
-    
-    # 실행할 단게
+
     steps:
-      - name: 코드 가져오기
+      # 0. 디스크 공간 확보
+      - name: Free Disk Space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
+          
+      # 1. 코드 가져오기
+      - name: Checkout
         uses: actions/checkout@v4
-        
-      - name: 유니티 빌드
-        run: echo "유니티 빌드를 합니다."
-     
-      # 유니티 설치
-      # 로그인 및 라이선스 인증
-      # 프로젝트를 열어서 특정 플랫폼(윈도우/웹빌드) 빌드
-      # 빌드 경과물 (.exe)을 특정 폴더에다가 업로드
-      - name: Unity 빌드
+      
+      # 2. 캐시 (빌드 속도 향상)
+      - name: Cache Library
+        uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-Windows-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-Windows-
+            Library-
+      
+      # 3. Unity 빌드 (데스크탑)
+      - name: Build Windows
         uses: game-ci/unity-builder@v4
         env:
-          UNITY_LICENSE: ${{secrets.UNITY_LICENSE}}
-          UNITY_EMAIL: ${{screts.UNITY_EMAIL}}
-          UNITY_PASSWORD: ${{secrets.UNITY_PASSWORD}}
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          targetPlatform: StandaloneWindows64
+      
+      # 4. 빌드 결과물 업로드
+      - name: Upload Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: Windows-Build
+          path: build/StandaloneWindows64
