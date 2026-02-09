@@ -1,4 +1,4 @@
-/*using System;
+using System;
 using Firebase.Firestore;
 using UnityEngine;
 
@@ -33,4 +33,4 @@ public class Dog
         Name = name;
         Age = age;
     }
-}*/
+}

@@ -1,3 +1,6 @@
+#if !UNITY_WEBGL || UNITY_EDITOR
+
+
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -6,26 +9,21 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using TMPro;
 
-#if !UNITY_WEBGL || UNITY_EDITOR
 using Firebase;
 using Firebase.Auth;
 using Firebase.Extensions;
 using Firebase.Firestore;
-#endif
 
 public class FirebaseTutorial : MonoBehaviour
 {
-#if !UNITY_WEBGL || UNITY_EDITOR
     private FirebaseApp _app = null;
     private FirebaseAuth _auth = null;
     private FirebaseFirestore _db = null;
-#endif
 
     public TextMeshProUGUI _progressText;
 
     private async void Start()
     {
-#if !UNITY_WEBGL || UNITY_EDITOR
         Debug.Log("현재 CPU 번호:" + Thread.CurrentThread.ManagedThreadId);
 
         await InitFirebase();
@@ -56,16 +54,11 @@ public class FirebaseTutorial : MonoBehaviour
         Debug.Log("강아지 추가 완료");
 
         Debug.Log("현재 CPU 번호:" + Thread.CurrentThread.ManagedThreadId);
-#else
-        Debug.Log("WebGL 모드: Firebase Tutorial을 사용할 수 없습니다.");
-        _progressText.text = "WebGL 모드 (Firebase 미지원)";
-        await UniTask.CompletedTask;
-#endif
+
     }
 
     private async UniTask InitFirebase()
     {
-#if !UNITY_WEBGL || UNITY_EDITOR
         DependencyStatus status = await FirebaseApp.CheckAndFixDependenciesAsync().AsUniTask();
 
         try
@@ -87,16 +80,11 @@ public class FirebaseTutorial : MonoBehaviour
         {
             Debug.LogError("실패: " + e.Message);
         }
-#else
-        Debug.Log("WebGL 모드: Firebase 초기화를 건너뜁니다.");
-        await UniTask.CompletedTask;
-#endif
     }
 
 
     private void Register(string email, string password)
     {
-#if !UNITY_WEBGL || UNITY_EDITOR
         _auth.CreateUserWithEmailAndPasswordAsync(email, password).ContinueWithOnMainThread(task =>
         {
             if (task.IsCanceled || task.IsFaulted)
@@ -108,14 +96,10 @@ public class FirebaseTutorial : MonoBehaviour
             Firebase.Auth.AuthResult result = task.Result;
             Debug.LogFormat("회원가입에 성공했습니다.: {0} ({1})", result.User.DisplayName, result.User.UserId);
         });
-#else
-        Debug.LogWarning("WebGL 모드: 회원가입을 사용할 수 없습니다.");
-#endif
     }
 
     private async UniTask Login(string email, string password)
     {
-#if !UNITY_WEBGL || UNITY_EDITOR
         try
         {
             Firebase.Auth.AuthResult result = await _auth.SignInWithEmailAndPasswordAsync(email, password).AsUniTask();
@@ -130,25 +114,18 @@ public class FirebaseTutorial : MonoBehaviour
         {
             Debug.LogError("로그인 실패: " + e.Message);
         }
-#else
-        Debug.LogWarning("WebGL 모드: 로그인을 사용할 수 없습니다.");
-        await UniTask.CompletedTask;
-#endif
+
     }
 
     private void Logout()
     {
-#if !UNITY_WEBGL || UNITY_EDITOR
         _auth.SignOut();
         Debug.Log("로그아웃 성공!");
-#else
-        Debug.LogWarning("WebGL 모드: 로그아웃을 사용할 수 없습니다.");
-#endif
+
     }
 
     private void CheckLoginStatus()
     {
-#if !UNITY_WEBGL || UNITY_EDITOR
         FirebaseUser user = _auth.CurrentUser;
         if (user == null)
         {
@@ -158,14 +135,11 @@ public class FirebaseTutorial : MonoBehaviour
         {
             Debug.LogFormat("로그인 중: {0} ({1})", user.Email, user.UserId);
         }
-#else
-        Debug.LogWarning("WebGL 모드: 로그인 상태 확인을 사용할 수 없습니다.");
-#endif
+
     }
 
     private async UniTask SaveDog()
     {
-#if !UNITY_WEBGL || UNITY_EDITOR
         Dog dog = new Dog("소똥이", 4);
 
         try
@@ -181,15 +155,10 @@ public class FirebaseTutorial : MonoBehaviour
         {
             Debug.LogError("저장 실패!" + e.Message);
         }
-#else
-        Debug.LogWarning("WebGL 모드: 데이터 저장을 사용할 수 없습니다.");
-        await UniTask.CompletedTask;
-#endif
     }
 
     private void LoadMyDog()
     {
-#if !UNITY_WEBGL || UNITY_EDITOR
         _db.Collection("Dogs").Document("홍일이 개").GetSnapshotAsync().ContinueWithOnMainThread(task =>
         {
             if (task.IsCompletedSuccessfully)
@@ -210,14 +179,11 @@ public class FirebaseTutorial : MonoBehaviour
                 Debug.LogError("불러오기 실패: " + task.Exception);
             }
         });
-#else
-        Debug.LogWarning("WebGL 모드: 데이터 불러오기를 사용할 수 없습니다.");
-#endif
+
     }
 
     private void LoadDogs()
     {
-#if !UNITY_WEBGL || UNITY_EDITOR
         _db.Collection("Dogs").GetSnapshotAsync().ContinueWithOnMainThread(task =>
         {
             if (task.IsCompletedSuccessfully)
@@ -237,14 +203,10 @@ public class FirebaseTutorial : MonoBehaviour
                 Debug.LogError("불러오기 실패: " + task.Exception);
             }
         });
-#else
-        Debug.LogWarning("WebGL 모드: 데이터 불러오기를 사용할 수 없습니다.");
-#endif
     }
 
     private void DeleteDogs()
     {
-#if !UNITY_WEBGL || UNITY_EDITOR
         _db.Collection("Dogs").WhereEqualTo("Name", "소똥이").GetSnapshotAsync().ContinueWithOnMainThread(task =>
         {
             if (task.IsCompletedSuccessfully)
@@ -273,15 +235,12 @@ public class FirebaseTutorial : MonoBehaviour
                 Debug.LogError("불러오기 실패: " + task.Exception);
             }
         });
-#else
-        Debug.LogWarning("WebGL 모드: 데이터 삭제를 사용할 수 없습니다.");
-#endif
+
     }
 
 
     private void Update()
     {
-#if !UNITY_WEBGL || UNITY_EDITOR
         if (_app == null) return;
 
         if (Input.GetKeyDown(KeyCode.Alpha1))
@@ -318,6 +277,6 @@ public class FirebaseTutorial : MonoBehaviour
         {
             LoadDogs();
         }
-#endif
     }
 }
+#endif
