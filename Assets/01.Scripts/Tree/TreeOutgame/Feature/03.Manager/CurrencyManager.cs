@@ -52,9 +52,7 @@ private void InitializeRepository()
     {
         string userId = AccountManager.Instance?.Email ?? "guest";
 
-        _repository = _useFirebase
-                ? (ICurrencyRepository)new FirebaseCurrencyRepository()
-                : new LocalCurrencyRepository();
+        _repository = _useFirebase ? new FirebaseCurrencyRepository(): new LocalCurrencyRepository();
 
         Debug.Log($"Repository 초기화 완료 - Firebase: {_useFirebase}");
     }

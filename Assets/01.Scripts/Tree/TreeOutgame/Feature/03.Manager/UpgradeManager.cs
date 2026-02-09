@@ -35,9 +35,7 @@ private void InitializeRepository()
     {
         string userId = AccountManager.Instance?.Email ?? "guest";
 
-        _repository = _useFirebase
-            ? (IUpgradeRepository)new FirebaseUpgradeRepository()
-            : new LocalUpgradeRepository();
+        _repository = _useFirebase ? new FirebaseUpgradeRepository() : new LocalUpgradeRepository();
 
         Debug.Log($"Repository 초기화 완료 - Firebase: {_useFirebase}");
     }
