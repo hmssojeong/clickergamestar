@@ -26,3 +26,14 @@ jobs:
         
       - name: 유니티 빌드
         run: echo "유니티 빌드를 합니다."
+     
+      # 유니티 설치
+      # 로그인 및 라이선스 인증
+      # 프로젝트를 열어서 특정 플랫폼(윈도우/웹빌드) 빌드
+      # 빌드 경과물 (.exe)을 특정 폴더에다가 업로드
+      - name: Unity 빌드
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{secrets.UNITY_LICENSE}}
+          UNITY_EMAIL: ${{screts.UNITY_EMAIL}}
+          UNITY_PASSWORD: ${{secrets.UNITY_PASSWORD}}
