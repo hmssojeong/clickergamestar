@@ -1,9 +1,12 @@
 using Cysharp.Threading.Tasks;
+using System;
+using UnityEngine;
+
+#if !UNITY_WEBGL || UNITY_EDITOR
 using Firebase;
 using Firebase.Auth;
 using Firebase.Firestore;
-using System;
-using UnityEngine;
+#endif
 
 public class FirebaseInitializer : MonoBehaviour
 {
@@ -24,6 +27,7 @@ public class FirebaseInitializer : MonoBehaviour
 
     private async UniTask InitFirebase()
     {
+#if !UNITY_WEBGL || UNITY_EDITOR
         DependencyStatus status = await FirebaseApp.CheckAndFixDependenciesAsync().AsUniTask();
 
         try
@@ -41,5 +45,9 @@ public class FirebaseInitializer : MonoBehaviour
         {
             Debug.LogError("실패: " + e.Message);
         }
+#else
+        Debug.Log("WebGL 모드: Firebase 초기화를 건너뜁니다.");
+        await UniTask.CompletedTask;
+#endif
     }
 }
