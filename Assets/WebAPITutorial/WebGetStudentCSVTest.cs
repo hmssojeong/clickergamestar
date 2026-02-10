@@ -1,19 +1,36 @@
-using System.Collections.Generic;
+using CsvHelper;
+using CsvHelper.Configuration;
+using CsvHelper.Configuration.Attributes;
 using Cysharp.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.Networking;
 
 public class WebGetStudentCSVTest : MonoBehaviour
 {
     private async void Start()
     {
+        // 일종 스펙(기획) 데이터
         string result = await GetWebText("https://raw.githubusercontent.com/mongilteacher/skku2_script_study/refs/heads/main/students.csv");
-        Debug.Log(result);
+        result = result.TrimStart('\uFEFF'); // 맨 앞에 숨겨짓 문자 삭제
 
-        List<Person> persons = new List<Person>();
-        // 1. 읽어온 CSV 파일을 파싱해서 (파싱 방법은 블로그 또는 llm 활용)
-        // 2. Person 도메인 클래스에 넣고 persons에 추가
-        // 3. List<Person> persons 순회하면서 출력하세요.
+        // CSV-Helper (어떻게 구현 됐냐보다는 API 문서를 참고해서 잘 가져다 써라)
+        var config = new CsvConfiguration(CultureInfo.CurrentCulture);
+        var stringReader = new StringReader(result);
+        var csv = new CsvReader(stringReader, config);
+
+        List<Person> persons = new();
+        persons = csv.GetRecords<Person>().ToList();
+
+        foreach (Person p in persons)
+        {
+            Debug.Log(p);
+        }
     }
 
     private async UniTask<string> GetWebText(string url)
@@ -25,6 +42,30 @@ public class WebGetStudentCSVTest : MonoBehaviour
 
 public class Person
 {
-    public string Name;
-    public int Age;
+    [Name("id")]
+    public int Id { get; set; }
+
+    [Name("name")]
+    public string Name { get; set; }
+
+
+    [Name("age")]
+    public int Age { get; set; }
+
+    public Person()
+    {
+
+    }
+
+    public Person(int id, string name, int age)
+    {
+        Id = id;
+        Name = name ?? throw new ArgumentNullException(nameof(name));
+        Age = age;
+    }
+
+    public override string ToString()
+    {
+        return $"Person(Id={Id}, Name={Name}, Age={Age})";
+    }
 }
