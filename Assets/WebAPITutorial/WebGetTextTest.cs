@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Networking;
 using System.Collections;
+using Cysharp.Threading.Tasks;
 
 public class WebGetTextTest : MonoBehaviour
 {
@@ -11,9 +12,20 @@ public class WebGetTextTest : MonoBehaviour
     // 3. 데이터 수정해줘 : PUT
     // 4. 데이터 삭제해줘 : DELETE
 
-    void Start()
+    async void Start()
     {
+        string result = await GetWebText("<URL>");
+
+        Debug.Log(result);
+
+        // 서버에게 데이터 내놔~ 하는 작업 비동기 이므로 코루틴을 이용했다.
         StartCoroutine(GetText());
+    }
+
+    private async UniTask<string> GetWebText(string url)
+    {
+        var txt = (await UnityWebRequest.Get("https://...").SendWebRequest()).downloadHandler.text;
+        return txt;
     }
 
     IEnumerator GetText()
