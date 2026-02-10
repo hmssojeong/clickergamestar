@@ -18,23 +18,9 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    # 스케줄 실행 시, 지난 24시간 동안 커밋이 있었는지 확인
-    outputs:
-      should_run: ${{ steps.check_commits.outputs.count != '0'}}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Check for new commits (Last 24h)
-        id: check_commits
-        if: github.event_name == 'schedule'
-        run: |
-          COUNT=$(git rev-list --count --since="24 hours ago" main)
-          echo "count=$COUNT" >> $GITHUB_OUTPUT
-
+    # 스케줄 실행 시, 지난 24시간 동안 커밋이 있었는지 확인하는 로직은 
+    # 아래 steps 내에서 통합하여 관리하거나 전체 실행으로 유지합니다.
+    
     steps:
       # 0. 디스크 공간 확보
       - name: Free Disk Space
@@ -53,6 +39,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0 # 이전 커밋과의 비교를 위해 전체 이력을 가져옵니다.
+
+      # (선택 추가) 스케줄 실행 시 커밋 확인이 꼭 필요하다면 여기에 체크 단계를 둘 수 있습니다.
 
       # 2. 캐시 (빌드 속도 향상)
       - name: Cache Library
@@ -102,8 +90,8 @@ jobs:
         id: Changelog
         run: |
           # 이전 배포(성공한 마지막 커밋)부터 현재까지의 로그를 한 줄씩 추출
-          # %s는 커밋 메시지 본문입니다.
-          CHANGELOG=$(git log--pretty="• %s" ${{ github.event.before }}..${{ github.sha }})
+          # %s는 커밋 메시지 본문입니다. (명령어 공백 수정)
+          CHANGELOG=$(git log --pretty=format:"• %s" ${{ github.event.before }}..${{ github.sha }})
 
           # 슬랙 페이로드에 포함하기 위해 줄바꿈 처리 및 환경 변수 저장
           echo "logs<<EOF" >> $GITHUB_OUTPUT
@@ -125,9 +113,8 @@ jobs:
                   type: mrkdwn
                   text: |
                     ✅ *${{ github.repository }}* 빌드 & 배포 완료!
-                    📝 커밋: ${{ github.event.head_commit.message }}
                     👤 작성자: ${{ github.actor }}
-                    🌐 <https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/|플레이하기>
+                    🌐 <https://hamsso.itch.io/fruittree|Itch.io 플레이> | <https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/|GitHub Pages>
               - type: section
                 text:
                   type: mrkdwn
@@ -154,17 +141,12 @@ jobs:
                     👤 작성자: ${{ github.actor }}
                     🔗 <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|로그 확인>
 
-      # 10. Itch.io 업로드
+      # 10. Itch.io 업로드 (사용 가능한 파라미터로 수정)
       - name: Push to Itch.io
         uses: manleyjls/butler-publish@v5.1.0
         with:
-          # Itch.io 사용자 이름/게임 슬러그(주소창에 나오는 이름)
-          project: "hamsso/fruittree"
-          # 업로드할 빌드 폴더 경로
-          directory: build/WebGL/WebGL
-          # 채널 이름
-          channel: web
-        env:
-          BUTLER_API_KEY: ${{ secrets.BUTLER_CREDENTIALS }} 
-
-             
+          butler_key: ${{ secrets.BUTLER_CREDENTIALS }}
+          package: build/WebGL/WebGL
+          itch_user: hamsso
+          itch_game: fruittree
+          itch_channel: web
