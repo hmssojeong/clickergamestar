@@ -3,6 +3,11 @@ name: Unity WebGL Build & Deploy
 on:
   push:
     branches: [ web-build ]
+  # 매일 아침 9시(한국 시간) 실행 스케줄 추가
+  schedule:
+    - cron: '0 0 * * *'
+  # 수동으로도 실행할 수 있도록 버튼 추가 (테스트용)
+  workflow_dispatch:
 
 # GitHub Pages 배포에 필요한 권한
 permissions:
@@ -13,6 +18,22 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # 스케줄 실행 시, 지난 24시간 동안 커밋이 있었는지 확인
+    outputs:
+      should_run: ${{ steps.check_commits.outputs.count != '0'}}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for new commits (Last 24h)
+        id: check_commits
+        if: github.event_name == 'schedule'
+        run: |
+          COUNT=$(git rev-list --count --since="24 hours ago" main)
+          echo "count=$COUNT" >> $GITHUB_OUTPUT
 
     steps:
       # 0. 디스크 공간 확보
@@ -112,7 +133,7 @@ jobs:
                   type: mrkdwn
                   text: |
                     *🚀 주요 업데이트 내역:*
-                    ${{ steps.changelog.outputs.logs || '변경 내역 없음' }}
+                    ${{ steps.Changelog.outputs.logs || '변경 내역 없음' }}
 
       # 9. 슬랙 알림 (실패)
       - name: Slack Notification (Failure)
@@ -135,7 +156,7 @@ jobs:
 
       # 10. Itch.io 업로드
       - name: Push to Itch.io
-        uses: josephbbaumann/itchey@v1
+        uses: manleyjls/butler-publish@v5.1.0
         with:
           # Itch.io 사용자 이름/게임 슬러그(주소창에 나오는 이름)
           project: "hamsso/fruittree"
