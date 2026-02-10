@@ -61,8 +61,8 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           targetPlatform: WebGL
-          buildProfile: "Assets/Settings/Build Profiles/Web - Desktop - Release.asset"
-        if: github.event_name == 'push' || steps.Changelog.outputs.logs != ''
+          # buildProfile: "Assets/Settings/Build Profiles/Web - Desktop - Release.asset"
+          # 주의: buildProfile은 Unity 6 이상에서만 지원됩니다. 사용하지 않는 경우 주석 처리하세요.
 
       # 4. 빌드 결과물 업로드 (Artifact)
       - name: Upload Build
@@ -92,7 +92,11 @@ jobs:
         run: |
           # 이전 배포(성공한 마지막 커밋)부터 현재까지의 로그를 한 줄씩 추출
           # %s는 커밋 메시지 본문입니다. (명령어 공백 수정)
-          CHANGELOG=$(git log --pretty=format:"• %s" ${{ github.event.before }}..${{ github.sha }})
+          if [ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ] && [ -n "${{ github.event.before }}" ]; then
+            CHANGELOG=$(git log --pretty=format:"• %s" ${{ github.event.before }}..${{ github.sha }})
+          else
+            CHANGELOG=$(git log --pretty=format:"• %s" -10)
+          fi
 
           # 슬랙 페이로드에 포함하기 위해 줄바꿈 처리 및 환경 변수 저장
           echo "logs<<EOF" >> $GITHUB_OUTPUT
@@ -107,21 +111,25 @@ jobs:
           webhook: ${{ secrets.SLACK_WEBHOOK }}
           webhook-type: incoming-webhook
           payload: |
-            text: "✅ WebGL 빌드 & 배포 성공"
-            blocks:
-              - type: section
-                text:
-                  type: mrkdwn
-                  text: |
-                    ✅ *${{ github.repository }}* 빌드 & 배포 완료!
-                    👤 작성자: ${{ github.actor }}
-                    🌐 <https://hamsso.itch.io/fruittree|Itch.io 플레이> | <https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/|GitHub Pages>
-              - type: section
-                text:
-                  type: mrkdwn
-                  text: |
-                    *🚀 주요 업데이트 내역:*
-                    ${{ steps.Changelog.outputs.logs || '변경 내역 없음' }}
+            {
+              "text": "✅ WebGL 빌드 & 배포 성공",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "✅ *${{ github.repository }}* 빌드 & 배포 완료!\n👤 작성자: ${{ github.actor }}\n🌐 <https://hamsso.itch.io/fruittree|Itch.io 플레이> | <https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/|GitHub Pages>"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*🚀 주요 업데이트 내역:*\n${{ steps.Changelog.outputs.logs || '변경 내역 없음' }}"
+                  }
+                }
+              ]
+            }
 
       # 9. 슬랙 알림 (실패)
       - name: Slack Notification (Failure)
@@ -131,23 +139,36 @@ jobs:
           webhook: ${{ secrets.SLACK_WEBHOOK }}
           webhook-type: incoming-webhook
           payload: |
-            text: "❌ WebGL 빌드 실패"
-            blocks:
-              - type: section
-                text:
-                  type: mrkdwn
-                  text: |
-                    🔥 *${{ github.repository }}* 빌드 실패!
-                    📝 커밋: ${{ github.event.head_commit.message }}
-                    👤 작성자: ${{ github.actor }}
-                    🔗 <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|로그 확인>
+            {
+              "text": "❌ WebGL 빌드 실패",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "🔥 *${{ github.repository }}* 빌드 실패!\n📝 커밋: ${{ github.event.head_commit.message }}\n👤 작성자: ${{ github.actor }}\n🔗 <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|로그 확인>"
+                  }
+                }
+              ]
+            }
 
       # 10. Itch.io 업로드 (사용 가능한 파라미터로 수정)
+      - name: Install Butler
+        if: success()
+        run: |
+          curl -L -o butler.zip https://broth.itch.ovh/butler/linux-amd64/LATEST/archive/default
+          unzip butler.zip
+          chmod +x butler
+          ./butler -V
+
+      - name: Login to Butler
+        if: success()
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_CREDENTIALS }}
+        run: |
+          ./butler login
+
       - name: Push to Itch.io
-        uses: Ayfel/butler-publish@v1.0.3
-        with:
-          butler_key: ${{ secrets.BUTLER_CREDENTIALS }}
-          package: build/WebGL/WebGL
-          itch_user: hamsso
-          itch_game: fruittree
-          itch_channel: web
+        if: success()
+        run: |
+          ./butler push build/WebGL/WebGL hamsso/fruittree:web --userversion ${{ github.run_number }}
