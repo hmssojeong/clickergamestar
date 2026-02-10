@@ -62,6 +62,7 @@ jobs:
         with:
           targetPlatform: WebGL
           buildProfile: "Assets/Settings/Build Profiles/Web - Desktop - Release.asset"
+        if: github.event_name == 'push' || steps.Changelog.outputs.logs != ''
 
       # 4. 빌드 결과물 업로드 (Artifact)
       - name: Upload Build
@@ -143,7 +144,7 @@ jobs:
 
       # 10. Itch.io 업로드 (사용 가능한 파라미터로 수정)
       - name: Push to Itch.io
-        uses: manleyjls/butler-publish@v5.1.0
+        uses: Ayfel/butler-publish@v1.0.3
         with:
           butler_key: ${{ secrets.BUTLER_CREDENTIALS }}
           package: build/WebGL/WebGL
