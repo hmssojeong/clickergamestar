@@ -152,23 +152,14 @@ jobs:
               ]
             }
 
-      # 10. Itch.io 업로드 (사용 가능한 파라미터로 수정)
-      - name: Install Butler
+      # 10. Itch.io 업로드 (GitHub Action 사용)
+      - name: Deploy to Itch.io
         if: success()
-        run: |
-          curl -L -o butler.zip https://broth.itch.ovh/butler/linux-amd64/LATEST/archive/default
-          unzip butler.zip
-          chmod +x butler
-          ./butler -V
-
-      - name: Login to Butler
-        if: success()
+        uses: manleydev/butler-publish-itchio-action@master
         env:
-          BUTLER_API_KEY: ${{ secrets.BUTLER_CREDENTIALS }}
-        run: |
-          ./butler login
-
-      - name: Push to Itch.io
-        if: success()
-        run: |
-          ./butler push build/WebGL/WebGL hamsso/fruittree:web --userversion ${{ github.run_number }}
+          BUTLER_CREDENTIALS: ${{ secrets.BUTLER_CREDENTIALS }}
+          CHANNEL: web
+          ITCH_GAME: fruittree
+          ITCH_USER: hamsso
+          PACKAGE: build/WebGL/WebGL
+          VERSION: ${{ github.run_number }}
