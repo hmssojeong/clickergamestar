@@ -12,7 +12,7 @@ public class WebGetWeatherTest : MonoBehaviour
         float lon = 127.1060049f;
 
         string url =
-            $"https://api.openweathermap.org/data/2.5/onecall?lat={{lat}}&lon={{lon}}&appid={{API key}}";
+            $"https://api.openweathermap.org/data/3.0/onecall?lat={{lat}}&lon={{lon}}&appid={{API key}}";
 
         Debug.Log(url);
 
