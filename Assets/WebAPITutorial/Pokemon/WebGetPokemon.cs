@@ -18,24 +18,39 @@ public class WebGetPokemon : MonoBehaviour
         _httpClient = new HttpClient();
     }
 
-    public async Task<List<Pokemon>> FetchPokemonDataAsync(int pageNumber)
+public async Task<List<Pokemon>> FetchPokemonDataAsync(int pageNumber)
     {
         try
         {
             int pageSize = 20;
             int start = (pageNumber - 1) * pageSize + 1;
-
             int end = Mathf.Min(pageNumber * pageSize, 151);
             int count = end - start + 1;
             if (count <= 0) return new List<Pokemon>();
 
-            var tasks = Enumerable.Range(start, count).Select(async id =>
+            // 포켓몬 기본 데이터 가져오기
+            var pokemonTasks = Enumerable.Range(start, count).Select(async id =>
             {
                 string json = await _httpClient.GetStringAsync($"{_pokemonUrl}{id}");
                 return JsonConvert.DeserializeObject<Pokemon>(json);
             });
+            Pokemon[] results = await Task.WhenAll(pokemonTasks);
 
-            Pokemon[] results = await Task.WhenAll(tasks);
+            // species(한국어 이름) 병렬로 가져오기
+            var speciesTasks = results.Select(async p =>
+            {
+                try
+                {
+                    string json = await _httpClient.GetStringAsync($"{_speciesUrl}{p.Id}");
+                    var species = JsonConvert.DeserializeObject<PokemonSpecies>(json);
+                    string koName = species?.GetLocalizedName("ko");
+                    if (!string.IsNullOrEmpty(koName))
+                        p.KoreanName = koName;
+                }
+                catch { }
+            });
+            await Task.WhenAll(speciesTasks);
+
             return results.OrderBy(p => p.Id).ToList();
         }
         catch (Exception e)

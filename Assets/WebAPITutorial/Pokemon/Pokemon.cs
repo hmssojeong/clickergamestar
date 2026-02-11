@@ -6,6 +6,7 @@ public class Pokemon
 {
     public int Id { get; set; }
     public string Name { get; set; }
+    public string KoreanName { get; set; }  // species API에서 채워짐
     public int Height { get; set; }
     public int Weight { get; set; }
     public Sprites sprites { get; set; }
@@ -79,8 +80,17 @@ public class Pokemon
 }
 
 // 포켓몬 종 데이터 (/pokemon-species/{id}) — 설명 텍스트 포함
+public class NameEntry
+{
+    public string Name { get; set; }
+    public NamedResource Language { get; set; }
+}
+
 public class PokemonSpecies
 {
+    [JsonProperty("names")]
+    public List<NameEntry> Names { get; set; }
+
     [JsonProperty("flavor_text_entries")]
     public List<FlavorTextEntry> FlavorTextEntries { get; set; }
 
@@ -97,6 +107,17 @@ public class PokemonSpecies
                     .Replace("\f", " ")
                     .Replace("\r", " ");
             }
+        }
+        return "";
+    }
+
+    public string GetLocalizedName(string lang = "ko")
+    {
+        if (Names == null) return "";
+        foreach (var entry in Names)
+        {
+            if (entry.Language?.Name == lang)
+                return entry.Name;
         }
         return "";
     }

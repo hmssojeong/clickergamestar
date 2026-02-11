@@ -92,7 +92,9 @@ private async void Start()
             }
             else
             {
-                bool match = _allPokemon[i].Name.ToLower().Contains(searchTerm) || _allPokemon[i].Id.ToString().Contains(searchTerm);
+                bool match = _allPokemon[i].Name.ToLower().Contains(searchTerm)
+                    || _allPokemon[i].Id.ToString().Contains(searchTerm)
+                    || (!string.IsNullOrEmpty(_allPokemon[i].KoreanName) && _allPokemon[i].KoreanName.Contains(searchTerm));
                 _pokemonCards[i].SetActive(match);
             }
         }
@@ -154,8 +156,9 @@ private async void Start()
         {
             var nameTMP = nameText.GetComponent<TMP_Text>();
             if (nameTMP != null)
-            { 
-                nameTMP.text = data.Name;
+            {
+                // 한국어 이름이 있으면 한국어, 없으면 영어
+                nameTMP.text = !string.IsNullOrEmpty(data.KoreanName) ? data.KoreanName : data.Name;
             }
         }
 
@@ -169,6 +172,15 @@ private async void Start()
                 {
                     pokemonTexture.filterMode = FilterMode.Point;
                     rawImage.texture = pokemonTexture;
+
+                    // 이미지 비율 유지
+                    AspectRatioFitter fitter = pokemonImage.GetComponent<AspectRatioFitter>();
+                    if (fitter == null)
+                    {
+                        fitter = pokemonImage.gameObject.AddComponent<AspectRatioFitter>();
+                    }
+                    fitter.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
+                    fitter.aspectRatio = (float)pokemonTexture.width / pokemonTexture.height;
                 }
             }
         }

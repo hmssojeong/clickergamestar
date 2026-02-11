@@ -144,7 +144,7 @@ public class UI_PokemonDetail : MonoBehaviour
     {
         if (_nameText != null)
         {
-            _nameText.text = pokemon.Name;
+            _nameText.text = !string.IsNullOrEmpty(pokemon.KoreanName) ? pokemon.KoreanName : pokemon.Name;
         }
 
         if (_heightValueText != null)
