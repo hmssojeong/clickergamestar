@@ -22,6 +22,14 @@ public class UI_Pokemon : MonoBehaviour
     [SerializeField] private TMP_InputField _searchInput;
     [SerializeField] private Button _searchButton;
 
+    [Header("Pagination")]
+    [SerializeField] private Button _prevButton;
+    [SerializeField] private Button _nextButton;
+    [SerializeField] private TMP_Text _pageText;
+
+    private int _currentPage = 1;
+    private const int TOTAL_PAGES = 8;
+
     private HttpClient _imageClient = new HttpClient();
     private List<Pokemon> _allPokemon = new List<Pokemon>();
     private List<GameObject> _pokemonCards = new List<GameObject>();
@@ -59,12 +67,10 @@ private async void Start()
             _searchInput.onSubmit.AddListener((_) => OnSearchClicked());
         }
 
-        _allPokemon = await _pokemonDownloader.FetchPokemonDataAsync(1);
+        if (_prevButton != null) _prevButton.onClick.AddListener(OnPrevPage);
+        if (_nextButton != null) _nextButton.onClick.AddListener(OnNextPage);
 
-        foreach (var pokemon in _allPokemon)
-        {
-            await CreatePokemonUI(pokemon);
-        }
+        await LoadPage(1);
     }
 
     private void OnSearchClicked()
@@ -203,4 +209,24 @@ private async void Start()
             return null;
         }
     }
+
+
+private async Task LoadPage(int page)
+    {
+        _currentPage = page;
+        foreach (var card in _pokemonCards)
+            if (card != null) Destroy(card);
+        _pokemonCards.Clear();
+        _allPokemon.Clear();
+        if (_searchInput != null) _searchInput.text = "";
+        if (_pageText != null) _pageText.text = $"{_currentPage} / {TOTAL_PAGES}";
+        if (_prevButton != null) _prevButton.interactable = _currentPage > 1;
+        if (_nextButton != null) _nextButton.interactable = _currentPage < TOTAL_PAGES;
+        _allPokemon = await _pokemonDownloader.FetchPokemonDataAsync(_currentPage);
+        foreach (var pokemon in _allPokemon)
+            await CreatePokemonUI(pokemon);
+    }
+
+    private async void OnPrevPage() { if (_currentPage > 1) await LoadPage(_currentPage - 1); }
+    private async void OnNextPage() { if (_currentPage < TOTAL_PAGES) await LoadPage(_currentPage + 1); }
 }
