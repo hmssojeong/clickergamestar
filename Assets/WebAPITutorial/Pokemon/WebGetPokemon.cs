@@ -9,7 +9,9 @@ using Newtonsoft.Json;
 public class WebGetPokemon : MonoBehaviour
 {
     private readonly HttpClient _httpClient;
-    private const string _url = "https://pokeapi.co/api/v2/pokemon/";
+    private const string _pokemonUrl = "https://pokeapi.co/api/v2/pokemon/";
+    private const string _speciesUrl = "https://pokeapi.co/api/v2/pokemon-species/";
+    private const string _typeUrl = "https://pokeapi.co/api/v2/type/";
 
     public WebGetPokemon()
     {
@@ -29,7 +31,7 @@ public class WebGetPokemon : MonoBehaviour
 
             var tasks = Enumerable.Range(start, count).Select(async id =>
             {
-                string json = await _httpClient.GetStringAsync($"{_url}{id}");
+                string json = await _httpClient.GetStringAsync($"{_pokemonUrl}{id}");
                 return JsonConvert.DeserializeObject<Pokemon>(json);
             });
 
@@ -61,7 +63,7 @@ public class WebGetPokemon : MonoBehaviour
     {
         try
         {
-            string json = await _httpClient.GetStringAsync($"{_url}{nameOrId.ToLower()}");
+            string json = await _httpClient.GetStringAsync($"{_pokemonUrl}{nameOrId.ToLower()}");
             return JsonConvert.DeserializeObject<Pokemon>(json);
         }
         catch (Exception e)
@@ -70,38 +72,32 @@ public class WebGetPokemon : MonoBehaviour
             return null;
         }
     }
-}
 
-public class Pokemon
-{
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public Sprites sprites { get; set; }
-    public List<TypeSlot> Types { get; set; }
-
-    public string PrimaryType
+    public async Task<PokemonSpecies> FetchPokemonSpeciesAsync(int id)
     {
-        get
+        try
         {
-            if (Types != null && Types.Count > 0)
-                return Types[0].type.Name;
-            return "normal";
+            string json = await _httpClient.GetStringAsync($"{_speciesUrl}{id}");
+            return JsonConvert.DeserializeObject<PokemonSpecies>(json);
+        }
+        catch (Exception e)
+        {
+            Debug.Log(e.Message);
+            return null;
         }
     }
 
-    public class Sprites
+    public async Task<PokemonTypeData> FetchTypeDamageAsync(string typeName)
     {
-        public string Front_Default { get; set; }
-    }
-
-    public class TypeSlot
-    {
-        public int Slot { get; set; }
-        public TypeInfo type { get; set; }
-    }
-
-    public class TypeInfo
-    {
-        public string Name { get; set; }
+        try
+        {
+            string json = await _httpClient.GetStringAsync($"{_typeUrl}{typeName.ToLower()}");
+            return JsonConvert.DeserializeObject<PokemonTypeData>(json);
+        }
+        catch (Exception e)
+        {
+            Debug.Log(e.Message);
+            return null;
+        }
     }
 }

@@ -12,6 +12,7 @@ public class UI_Pokemon : MonoBehaviour
 {
     [Header("Scripts")]
     [SerializeField] private WebGetPokemon _pokemonDownloader;
+    [SerializeField] private UI_PokemonDetail _pokemonDetailUI;
 
     [Header("UI")]
     [SerializeField] private Transform _contentParent;
@@ -97,10 +98,25 @@ private async void Start()
         }
     }
 
+    private void OnPokemonCardClicked(Pokemon pokemon)
+    {
+        if (_pokemonDetailUI != null)
+        {
+            _pokemonDetailUI.ShowDetail(pokemon);
+        }
+    }
+
     private async Task CreatePokemonUI(Pokemon data)
     {
         var go = Instantiate(_pokemonUIPrefab, _contentParent);
         _pokemonCards.Add(go);
+
+        Button cardButton = go.GetComponent<Button>();
+        if(cardButton != null)
+        {
+            Pokemon captured = data;
+            cardButton.onClick.AddListener(() => OnPokemonCardClicked(captured));
+        }
 
         Transform headerRow = go.transform.Find("HeaderRow");
         Transform badge = headerRow?.Find("NumberBadge");
