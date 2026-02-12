@@ -32,6 +32,18 @@
       "dependencies": {},
       "hash": "bf312d493712889933ad7394671a009d58a7ca39"
     },
+    "com.openai.unity": {
+      "version": "https://github.com/RageAgainstThePixel/com.openai.unity.git#upm",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.utilities.audio": "3.0.3",
+        "com.utilities.encoder.wav": "3.0.2",
+        "com.utilities.rest": "5.1.1",
+        "com.utilities.websockets": "2.0.0"
+      },
+      "hash": "d098333fb6f7e443d67d409caa0de8bd1efc0e6f"
+    },
     "com.unity.2d.animation": {
       "version": "13.0.4",
       "depth": 0,
@@ -42,6 +54,19 @@
         "com.unity.collections": "2.4.3",
         "com.unity.modules.animation": "1.0.0",
         "com.unity.modules.uielements": "1.0.0"
+      },
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.2d.aseprite": {
+      "version": "3.0.1",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.2d.common": "12.0.1",
+        "com.unity.2d.sprite": "1.0.0",
+        "com.unity.2d.tilemap": "1.0.0",
+        "com.unity.mathematics": "1.2.6",
+        "com.unity.modules.animation": "1.0.0"
       },
       "url": "https://packages.unity.com"
     },
@@ -60,11 +85,42 @@
       },
       "url": "https://packages.unity.com"
     },
+    "com.unity.2d.pixel-perfect": {
+      "version": "5.1.1",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.modules.imgui": "1.0.0"
+      },
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.2d.psdimporter": {
+      "version": "12.0.1",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.2d.common": "12.0.1",
+        "com.unity.2d.sprite": "1.0.0",
+        "com.unity.2d.tilemap": "1.0.0"
+      },
+      "url": "https://packages.unity.com"
+    },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 0,
       "source": "builtin",
       "dependencies": {}
+    },
+    "com.unity.2d.spriteshape": {
+      "version": "13.0.0",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.2d.common": "12.0.0",
+        "com.unity.mathematics": "1.1.0",
+        "com.unity.modules.physics2d": "1.0.0"
+      },
+      "url": "https://packages.unity.com"
     },
     "com.unity.2d.tilemap": {
       "version": "1.0.0",
@@ -74,6 +130,17 @@
         "com.unity.modules.tilemap": "1.0.0",
         "com.unity.modules.uielements": "1.0.0"
       }
+    },
+    "com.unity.2d.tilemap.extras": {
+      "version": "6.0.1",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.2d.tilemap": "1.0.0",
+        "com.unity.modules.tilemap": "1.0.0",
+        "com.unity.modules.jsonserialize": "1.0.0"
+      },
+      "url": "https://packages.unity.com"
     },
     "com.unity.2d.tooling": {
       "version": "1.0.2",
@@ -115,11 +182,34 @@
       },
       "url": "https://packages.unity.com"
     },
+    "com.unity.editorcoroutines": {
+      "version": "1.0.1",
+      "depth": 3,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
     "com.unity.ext.nunit": {
       "version": "2.0.5",
       "depth": 1,
       "source": "builtin",
       "dependencies": {}
+    },
+    "com.unity.feature.2d": {
+      "version": "2.0.2",
+      "depth": 0,
+      "source": "builtin",
+      "dependencies": {
+        "com.unity.2d.animation": "13.0.4",
+        "com.unity.2d.pixel-perfect": "5.1.1",
+        "com.unity.2d.psdimporter": "12.0.1",
+        "com.unity.2d.sprite": "1.0.0",
+        "com.unity.2d.spriteshape": "13.0.0",
+        "com.unity.2d.tilemap": "1.0.0",
+        "com.unity.2d.tilemap.extras": "6.0.1",
+        "com.unity.2d.aseprite": "3.0.1",
+        "com.unity.2d.tooling": "1.0.2"
+      }
     },
     "com.unity.ide.rider": {
       "version": "3.0.39",
@@ -139,6 +229,13 @@
       },
       "url": "https://packages.unity.com"
     },
+    "com.unity.ide.vscode": {
+      "version": "1.2.3",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
     "com.unity.inputsystem": {
       "version": "1.17.0",
       "depth": 0,
@@ -150,7 +247,7 @@
     },
     "com.unity.mathematics": {
       "version": "1.3.3",
-      "depth": 2,
+      "depth": 1,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
@@ -275,6 +372,77 @@
         "com.unity.modules.jsonserialize": "1.0.0"
       },
       "url": "https://packages.unity.com"
+    },
+    "com.utilities.async": {
+      "version": "3.0.2",
+      "depth": 2,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.editorcoroutines": "1.0.0",
+        "com.unity.test-framework": "1.4.2",
+        "com.unity.nuget.mono-cecil": "1.11.5"
+      },
+      "url": "https://package.openupm.com"
+    },
+    "com.utilities.audio": {
+      "version": "3.0.3",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.collections": "1.2.4",
+        "com.unity.modules.androidjni": "1.0.0",
+        "com.unity.modules.audio": "1.0.0",
+        "com.unity.modules.unitywebrequestaudio": "1.0.0",
+        "com.utilities.async": "3.0.2",
+        "com.utilities.extensions": "1.3.8"
+      },
+      "url": "https://package.openupm.com"
+    },
+    "com.utilities.encoder.wav": {
+      "version": "3.0.2",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.utilities.audio": "3.0.1"
+      },
+      "url": "https://package.openupm.com"
+    },
+    "com.utilities.extensions": {
+      "version": "1.3.8",
+      "depth": 2,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.modules.physics": "1.0.0"
+      },
+      "url": "https://package.openupm.com"
+    },
+    "com.utilities.rest": {
+      "version": "5.1.1",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.utilities.async": "3.0.2",
+        "com.utilities.extensions": "1.3.8",
+        "com.unity.modules.unitywebrequest": "1.0.0",
+        "com.unity.modules.unitywebrequestassetbundle": "1.0.0",
+        "com.unity.modules.unitywebrequestaudio": "1.0.0",
+        "com.unity.modules.unitywebrequesttexture": "1.0.0",
+        "com.unity.modules.unitywebrequestwww": "1.0.0",
+        "com.unity.nuget.newtonsoft-json": "3.2.1"
+      },
+      "url": "https://package.openupm.com"
+    },
+    "com.utilities.websockets": {
+      "version": "2.0.0",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.utilities.async": "3.0.2",
+        "com.utilities.extensions": "1.3.6",
+        "com.unity.collections": "1.2.4",
+        "com.unity.nuget.newtonsoft-json": "3.2.1"
+      },
+      "url": "https://package.openupm.com"
     },
     "com.unity.modules.accessibility": {
       "version": "1.0.0",

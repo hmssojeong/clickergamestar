@@ -4,13 +4,19 @@
     "com.coplaydev.unity-mcp": "https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity#main",
     "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",
     "com.joshclose.csvhelper": "https://github.com/bilal-arikan/CsvHelper-For-Unity.git?path=/src/CsvHelper",
+    "com.openai.unity": "https://github.com/RageAgainstThePixel/com.openai.unity.git#upm",
     "com.unity.2d.animation": "13.0.4",
+    "com.unity.2d.pixel-perfect": "5.1.1",
+    "com.unity.2d.psdimporter": "12.0.1",
     "com.unity.2d.sprite": "1.0.0",
+    "com.unity.2d.spriteshape": "13.0.0",
     "com.unity.2d.tilemap": "1.0.0",
     "com.unity.2d.tooling": "1.0.2",
     "com.unity.collab-proxy": "2.10.2",
+    "com.unity.feature.2d": "2.0.2",
     "com.unity.ide.rider": "3.0.39",
     "com.unity.ide.visualstudio": "2.0.25",
+    "com.unity.ide.vscode": "1.2.3",
     "com.unity.inputsystem": "1.17.0",
     "com.unity.multiplayer.center": "1.0.1",
     "com.unity.nuget.newtonsoft-json": "3.2.2",
@@ -53,5 +59,15 @@
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
     "com.unity.modules.xr": "1.0.0"
-  }
+  },
+  "scopedRegistries": [
+    {
+      "name": "OpenUPM",
+      "url": "https://package.openupm.com",
+      "scopes": [
+        "com.openai",
+        "com.utilities"
+      ]
+    }
+  ]
 }
