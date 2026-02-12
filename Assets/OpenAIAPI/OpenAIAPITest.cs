@@ -19,19 +19,36 @@ public class OpenAIAPITest : MonoBehaviour
     // - gitignore를 이용한 방식
     // - 깃허브 시크릿 파일을 이용한 방식
 
-    private async void Start()
+
+    private void Start()
     {
+        // 버튼 클릭 이벤트
+        _sendButton.onClick.AddListener(Send);
+    }
+
+    private async void Send()
+    {
+        // 프롬프트(AI에게 요청하는 내용을 담은 텍스트)를 읽어온다.
+        string prompt = _promptTextField.text;
+        if (string.IsNullOrEmpty(prompt))
+        {
+            return;
+        }
+
+        // 0. 버튼을 잠근다.
+        _sendButton.interactable = false;
+
         // 1. ChatGPT 사이트에 API_KEY로 로그인한다.
         var api = new OpenAIClient(_config.OpenAIKey);
 
         // 2. 프롬프트를 작성한다.
         var messages = new List<Message>
         {
-            new Message(Role.User, "너는 누구니?"),
+            new Message(Role.User, prompt),
         };
 
         // 3. 모델을 선택하고, 요청을 보낸다. (전송 버튼을 누른다.)
-        var chatRequest = new ChatRequest(messages, Model.GPT4oMini);
+        var chatRequest = new ChatRequest(messages, Model.GPT4oMini, temperature: 0);
 
         // 4. 답변을 비동기로 받는다.
         var response = await api.ChatEndpoint.GetCompletionAsync(chatRequest);
@@ -41,6 +58,9 @@ public class OpenAIAPITest : MonoBehaviour
 
         // 결과값을 UI에 출력한다.
         _resultTextUI.text = choice.Message;
-    }
 
+        // 초기화
+        _promptTextField.text = string.Empty;
+        _sendButton.interactable = true;
+    }
 }
