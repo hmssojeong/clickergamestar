@@ -3,9 +3,6 @@ name: Unity WebGL Build & Deploy
 on:
   push:
     branches: [ web-build ]
-  # 매일 아침 9시(한국 시간) 실행 스케줄 추가
-  schedule:
-    - cron: '0 0 * * *'
   # 수동으로도 실행할 수 있도록 버튼 추가 (테스트용)
   workflow_dispatch:
 
