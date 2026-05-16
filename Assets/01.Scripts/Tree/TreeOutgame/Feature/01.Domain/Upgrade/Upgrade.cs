@@ -11,7 +11,7 @@ public class Upgrade : IReadonlyUpgrade
     public string Name => _specData.Name;
     public string Description => _specData.Description;
     public Currency Cost => _specData.CalculateCost(Level);
-    public double Damage => _specData.CalculateDamage(Level);
+    public int Damage => _specData.CalculateDamage(Level);
     public bool IsMaxLevel => Level >= _specData.MaxLevel;
     public Sprite Icon => _specData.Icon;
 

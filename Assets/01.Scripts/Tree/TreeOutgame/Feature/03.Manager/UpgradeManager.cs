@@ -187,7 +187,7 @@ private void InitializeRepository()
                 break;
 
             case EUpgradeType.FeverMaster:
-                // FeverSystem은 초기화 시점에 설정
+                GameplayManager.Instance.SetFeverMultiplier(upgrade.Damage);
                 break;
 
             case EUpgradeType.SuperCritical:
@@ -200,7 +200,7 @@ private void InitializeRepository()
         }
     }
 
-    public double GetUpgradeValue(EUpgradeType type)
+    public int GetUpgradeValue(EUpgradeType type)
     {
         var upgrade = Get(type);
         return upgrade != null ? upgrade.Damage : 0;

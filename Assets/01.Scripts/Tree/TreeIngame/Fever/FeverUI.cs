@@ -1,107 +1,173 @@
+using DG.Tweening;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using DG.Tweening;
 
 public class FeverUI : MonoBehaviour
 {
     [Header("Fever Gauge UI")]
-    [SerializeField] private Slider _feverGaugeSlider; // 피버 게이지 슬라이더
-    [SerializeField] private Image _gaugeFillImage; // 게이지 채우기 이미지
-    [SerializeField] private TextMeshProUGUI _gaugeText; // "50 / 75" 형식
-    [SerializeField] private Gradient _gaugeColorGradient; // 게이지 색상 그라데이션
+    [SerializeField] private Slider _feverGaugeSlider;
+    [SerializeField] private Image _gaugeFillImage;
+    [SerializeField] private TextMeshProUGUI _gaugeText;
+    [SerializeField] private Gradient _gaugeColorGradient;
 
     [Header("Fever Timer UI")]
-    [SerializeField] private GameObject _feverTimerPanel; // 피버 타이머 패널
-    [SerializeField] private Slider _feverTimerSlider; // 피버 남은 시간 슬라이더
-    [SerializeField] private TextMeshProUGUI _feverTimerText; // "12.5s" 형식
+    [SerializeField] private GameObject _feverTimerPanel;
+    [SerializeField] private Slider _feverTimerSlider;
+    [SerializeField] private TextMeshProUGUI _feverTimerText;
 
     [Header("Fever Effect UI")]
-    [SerializeField] private GameObject _feverEffectPanel; // "FEVER TIME!" 텍스트 패널
+    [SerializeField] private GameObject _feverEffectPanel;
     [SerializeField] private TextMeshProUGUI _feverEffectText;
-    [SerializeField] private Image _screenOverlay; // 화면 전체 오버레이
-    [SerializeField] private Color _feverOverlayColor = new Color(1f, 0.5f, 0f, 0.2f); // 주황색
+    [SerializeField] private Image _screenOverlay;
+    [SerializeField] private Color _feverOverlayColor = new Color(1f, 0.5f, 0f, 0.2f);
 
     [Header("Animation Settings")]
     [SerializeField] private float _gaugePulseScale = 1.1f;
     [SerializeField] private float _gaugePulseDuration = 0.3f;
 
     [Header("Sky Background Settings")]
-    [SerializeField] private SpriteRenderer _skyUp;  
-    [SerializeField] private SpriteRenderer _skyBottom; 
+    [SerializeField] private SpriteRenderer _skyUp;
+    [SerializeField] private SpriteRenderer _skyBottom;
     [SerializeField] private Color _feverSkyColor = new Color32(0x54, 0x59, 0x7B, 0xFF);
-    [SerializeField] private float _colorTransitionDuration = 0.5f; // 색 변화 시간
+    [SerializeField] private float _colorTransitionDuration = 0.5f;
 
     [Header("Rain Particle Settings")]
     [SerializeField] private ParticleSystem _rainFallParticle;
     [SerializeField] private ParticleSystem _rainMistParticle;
+    [SerializeField] private GameObject _fallingLeavesObject;
     [SerializeField] private float _fadeDuration = 0.5f;
 
     [Header("Sound Settings")]
     [SerializeField] private AudioSource _feverAudioSource;
     [SerializeField] private AudioClip _feverBGMClip;
     [SerializeField] private AudioClip _feverStartClip;
-
     [SerializeField] private float _soundFadeDuration = 0.5f;
 
+    private GameplayManager _gameplayManager;
+
     private void Start()
+    {
+        InitializeVisualState();
+        SubscribeToGameplayManager();
+        SyncFromGameplayState();
+    }
+
+    private void OnDestroy()
+    {
+        UnsubscribeFromGameplayManager();
+    }
+
+    private void InitializeVisualState()
     {
         if (_rainFallParticle != null)
         {
             _rainFallParticle.Stop();
             SetParticleAlpha(_rainFallParticle, 0f);
         }
+
         if (_rainMistParticle != null)
         {
             _rainMistParticle.Stop();
             SetParticleAlpha(_rainMistParticle, 0f);
         }
 
-        if (FeverManager.Instance != null)
+        if (_feverTimerPanel != null)
         {
-            // 이벤트 구독
-            FeverManager.Instance.OnClickCountChanged.AddListener(UpdateFeverGauge);
-            FeverManager.Instance.OnFeverStart.AddListener(OnFeverStart);
-            FeverManager.Instance.OnFeverEnd.AddListener(OnFeverEnd);
-            FeverManager.Instance.OnFeverTimeChanged.AddListener(UpdateFeverTimer);
+            _feverTimerPanel.SetActive(false);
         }
 
-        // 초기 상태 설정
-        if (_feverTimerPanel != null)
-            _feverTimerPanel.SetActive(false);
-
         if (_feverEffectPanel != null)
+        {
             _feverEffectPanel.SetActive(false);
+        }
 
         if (_screenOverlay != null)
         {
-            _screenOverlay.color = new Color(1, 1, 1, 0); // 투명
+            _screenOverlay.color = new Color(1f, 1f, 1f, 0f);
+        }
+
+        if (_fallingLeavesObject != null)
+        {
+            _fallingLeavesObject.SetActive(false);
         }
     }
 
-    // 피버 게이지 업데이트
+    private void SubscribeToGameplayManager()
+    {
+        _gameplayManager = GameplayManager.Instance;
+        if (_gameplayManager == null)
+        {
+            return;
+        }
+
+        _gameplayManager.OnFeverClickCountChanged += UpdateFeverGauge;
+        _gameplayManager.OnFeverStarted += OnFeverStart;
+        _gameplayManager.OnFeverEnded += OnFeverEnd;
+        _gameplayManager.OnFeverTimeChanged += UpdateFeverTimer;
+    }
+
+    private void UnsubscribeFromGameplayManager()
+    {
+        if (_gameplayManager == null)
+        {
+            return;
+        }
+
+        _gameplayManager.OnFeverClickCountChanged -= UpdateFeverGauge;
+        _gameplayManager.OnFeverStarted -= OnFeverStart;
+        _gameplayManager.OnFeverEnded -= OnFeverEnd;
+        _gameplayManager.OnFeverTimeChanged -= UpdateFeverTimer;
+    }
+
+    private void SyncFromGameplayState()
+    {
+        if (_gameplayManager == null)
+        {
+            return;
+        }
+
+        UpdateFeverGauge(
+            _gameplayManager.GetFeverClickCount(),
+            _gameplayManager.GetFeverClickThreshold());
+
+        if (_gameplayManager.IsFeverActive())
+        {
+            if (_feverTimerPanel != null)
+            {
+                _feverTimerPanel.SetActive(true);
+                _feverTimerPanel.transform.localScale = Vector3.one;
+            }
+
+            UpdateFeverTimer(_gameplayManager.GetFeverTimeRemaining());
+            if (_gaugeText != null)
+            {
+                _gaugeText.text = "FEVER";
+            }
+        }
+        else
+        {
+            ResetGaugeDisplay();
+        }
+    }
+
     private void UpdateFeverGauge(int currentClicks, int maxClicks)
     {
         if (_feverGaugeSlider != null)
         {
-            float progress = (float)currentClicks / maxClicks;
+            float progress = maxClicks <= 0 ? 0f : (float)currentClicks / maxClicks;
             _feverGaugeSlider.value = progress;
 
-            // 게이지 색상 변경
-            if (_gaugeFillImage != null && _gaugeColorGradient != null)
+            if (_gaugeFillImage != null)
             {
                 _gaugeFillImage.color = _gaugeColorGradient.Evaluate(progress);
             }
 
-            // 게이지 텍스트 업데이트
-            if (_gaugeText != null)
+            if (_gaugeText != null && (_gameplayManager == null || !_gameplayManager.IsFeverActive()))
             {
-                string current = currentClicks.ToString();
-                string max = maxClicks.ToString();
-                _gaugeText.text = $"수동 클릭: {current} / {max}";
+                _gaugeText.text = $"수동 클릭: {currentClicks} / {maxClicks}";
             }
 
-            // 게이지 꽉 차면 펄스 애니메이션
             if (progress >= 1f)
             {
                 AnimateGaugeFull();
@@ -109,28 +175,26 @@ public class FeverUI : MonoBehaviour
         }
     }
 
-    // 게이지 꽉 찼을 때 애니메이션
     private void AnimateGaugeFull()
     {
-        if (_feverGaugeSlider != null)
+        if (_feverGaugeSlider == null)
         {
-            _feverGaugeSlider.transform.DOKill();
-            _feverGaugeSlider.transform.DOPunchScale(
-                Vector3.one * (_gaugePulseScale - 1f),
-                _gaugePulseDuration,
-                5,
-                0.5f
-            );
+            return;
         }
+
+        _feverGaugeSlider.transform.DOKill();
+        _feverGaugeSlider.transform.DOPunchScale(
+            Vector3.one * (_gaugePulseScale - 1f),
+            _gaugePulseDuration,
+            5,
+            0.5f);
     }
 
-    // 피버 타이머 업데이트
     private void UpdateFeverTimer(float remainingTime)
     {
-        if (_feverTimerSlider != null && FeverManager.Instance != null)
+        if (_feverTimerSlider != null && _gameplayManager != null)
         {
-            float progress = FeverManager.Instance.GetFeverTimeProgress();
-            _feverTimerSlider.value = progress;
+            _feverTimerSlider.value = _gameplayManager.GetFeverTimeProgress();
         }
 
         if (_feverTimerText != null)
@@ -139,7 +203,6 @@ public class FeverUI : MonoBehaviour
         }
     }
 
-    // 피버 시작 시 호출
     private void OnFeverStart()
     {
         if (_feverAudioSource != null && _feverStartClip != null)
@@ -147,14 +210,18 @@ public class FeverUI : MonoBehaviour
             _feverAudioSource.PlayOneShot(_feverStartClip);
         }
 
-        // BGM 재생 및 페이드 인
         if (_feverAudioSource != null && _feverBGMClip != null)
         {
             _feverAudioSource.clip = _feverBGMClip;
-            _feverAudioSource.loop = true;         
-            _feverAudioSource.volume = 0;
+            _feverAudioSource.loop = true;
+            _feverAudioSource.volume = 0f;
             _feverAudioSource.Play();
             _feverAudioSource.DOFade(1f, _soundFadeDuration);
+        }
+
+        if (_feverGaugeSlider != null)
+        {
+            _feverGaugeSlider.value = 1f;
         }
 
         if (_gaugeText != null)
@@ -163,7 +230,6 @@ public class FeverUI : MonoBehaviour
             _gaugeText.transform.DOShakePosition(0.5f, 5f);
         }
 
-        // 타이머 패널 표시
         if (_feverTimerPanel != null)
         {
             _feverTimerPanel.SetActive(true);
@@ -171,22 +237,25 @@ public class FeverUI : MonoBehaviour
             _feverTimerPanel.transform.DOScale(Vector3.one, 0.3f).SetEase(Ease.OutBack);
         }
 
-        // "FEVER TIME!" 텍스트 표시
         if (_feverEffectPanel != null)
         {
             _feverEffectPanel.SetActive(true);
-            _feverEffectText.DOFade(0f, 2f).From(1f);
-            _feverEffectPanel.transform.DOScale(1.5f, 2f).From(0.5f).SetEase(Ease.OutQuad);
 
-            // 2초 후 페이드 아웃
+            if (_feverEffectText != null)
+            {
+                _feverEffectText.DOFade(0f, 2f).From(1f);
+            }
+
+            _feverEffectPanel.transform.DOScale(1.5f, 2f).From(0.5f).SetEase(Ease.OutQuad);
             DOVirtual.DelayedCall(2f, () =>
             {
                 if (_feverEffectPanel != null)
+                {
                     _feverEffectPanel.SetActive(false);
+                }
             });
         }
 
-        // 화면 오버레이 페이드 인
         if (_screenOverlay != null)
         {
             _screenOverlay.DOColor(_feverOverlayColor, 0.5f);
@@ -196,6 +265,7 @@ public class FeverUI : MonoBehaviour
         {
             _skyUp.DOColor(_feverSkyColor, _colorTransitionDuration);
         }
+
         if (_skyBottom != null)
         {
             _skyBottom.DOColor(_feverSkyColor, _colorTransitionDuration);
@@ -206,31 +276,32 @@ public class FeverUI : MonoBehaviour
             _rainFallParticle.Play();
             FadeParticle(_rainFallParticle, 1f);
         }
+
         if (_rainMistParticle != null)
         {
             _rainMistParticle.Play();
             FadeParticle(_rainMistParticle, 1f);
         }
+
+        if (_fallingLeavesObject != null)
+        {
+            _fallingLeavesObject.SetActive(true);
+        }
     }
 
-    // 피버 종료 시 호출
     private void OnFeverEnd()
     {
         if (_feverAudioSource != null)
         {
-            _feverAudioSource.DOFade(0f, _soundFadeDuration).OnComplete(() => {
+            _feverAudioSource.DOFade(0f, _soundFadeDuration).OnComplete(() =>
+            {
                 _feverAudioSource.Stop();
-                _feverAudioSource.clip = null; // 클립 제거
+                _feverAudioSource.clip = null;
             });
         }
 
-        if (_gaugeText != null && FeverManager.Instance != null)
-        {
-            // 피버가 끝나면 클릭 수가 0으로 리셋되므로 "0 / 75" 형태로 표시
-            _gaugeText.text = $"0 / {FeverManager.Instance.GetClicksNeeded()}";
-        }
+        ResetGaugeDisplay();
 
-        // 타이머 패널 숨기기
         if (_feverTimerPanel != null)
         {
             _feverTimerPanel.transform.DOScale(Vector3.zero, 0.3f)
@@ -238,16 +309,16 @@ public class FeverUI : MonoBehaviour
                 .OnComplete(() => _feverTimerPanel.SetActive(false));
         }
 
-        // 화면 오버레이 페이드 아웃
         if (_screenOverlay != null)
         {
-            _screenOverlay.DOColor(new Color(1, 1, 1, 0), 0.5f);
+            _screenOverlay.DOColor(new Color(1f, 1f, 1f, 0f), 0.5f);
         }
 
         if (_skyUp != null)
         {
             _skyUp.DOColor(Color.white, _colorTransitionDuration);
         }
+
         if (_skyBottom != null)
         {
             _skyBottom.DOColor(Color.white, _colorTransitionDuration);
@@ -255,45 +326,83 @@ public class FeverUI : MonoBehaviour
 
         FadeParticle(_rainFallParticle, 0f, true);
         FadeParticle(_rainMistParticle, 0f, true);
+
+        if (_fallingLeavesObject != null)
+        {
+            _fallingLeavesObject.SetActive(false);
+        }
     }
 
-    private void FadeParticle(ParticleSystem ps, float targetAlpha, bool stopOnComplete = false)
+    private void ResetGaugeDisplay()
     {
-        if (ps == null) return;
+        if (_gameplayManager == null)
+        {
+            return;
+        }
 
-        var main = ps.main;
+        if (_feverGaugeSlider != null)
+        {
+            _feverGaugeSlider.value = 0f;
+        }
+
+        if (_gaugeFillImage != null)
+        {
+            _gaugeFillImage.color = _gaugeColorGradient.Evaluate(0f);
+        }
+
+        if (_gaugeText != null)
+        {
+            _gaugeText.text = $"수동 클릭: 0 / {_gameplayManager.GetFeverClickThreshold()}";
+        }
+
+        if (_feverTimerSlider != null)
+        {
+            _feverTimerSlider.value = 0f;
+        }
+
+        if (_feverTimerText != null)
+        {
+            _feverTimerText.text = "0.0s";
+        }
+    }
+
+    private void FadeParticle(ParticleSystem particleSystem, float targetAlpha, bool stopOnComplete = false)
+    {
+        if (particleSystem == null)
+        {
+            return;
+        }
+
+        var main = particleSystem.main;
         Color color = main.startColor.color;
 
-        DOTween.To(() => color.a, x => {
-            color.a = x;
-            main.startColor = color;
-        }, targetAlpha, _fadeDuration).OnComplete(() => {
-            // 페이드 아웃이 완료되었고, stopOnComplete가 true라면 시스템 정지
-            if (stopOnComplete && targetAlpha <= 0f)
+        DOTween.To(
+            () => color.a,
+            alpha =>
             {
-                ps.Stop();
-            }
-        });
+                color.a = alpha;
+                main.startColor = color;
+            },
+            targetAlpha,
+            _fadeDuration).OnComplete(() =>
+            {
+                if (stopOnComplete && targetAlpha <= 0f)
+                {
+                    particleSystem.Stop();
+                }
+            });
     }
 
-    private void SetParticleAlpha(ParticleSystem ps, float alpha)
+    private void SetParticleAlpha(ParticleSystem particleSystem, float alpha)
     {
-        if (ps == null) return;
-        var main = ps.main;
+        if (particleSystem == null)
+        {
+            return;
+        }
+
+        var main = particleSystem.main;
         Color color = main.startColor.color;
         color.a = alpha;
         main.startColor = color;
-    }
-
-    private void OnDestroy()
-    {
-        // 이벤트 구독 해제
-        if (FeverManager.Instance != null)
-        {
-            FeverManager.Instance.OnClickCountChanged.RemoveListener(UpdateFeverGauge);
-            FeverManager.Instance.OnFeverStart.RemoveListener(OnFeverStart);
-            FeverManager.Instance.OnFeverEnd.RemoveListener(OnFeverEnd);
-            FeverManager.Instance.OnFeverTimeChanged.RemoveListener(UpdateFeverTimer);
-        }
     }
 }

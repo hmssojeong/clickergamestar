@@ -50,7 +50,7 @@ public class UpgradeItemUI : MonoBehaviour
 
         if (DescriptionTextUI != null)
         {
-            DescriptionTextUI.text = string.Format(upgrade.Description, upgrade.Damage);
+            DescriptionTextUI.text = string.Format(upgrade.Description, upgrade.Damage.ToString("N0"));
         }
 
         if (LevelTextUI != null)

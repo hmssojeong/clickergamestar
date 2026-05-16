@@ -23,22 +23,22 @@ MonoBehaviour:
     CostMultiplier: 1.15
     BaseDamage: 10
     DamageMultiplier: 2
-    DamageBonus: 0.1
+    DamageBonus: 0
   - Type: 1
     Name: "\uB2E4\uB78C\uC950 \uACE0\uC6A9"
-    Description: "\uCD08\uB2F9 \uACFC\uC77C {0}\uAC1C \uC218\uD655"
+    Description: "\uB2E4\uB78C\uC950 1\uD68C \uD0C0\uACA9\uB2F9 \uACFC\uC77C {0}\uAC1C \uD68D\uB4DD"
     Icon: {fileID: 21300000, guid: cd7def56218f44c49a07cc050bba2e7d, type: 3}
     MaxLevel: 15
     BaseCost: 200
     CostLinearIncrement: 100
     CostMultiplier: 1.3
-    BaseDamage: 30
-    DamageMultiplier: 10
-    DamageBonus: 0.5
+    BaseDamage: 20
+    DamageMultiplier: 8
+    DamageBonus: 0
   - Type: 2
-    Name: "\uD669\uAE08 \uC0AC\uACFC \uD589\uC6B4"
-    Description: "\uD669\uAE08\uC0AC\uACFC\uAC00 \uB5A8\uC5B4\uC9C8 \uD655\uB960\uC774
-      \uC99D\uAC00\uD569\uB2C8\uB2E4."
+    Name: "\uD06C\uB9AC\uD2F0\uCEEC \uD589\uC6B4"
+    Description: "\uD06C\uB9AC\uD2F0\uCEEC \uBC1C\uB3D9 \uD655\uB960\uC774 {0}%\uAC00
+      \uB429\uB2C8\uB2E4."
     Icon: {fileID: -5315848806884345938, guid: cc4a532fd26349643b444ac9b36a729b, type: 3}
     MaxLevel: 15
     BaseCost: 300
@@ -46,27 +46,28 @@ MonoBehaviour:
     CostMultiplier: 1.4
     BaseDamage: 5
     DamageMultiplier: 2
-    DamageBonus: 0.05
+    DamageBonus: 0
   - Type: 3
-    Name: "\uD53C\uBC84 \uD0C0\uC784 \uB9C8\uC2A4\uD130"
-    Description: "\uD53C\uBC84 \uD0C0\uC784 \uD6A8\uACFC\uB97C \uAC15\uD654\uD569\uB2C8\uB2E4."
+    Name: "\uD53C\uBC84 \uBC30\uC728 \uAC15\uD654"
+    Description: "\uD53C\uBC84 \uD0C0\uC784 \uC911 \uD68D\uB4DD \uC810\uC218\uAC00
+      {0}\uBC30\uAC00 \uB429\uB2C8\uB2E4."
     Icon: {fileID: 3349391187094723686, guid: c11cfeac0a7710549a892578d75c0290, type: 3}
     MaxLevel: 10
     BaseCost: 500
     CostLinearIncrement: 250
     CostMultiplier: 1.5
-    BaseDamage: 2.5
-    DamageMultiplier: 0.5
-    DamageBonus: 0.05
+    BaseDamage: 3
+    DamageMultiplier: 1
+    DamageBonus: 0
   - Type: 4
     Name: "\uC288\uD37C \uD06C\uB9AC\uD2F0\uCEEC"
-    Description: "\uB354 \uD070 \uC0AC\uACFC\uB97C \uC218\uD655\uD569\uB2C8\uB2E4\\n\uD074\uB9AD\uB2F9
-      \uB370\uBBF8\uC9C0 +10"
+    Description: "\uD06C\uB9AC\uD2F0\uCEEC \uB370\uBBF8\uC9C0 \uBC30\uC728\uC744
+      \uAC15\uD654\uD569\uB2C8\uB2E4."
     Icon: {fileID: 21300000, guid: bd08f2a7e90c9ea4c9e54ca6ed2465a6, type: 3}
     MaxLevel: 15
     BaseCost: 2
     CostLinearIncrement: 500
     CostMultiplier: 1.6
-    BaseDamage: 1000
-    DamageMultiplier: 0.4
-    DamageBonus: 0.02
+    BaseDamage: 2
+    DamageMultiplier: 1
+    DamageBonus: 0

@@ -766,9 +766,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77af4195dbcaeaa4983db5014644e17e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AutoClicker
-  _interval: 4
+  _targetTree: {fileID: 2790100680156790224, guid: 3052a29734d13884481e98b951bae049, type: 3}
+  _interval: 2
   _attackDistance: 0.5
   _attackSpeed: 0.1
+  _requiredSquirrelCount: 2
 --- !u!1001 &242182932
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2732,7 +2734,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3096989814660996489, guid: bb8a313e4fdbf5041825893d15a5dbad, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5239809338357576990, guid: bb8a313e4fdbf5041825893d15a5dbad, type: 3}
       propertyPath: lengthInSec
@@ -6609,7 +6611,6 @@ Transform:
   m_Children:
   - {fileID: 1886041074}
   - {fileID: 1742392474}
-  - {fileID: 2079417352}
   - {fileID: 357336830}
   - {fileID: 520989909}
   - {fileID: 492424687}
@@ -6912,6 +6913,7 @@ MonoBehaviour:
   _colorTransitionDuration: 0.5
   _rainFallParticle: {fileID: 1818889195}
   _rainMistParticle: {fileID: 2052237357}
+  _fallingLeavesObject: {fileID: 893573742}
   _fadeDuration: 0.5
   _feverAudioSource: {fileID: 1514688185}
   _feverBGMClip: {fileID: 8300000, guid: c980eda1ec9b9ff4b930005976b00f41, type: 3}
@@ -7141,9 +7143,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77af4195dbcaeaa4983db5014644e17e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AutoClicker
-  _interval: 3
+  _targetTree: {fileID: 2790100680156790224, guid: 3052a29734d13884481e98b951bae049, type: 3}
+  _interval: 1.5
   _attackDistance: 0.5
   _attackSpeed: 0.1
+  _requiredSquirrelCount: 1
 --- !u!1 &1591327495
 GameObject:
   m_ObjectHideFlags: 0
@@ -20822,69 +20826,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2056596014}
   m_CullTransparentMesh: 1
---- !u!1 &2079417351
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2079417352}
-  - component: {fileID: 2079417353}
-  m_Layer: 0
-  m_Name: FeverManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2079417352
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2079417351}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1427044820}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2079417353
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2079417351}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 95c2dde560dfcc049a218abc902b354a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FeverManager
-  _clicksNeededForFever: 75
-  _feverDuration: 12
-  _damageMultiplier: 2.5
-  CurrentClicks: 0
-  IsFeverActive: 0
-  _fallingLeavesObject: {fileID: 893573742}
-  _feverStartEffect: {fileID: 0}
-  OnFeverStart:
-    m_PersistentCalls:
-      m_Calls: []
-  OnFeverEnd:
-    m_PersistentCalls:
-      m_Calls: []
-  OnClickCountChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  OnFeverTimeChanged:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1001 &4693880782315122291
 PrefabInstance:
   m_ObjectHideFlags: 0

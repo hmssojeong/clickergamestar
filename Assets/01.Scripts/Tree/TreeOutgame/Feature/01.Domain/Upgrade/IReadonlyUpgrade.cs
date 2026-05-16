@@ -5,7 +5,7 @@
     string Description { get; }
     int Level { get; }
     Currency Cost { get; }
-    double Damage { get; }
+    int Damage { get; }
     bool IsMaxLevel { get; }
     UnityEngine.Sprite Icon { get; }
 }

@@ -32,38 +32,34 @@ public class Tree : MonoBehaviour
 
     public void OnClick(Vector2 position, EClickType clickType)
     {
-        // ClickInfo 생성
         var clickInfo = new ClickInfo(position, clickType);
 
-        // GameplayManager에게 클릭 처리 위임
+        double damage = 0d;
         if (GameplayManager.Instance != null)
         {
-            GameplayManager.Instance.ProcessTreeClick(clickInfo);
+            damage = clickType == EClickType.Manual
+                ? GameplayManager.Instance.ManualDamage
+                : GameplayManager.Instance.AutoDamage;
         }
 
-        // 나무 체력 감소
-        double damage = clickType == EClickType.Manual
-            ? GameplayManager.Instance.ManualDamage
-            : GameplayManager.Instance.AutoDamage;
+        if (GameplayManager.Instance != null)
+        {
+            damage = GameplayManager.Instance.ProcessTreeClick(clickInfo);
+        }
 
         _currentHealth -= damage;
 
-        // UI 업데이트
         UpdateHealthBar();
 
-        // 사과 떨어뜨리기
         if (clickType == EClickType.Manual)
         {
             DropApple(position);
         }
 
-        // 피드백 실행
         PlayFeedbacks(clickInfo);
 
-        // 파티클 효과
         PlayParticleEffects(clickInfo);
 
-        // 나무 리스폰 체크
         if (_currentHealth <= 0)
         {
             RespawnTree();

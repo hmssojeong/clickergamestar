@@ -1,6 +1,8 @@
 
 public static class NumberFormatExtension
 {
+    private const double WholeNumberTolerance = 0.0001d;
+
     private static string[] _suffixes =
     {
         "", "K", "M", "B", "T",
@@ -16,7 +18,15 @@ public static class NumberFormatExtension
     {
         // 1,000 -> 1K
         // 12,000,000 -> 12M
-        if (number < 1000) return number.ToString("N0");
+        if (number < 1000)
+        {
+            if (System.Math.Abs(number - System.Math.Round(number)) < WholeNumberTolerance)
+            {
+                return number.ToString("N0");
+            }
+
+            return number.ToString("#,0.##");
+        }
 
         int suffixIndex = 0;
         // 1200

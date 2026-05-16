@@ -1,17 +1,17 @@
 using DG.Tweening;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class AutoClicker : MonoBehaviour
 {
-    // 역할: 정해진 시간 간격마다 Clickable한 친구를 때린다.
-    [SerializeField] private float _interval;       // 시간 간격
+    [SerializeField] private Tree _targetTree;
+    [SerializeField] private float _interval = 3f;
     [SerializeField] private float _attackDistance = 0.5f;
     [SerializeField] private float _attackSpeed = 0.1f;
+    [SerializeField] private int _requiredSquirrelCount = 1;
 
     private float _timer;
+    private bool _isAttacking;
     private Vector3 _originalPos;
-
     private void Start()
     {
         _originalPos = transform.position;
@@ -19,6 +19,11 @@ public class AutoClicker : MonoBehaviour
 
     private void Update()
     {
+        if (_isAttacking || _interval <= 0f || !CanAutoClick())
+        {
+            return;
+        }
+
         _timer += Time.deltaTime;
         if (_timer >= _interval)
         {
@@ -27,51 +32,56 @@ public class AutoClicker : MonoBehaviour
         }
     }
 
-private void ExecuteAutoClick()
+    private void ExecuteAutoClick()
     {
-        // 1. 나무(타겟) 찾기
-        GameObject target = GameObject.FindGameObjectWithTag("Clickable");
-
-        if (target != null)
+        if (_targetTree == null)
         {
-            // 나무 방향으로의 방향 계산
-            Vector3 direction = (target.transform.position - _originalPos).normalized;
-            Vector3 attackPos = _originalPos + (direction * _attackDistance);
-
-            // 2. 공격 애니메이션 시퀀스
-            Sequence attackSeq = DOTween.Sequence();
-
-            if (SoundManager.Instance != null)
-            {
-                SoundManager.Instance.PlaySFX(ESfx.AutoClickerAttack);
-            }
-
-            attackSeq.Append(transform.DOMove(attackPos, _attackSpeed).SetEase(Ease.OutQuad))
-                     .Append(transform.DOMove(_originalPos, _attackSpeed).SetEase(Ease.InQuad));
-
-            // 3. 실제 데미지 입히기
-            // Clickable 대신 Tree 컴포넌트 찾기
-            Tree treeScript = target.GetComponent<Tree>();
-            if (treeScript != null)
-            {
-                Vector2 clickPosition = target.transform.position;
-                treeScript.OnClick(clickPosition, EClickType.Auto);
-            }
-            else
-            {
-                // 호환성을 위해 Clickable도 지원
-                Clickable clickableScript = target.GetComponent<Clickable>();
-                if (clickableScript != null)
-                {
-                    ClickInfo clickInfo = new ClickInfo
-                    {
-                        Type = EClickType.Auto,
-                        Damage = GameplayManager.Instance.AutoDamage,
-                        Position = target.transform.position
-                    };
-                    clickableScript.OnClick(clickInfo);
-                }
-            }
+            return;
         }
+
+        Vector3 targetPosition = _targetTree.transform.position;
+        Vector3 direction = (targetPosition - _originalPos).normalized;
+        Vector3 attackPos = _originalPos + (direction * _attackDistance);
+
+        _isAttacking = true;
+
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlaySFX(ESfx.AutoClickerAttack);
+        }
+
+        Sequence attackSequence = DOTween.Sequence();
+        attackSequence.Append(transform.DOMove(attackPos, _attackSpeed).SetEase(Ease.OutQuad))
+            .AppendCallback(ApplyAutoHit)
+            .Append(transform.DOMove(_originalPos, _attackSpeed).SetEase(Ease.InQuad))
+            .OnComplete(ResetAttackState);
+    }
+
+    private bool CanAutoClick()
+    {
+        return GameplayManager.Instance != null &&
+               GameplayManager.Instance.CanUseAutoClicker(_requiredSquirrelCount);
+    }
+
+    private void ApplyAutoHit()
+    {
+        if (_targetTree == null)
+        {
+            return;
+        }
+
+        Vector2 hitPosition = _targetTree.transform.position;
+        _targetTree.OnClick(hitPosition, EClickType.Auto);
+    }
+
+    private void ResetAttackState()
+    {
+        _isAttacking = false;
+        transform.position = _originalPos;
+    }
+
+    private void OnDestroy()
+    {
+        transform.DOKill();
     }
 }
