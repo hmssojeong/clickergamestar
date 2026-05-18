@@ -88,11 +88,7 @@ public class GameplayManager : MonoBehaviour
 
     public void OnTreeRespawn()
     {
-        double bonusApples = ManualDamage * 10d;
-        AddApples(bonusApples);
-
         OnTreeRespawned?.Invoke();
-        Debug.Log($"Tree respawn bonus +{bonusApples}");
     }
 
     public void SetManualDamage(double damage)
